@@ -4,7 +4,7 @@ import logo from './logo.svg';
 function Signup() {
   return (
     <div className="Signup">
-      <p>login works</p>
+      <p>signup works</p>
     </div>
   );
 }
