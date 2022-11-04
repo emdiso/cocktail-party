@@ -1,12 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 
-function Signup() {
-  return (
-    <div className="Signup">
-      <p>signup works</p>
-    </div>
-  );
+class Signup extends Component {
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {};
+  // }
+
+  render() {
+    return (
+      <div className="Signup">
+        <p>signup works</p>
+      </div>
+    );
+  };
 }
 
 export default Signup;

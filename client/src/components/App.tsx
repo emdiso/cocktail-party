@@ -1,7 +1,10 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
 import './App.css';
 import Login from './Login';
 import Signup from './Signup';
-import { Routes, Route, Link } from "react-router-dom";
+import Navbar from './Navbar';
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 function App() {
   return (
@@ -9,26 +12,13 @@ function App() {
       <header className="App-header">
         Cocktail Party
       </header>
-      <div>
-        <Link to='/'>
-          <button color='secondary'> Home </button>
-        </Link>
-        <button color='secondary'> Random </button>
-        <button color='secondary'> Generate </button>
-        <button color='secondary'> Random </button>
-        <Link to='login'>
-          <button color='secondary'> Log In </button>
-        </Link>
-        <Link to='signup'>
-          <button color='secondary'> Sign Up </button>
-        </Link>
-      </div>
-      <Routes>
-        <Route path='/' element={<App/>}>
+      <Router>
+        <Navbar />
+        <Routes>
           <Route path='login'element={<Login/>}></Route>
           <Route path='signup'element={<Signup/>}></Route>
-        </Route>
-      </Routes>
+        </Routes>
+      </Router>
     </div>
   );
 }

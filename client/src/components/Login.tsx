@@ -1,12 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 
-function Login() {
-  return (
-    <div className="Login">
-      <p>login works</p>
-    </div>
-  );
+class Login extends Component {
+  // constructor(props) {
+  //   super(props);
+  //   this.state = {};
+  // }
+  
+  render() {
+    return (
+      <div className="Login">
+        <p>login works</p>
+      </div>
+    );
+  };
 }
 
 export default Login;
