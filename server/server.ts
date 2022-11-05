@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import { Pool } from 'pg';
 // import { PassThrough } from 'stream';
-import router, { verifyToken } from './routes/authRoute';
+import router, { verifyToken, generateAccessToken } from './routes/authRoute';
 
 
 dotenv.config();
@@ -87,12 +87,12 @@ app.post("/auth/signup", (req, res) => {
               .then(() => {
                 // account created
                 console.log(username, "account created");
-                return res.status(200).send();
+                return res.json({ accessToken: generateAccessToken(username)});
               })
               .catch((error: any) => {
                 // insert failed
                 console.log(error);
-                return res.status(500).send("insertion failed");
+                return res.status(500).send("insertion failed"); // TODO: prob should tell the client this
               });
           })
           .catch((error: any) => {
