@@ -52,6 +52,7 @@ function validPassword(password: any) {
   return true;
 }
 
+// TODO: add the endpoints for auth below to a router inside of "authRoute" then import the router here and use it instead
 app.post("/auth/signup", (req, res) => {
   let username = req.body.username;
   let plaintextPassword = req.body.password;
@@ -106,7 +107,7 @@ app.post("/auth/signup", (req, res) => {
 
 app.post("/auth/login", (req, res) => {
   let username = req.body.username;
-  let plaintextPassword = req.body.plaintextPassword;
+  let plaintextPassword = req.body.password;
 
   pool.query(`SELECT * FROM users WHERE username = '${username}'`)
     .then((result: any) => {
@@ -119,7 +120,7 @@ app.post("/auth/login", (req, res) => {
         .compare(plaintextPassword, hashedPassword)
         .then((passwordMatched: boolean) => {
           if (passwordMatched) {
-            res.status(200).send("user validated");
+            res.json({ accessToken: generateAccessToken(username)});
           } else {
             res.status(401).send("invalid credentials");
           }
