@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import { Pool } from 'pg';
 // import { PassThrough } from 'stream';
+import router, { verifyToken } from './routes/authRoute';
+
 
 dotenv.config();
 const PORT = process.env.PORT || 3001;
@@ -20,15 +22,6 @@ pool.connect().then(() => {
 
 let saltRounds = 10;
 
-// TODO: create a model/schema for the user object
-//
-// assuming our req.body looks like:
-// {
-//   username: string,
-//   password: string, 
-//   email: string, 
-// } 
-// we can include some kind of personalized part of a profile later
 
 function validUsername(username: any) {
   if (username === undefined
@@ -146,7 +139,7 @@ app.post("/auth/login", (req, res) => {
 
 
 if (sysEnv === 'development') {
-  app.get("/healthcheck", async (req: Request, res: Response) => {
+  app.get("/healthcheck", verifyToken, async (req: Request, res: Response) => {
     res.send();
   });
 }
