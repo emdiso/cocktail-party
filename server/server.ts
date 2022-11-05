@@ -1,29 +1,31 @@
-import { Express, Request, Response } from 'express';
+import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { PassThrough } from 'stream';
+import bcrypt from 'bcrypt';
+import { Pool } from 'pg';
+// import { PassThrough } from 'stream';
 
 dotenv.config();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
+const sysEnv = process.env.NODE_ENV || 'development';
 
-let express = require("express");
 const app: Express = express();
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
-let { Pool } = require("pg");
-let bcrypt = require("bcrypt");
-let env = require("../env.json");
-
-let pool = new Pool(env);
+const psqlEnv = require("../env.json");
+let pool = new Pool(psqlEnv);
 pool.connect().then(() => {
   console.log("Connected to database");
 });
 
 let saltRounds = 10;
 
+// TODO: create a model/schema for the user object
+//
 // assuming our req.body looks like:
 // {
 //   username: string,
-//   plaintextpassword: string, 
+//   password: string, 
 //   email: string, 
 // } 
 // we can include some kind of personalized part of a profile later
@@ -57,21 +59,22 @@ function validPassword(password: any) {
   return true;
 }
 
-app.post("/api/user", (req, res) => {
+app.post("/auth/signup", (req, res) => {
   let username = req.body.username;
-  let plaintextPassword = req.body.plaintextPassword;
+  let plaintextPassword = req.body.password;
   let email = req.body.email;
 
   if (!validUsername(username)) {
-    return res.status(401).send("Invalid username");
+    return res.status(401).send("Invalid username"); // TODO: We need to make this more descriptive so users know why
   }
   if (!validPassword(plaintextPassword)) {
-    return res.status(401).send("Invalid password");
+    return res.status(401).send("Invalid password"); // TODO: We need to make this more descriptive so users know why
   }
   if (!validEmail(email)) {
-    return res.status(401).send("Invalid email");
+    return res.status(401).send("Invalid email"); // TODO: We need to make this more descriptive so users know why
   }
 
+  // TODO: Possibly create a procedure in the database to do this instead (it'll be way more effecient and less prone to security risks)
   pool.query("SELECT hashed_password FROM users WHERE username = $1", [
     username,
   ])
@@ -108,7 +111,7 @@ app.post("/api/user", (req, res) => {
     });
 });
 
-app.post("/api/login", (req, res) => {
+app.post("/auth/login", (req, res) => {
   let username = req.body.username;
   let plaintextPassword = req.body.plaintextPassword;
 
@@ -141,9 +144,12 @@ app.post("/api/login", (req, res) => {
     });
 });
 
-app.get("/api", (req: Request, res: Response) => {
-  res.json({ message: "Hello from server!" });
-});
+
+if (sysEnv === 'development') {
+  app.get("/healthcheck", async (req: Request, res: Response) => {
+    res.send();
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
