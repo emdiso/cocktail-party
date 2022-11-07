@@ -1,12 +1,11 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
 
-function Signup() {
+const Signup = () => {
   return (
     <div className="Signup">
-      <p>login works</p>
+      <p>signup works</p>
     </div>
   );
-}
+};
 
 export default Signup;
