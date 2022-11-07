@@ -1,6 +1,8 @@
 import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
-import authRouter, { verifyToken } from './routes/authRoute';
+import authRouter from './routes/authRouter';
+import cocktailApiRouter from './routes/cocktailApiRouter';
+import { verifyToken } from './utils/authUtils';
 
 
 dotenv.config();
@@ -19,6 +21,7 @@ if (sysEnv === 'development') {
 }
 
 app.use('/auth', authRouter);
+app.use('/cocktailApi', cocktailApiRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

@@ -1,11 +1,11 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import psqlPool from '../utils/psqlConnection';
+import { generateAccessToken } from '../utils/authUtils';
 
 
-export const authRouter = express.Router();
+const authRouter = express.Router();
 dotenv.config();
 
 // interface User {
@@ -48,7 +48,7 @@ function validPassword(password: any) {
 }
 
 // TODO: add the endpoints for auth below to a router inside of "authRoute" then import the router here and use it instead
-authRouter.post("/signup", (req, res) => {
+authRouter.post("/signup", (req: Request, res: Response) => {
   console.log("test");
   let username = req.body.username;
   let plaintextPassword = req.body.password;
@@ -101,7 +101,7 @@ authRouter.post("/signup", (req, res) => {
     });
 });
 
-authRouter.post("/login", (req, res) => {
+authRouter.post("/login", (req: Request, res: Response) => {
   let username = req.body.username;
   let plaintextPassword = req.body.password;
 
@@ -109,7 +109,7 @@ authRouter.post("/login", (req, res) => {
     .then((result: any) => {
       if (result.rows.length === 0) {
         // username doesn't exist
-        return res.status(401).send("username doesn't exist");
+        return res.status(401).send("invalid credentials"); // Don't make username specific error message because it could allow people to figure out valid usernames
       }
       let hashedPassword = result.rows[0].hashed_password;
       bcrypt
@@ -133,32 +133,5 @@ authRouter.post("/login", (req, res) => {
       res.status(500).send();
     });
 });
-
-
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-  
-    if (!token) {
-        return res.status(403).send('A token is required for authentication of the form \"Bearer ******\"');
-    }
-    try {
-        const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN || "");
-        req.push(decodedToken); // This allows our endpoints to determine the username/userid
-    } catch (err) {
-        return res.status(401).send('Invalid Token');
-    }
-    return next();
-};
-
-export const generateAccessToken = (username: string) => {
-  return jwt.sign(
-    { username: username }, // TODO: replace with userid from DB instead
-    process.env.SECRET_TOKEN || "",
-    {
-      expiresIn: '1h',
-    }
-  );
-}
 
 export default authRouter;
