@@ -2,21 +2,13 @@ import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import psqlPool from '../utils/psqlConnection';
-import { generateAccessToken } from '../utils/authUtils';
+import { generateAccessToken, UserInfo } from '../utils/authUtils';
 
 
 const authRouter = express.Router();
 dotenv.config();
 
-// interface User {
-//     id: number;
-//     name: string;
-//     email: string;
-//     password: string;
-// }
-
 let saltRounds = 10;
-
 
 function validUsername(username: any) {
   if (username === undefined
@@ -105,18 +97,18 @@ authRouter.post("/login", (req: Request, res: Response) => {
   let username = req.body.username;
   let plaintextPassword = req.body.password;
 
-  psqlPool.query(`SELECT * FROM users WHERE username = '${username}'`)
+  psqlPool.query(`SELECT u.id, u.hashed_password FROM users u WHERE u.username = '${username}'`)
     .then((result: any) => {
       if (result.rows.length === 0) {
         // username doesn't exist
         return res.status(401).send("invalid credentials"); // Don't make username specific error message because it could allow people to figure out valid usernames
       }
-      let hashedPassword = result.rows[0].hashed_password;
+      const userInfo: UserInfo = result.rows[0];
       bcrypt
-        .compare(plaintextPassword, hashedPassword)
+        .compare(plaintextPassword, userInfo.hashed_password)
         .then((passwordMatched: boolean) => {
           if (passwordMatched) {
-            res.json({ accessToken: generateAccessToken(username)});
+            res.json({ accessToken: generateAccessToken(userInfo.id)});
           } else {
             res.status(401).send("invalid credentials");
           }

@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import authRouter from './routes/authRouter';
 import cocktailApiRouter from './routes/cocktailApiRouter';
-import { verifyToken } from './utils/authUtils';
+import { verifyToken, AuthenticatedRequest } from './utils/authUtils';
 
 
 dotenv.config();
@@ -15,13 +15,13 @@ app.use(express.urlencoded({extended: true}));
 
 
 if (sysEnv === 'development') {
-  app.get("/healthcheck", verifyToken, async (req: Request, res: Response) => {
-    res.send();
+  app.get("/healthcheck", verifyToken, (req: AuthenticatedRequest, res: Response) => {
+    res.sendStatus(200);
   });
 }
 
 app.use('/auth', authRouter);
-app.use('/cocktailApi', cocktailApiRouter);
+app.use('/cocktail_api', cocktailApiRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
