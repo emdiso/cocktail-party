@@ -56,7 +56,9 @@ authRouter.post("/signup", (req: Request, res: Response) => {
     return res.status(401).send("Invalid email"); // TODO: We need to make this more descriptive so users know why
   }
 
-  // TODO: Possibly create a procedure in the database to do this instead (it'll be way more effecient and less prone to security risks)
+  // TODO: Possibly create a procedure in the database to do this instead
+  //        - it'll be way more effecient as we won't keep going back and forth with the DB
+  //        - and less prone to security risks
   psqlPool.query("SELECT hashed_password FROM users WHERE username = $1", [
     username,
   ])
@@ -70,13 +72,13 @@ authRouter.post("/signup", (req: Request, res: Response) => {
           .hash(plaintextPassword, saltRounds)
           .then((hashedPassword: string) => {
             psqlPool.query(
-              "INSERT INTO users (username, hashed_password, email) VALUES ($1, $2, $3)",
+              "INSERT INTO users (username, hashed_password, email) VALUES ($1, $2, $3) RETURNING id",
               [username, hashedPassword, email]
             )
-              .then(() => {
+              .then((result) => {
                 // account created
                 console.log(username, "account created");
-                return res.json({ accessToken: generateAccessToken(username)});
+                return res.json({ accessToken: generateAccessToken(result.rows[0].id)});
               })
               .catch((error: any) => {
                 // insert failed

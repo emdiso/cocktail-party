@@ -1,4 +1,4 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, Response } from 'express';
 import dotenv from 'dotenv';
 import authRouter from './routes/authRouter';
 import cocktailApiRouter from './routes/cocktailApiRouter';

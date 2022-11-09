@@ -28,7 +28,6 @@ export const verifyToken = (req: AuthenticatedRequest, res: Response, next: Next
     } catch (err) {
         return res.status(401).send('Invalid Token');
     }
-    console.log("test 2");
     next();
 };
 
