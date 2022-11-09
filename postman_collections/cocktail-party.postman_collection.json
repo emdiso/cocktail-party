@@ -117,6 +117,34 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "List Ingredients",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/cocktail_api/list_ingredients",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"cocktail_api",
+						"list_ingredients"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"event": [
