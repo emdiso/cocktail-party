@@ -1,14 +1,11 @@
 import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import psqlPool from '../utils/psqlConnection';
 import { generateAccessToken, UserInfo } from '../utils/authUtils';
 
 
 const authRouter = express.Router();
-dotenv.config();
-
-let saltRounds = 10;
+const saltRounds = 10;
 
 function validUsername(username: any) {
   if (username === undefined
