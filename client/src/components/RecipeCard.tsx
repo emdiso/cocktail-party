@@ -48,7 +48,7 @@ function RecipeCard(data: any) {
                 alt="Recipe img not available"
             />
             <CardContent>
-                <h4>Category: {data.data.strCategory}</h4>
+                Category: {data.data.strCategory}
             </CardContent>
             <CardActions disableSpacing>
                 <button>Modify</button>

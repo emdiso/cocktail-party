@@ -10,16 +10,19 @@ import Landing from './Landing';
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <Router>
+      <Router>
+        <header className="App-header">
           <Navbar />
+        </header>
+        <div className="App-body">
           <Routes>
+            <Route path='/' element={<Landing />}></Route>
             <Route path='login' element={<Login />}></Route>
             <Route path='signup' element={<Signup />}></Route>
           </Routes>
-        </Router>
-      </header>
-      <Landing></Landing>
+        </div>
+      </Router>
+      {/* </header> */}
     </div>
   );
 }
