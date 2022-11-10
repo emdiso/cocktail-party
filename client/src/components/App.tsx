@@ -5,20 +5,24 @@ import Login from './Login';
 import Signup from './Signup';
 import Navbar from './Navbar';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Landing from './Landing';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        Cocktail Party
-      </header>
       <Router>
-        <Navbar />
-        <Routes>
-          <Route path='login'element={<Login/>}></Route>
-          <Route path='signup'element={<Signup/>}></Route>
-        </Routes>
+        <header className="App-header">
+          <Navbar />
+        </header>
+        <div className="App-body">
+          <Routes>
+            <Route path='/' element={<Landing />}></Route>
+            <Route path='login' element={<Login />}></Route>
+            <Route path='signup' element={<Signup />}></Route>
+          </Routes>
+        </div>
       </Router>
+      {/* </header> */}
     </div>
   );
 }

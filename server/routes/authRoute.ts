@@ -1,12 +1,22 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
+import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import psqlPool from '../utils/psqlConnection';
-import { generateAccessToken, UserInfo } from '../utils/authUtils';
-var cors = require('cors');
 
-const authRouter = express.Router();
-authRouter.use(cors());
-const saltRounds = 10;
+
+export const authRouter = express.Router();
+dotenv.config();
+
+// interface User {
+//     id: number;
+//     name: string;
+//     email: string;
+//     password: string;
+// }
+
+let saltRounds = 10;
+
 
 function validUsername(username: any) {
   if (username === undefined
@@ -38,7 +48,7 @@ function validPassword(password: any) {
 }
 
 // TODO: add the endpoints for auth below to a router inside of "authRoute" then import the router here and use it instead
-authRouter.post("/signup", (req: Request, res: Response) => {
+authRouter.post("/signup", (req, res) => {
   console.log("test");
   let username = req.body.username;
   let plaintextPassword = req.body.password;
@@ -54,9 +64,7 @@ authRouter.post("/signup", (req: Request, res: Response) => {
     return res.status(401).send("Invalid email"); // TODO: We need to make this more descriptive so users know why
   }
 
-  // TODO: Possibly create a procedure in the database to do this instead
-  //        - it'll be way more effecient as we won't keep going back and forth with the DB
-  //        - and less prone to security risks
+  // TODO: Possibly create a procedure in the database to do this instead (it'll be way more effecient and less prone to security risks)
   psqlPool.query("SELECT hashed_password FROM users WHERE username = $1", [
     username,
   ])
@@ -70,13 +78,13 @@ authRouter.post("/signup", (req: Request, res: Response) => {
           .hash(plaintextPassword, saltRounds)
           .then((hashedPassword: string) => {
             psqlPool.query(
-              "INSERT INTO users (username, hashed_password, email) VALUES ($1, $2, $3) RETURNING id",
+              "INSERT INTO users (username, hashed_password, email) VALUES ($1, $2, $3)",
               [username, hashedPassword, email]
             )
-              .then((result) => {
+              .then(() => {
                 // account created
                 console.log(username, "account created");
-                return res.json({ accessToken: generateAccessToken(result.rows[0].id)});
+                return res.json({ accessToken: generateAccessToken(username)});
               })
               .catch((error: any) => {
                 // insert failed
@@ -93,22 +101,22 @@ authRouter.post("/signup", (req: Request, res: Response) => {
     });
 });
 
-authRouter.post("/login", (req: Request, res: Response) => {
+authRouter.post("/login", (req, res) => {
   let username = req.body.username;
   let plaintextPassword = req.body.password;
 
-  psqlPool.query(`SELECT u.id, u.hashed_password FROM users u WHERE u.username = '${username}'`)
+  psqlPool.query(`SELECT * FROM users WHERE username = '${username}'`)
     .then((result: any) => {
       if (result.rows.length === 0) {
         // username doesn't exist
-        return res.status(401).send("invalid credentials"); // Don't make username specific error message because it could allow people to figure out valid usernames
+        return res.status(401).send("username doesn't exist");
       }
-      const userInfo: UserInfo = result.rows[0];
+      let hashedPassword = result.rows[0].hashed_password;
       bcrypt
-        .compare(plaintextPassword, userInfo.hashed_password)
+        .compare(plaintextPassword, hashedPassword)
         .then((passwordMatched: boolean) => {
           if (passwordMatched) {
-            res.json({ accessToken: generateAccessToken(userInfo.id)});
+            res.json({ accessToken: generateAccessToken(username)});
           } else {
             res.status(401).send("invalid credentials");
           }
@@ -125,5 +133,32 @@ authRouter.post("/login", (req: Request, res: Response) => {
       res.status(500).send();
     });
 });
+
+
+export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+  
+    if (!token) {
+        return res.status(403).send('A token is required for authentication of the form \"Bearer ******\"');
+    }
+    try {
+        const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN || "");
+        req.push(decodedToken); // This allows our endpoints to determine the username/userid
+    } catch (err) {
+        return res.status(401).send('Invalid Token');
+    }
+    return next();
+};
+
+export const generateAccessToken = (username: string) => {
+  return jwt.sign(
+    { username: username }, // TODO: replace with userid from DB instead
+    process.env.SECRET_TOKEN || "",
+    {
+      expiresIn: '1h',
+    }
+  );
+}
 
 export default authRouter;
