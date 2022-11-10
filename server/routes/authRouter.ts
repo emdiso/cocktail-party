@@ -2,9 +2,10 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import psqlPool from '../utils/psqlConnection';
 import { generateAccessToken, UserInfo } from '../utils/authUtils';
-
+var cors = require('cors');
 
 const authRouter = express.Router();
+authRouter.use(cors());
 const saltRounds = 10;
 
 function validUsername(username: any) {

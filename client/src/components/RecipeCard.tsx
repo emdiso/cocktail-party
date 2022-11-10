@@ -15,7 +15,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material';
 import React from 'react';
-import { RecipeData } from './Landing';
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -32,7 +31,7 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
     }),
 }));
 
-function RecipeCard(data: RecipeData) {
+function RecipeCard(data: any) {
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
@@ -41,24 +40,18 @@ function RecipeCard(data: RecipeData) {
 
     return (
         <Card sx={{ maxWidth: 345 }}>
-            <CardHeader title={data.title} />
+            <CardHeader title={data.data.strDrink} />
             <CardMedia
                 component="img"
                 height="194"
-                image={data.img}
+                image={data.data.strDrinkThumb}
                 alt="Recipe img not available"
             />
             <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                    Ingredients:
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    {data.ingredients}
-                </Typography>
+                <h4>Category: {data.data.strCategory}</h4>
             </CardContent>
             <CardActions disableSpacing>
                 <button>Modify</button>
-                <button>Pin to my profile</button>
                 <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}
@@ -72,7 +65,7 @@ function RecipeCard(data: RecipeData) {
                 <CardContent>
                     <Typography paragraph>Recipe:</Typography>
                     <Typography paragraph>
-                        {data.recipe}
+                        more work needed here
                     </Typography>
                 </CardContent>
             </Collapse>
