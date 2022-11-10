@@ -1,5 +1,4 @@
 import './App.css';
-import { RecipeData } from './App';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardMedia from '@mui/material/CardMedia';
@@ -16,6 +15,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material';
 import React from 'react';
+import { RecipeData } from './Landing';
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -57,12 +57,8 @@ function RecipeCard(data: RecipeData) {
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
-                <IconButton aria-label="add to favorites">
-                    <FavoriteIcon />
-                </IconButton>
-                <IconButton aria-label="share">
-                    <ShareIcon />
-                </IconButton>
+                <button>Modify</button>
+                <button>Pin to my profile</button>
                 <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}
