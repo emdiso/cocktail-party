@@ -13,7 +13,7 @@ import LoginForm from './forms/LoginForm';
 
 const LSPopUp = () => {
     const [open, setOpen] = React.useState(false);
-
+    
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -21,15 +21,24 @@ const LSPopUp = () => {
     const handleClose = () => {
         setOpen(false);
     };
+    
+    const [displayLI, displayLogin] = React.useState(true);
+    //const [displaySI, displaySignup] = React.useState(false);
+
+    const openLogin = () => {
+        displayLogin(true);
+        //displaySignup(false);
+    }
 
     return (
         <div>
             <Dialog open={open} onClose={handleClose}>
                 <DialogActions>
-                    <ButtonGroup variant="text" aria-label="text button group">
-                        <Button onClick={LoginForm}> Log-In </Button>
-                        {/* <Button onClick={}> Sign-Up </Button> */}
-                    </ButtonGroup>
+                <ButtonGroup variant="text" aria-label="text button group">
+                    <Button onClick={openLogin}> Log-In </Button>
+                    <LoginForm/>
+                    {/* <Button onClick={}> Sign-Up </Button> */}
+                </ButtonGroup>
                 </DialogActions>
             </Dialog>
         </div>
