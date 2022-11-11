@@ -11,35 +11,24 @@ import DialogTitle from '@mui/material/DialogTitle';
 import LoginForm from './forms/LoginForm';
 
 
-const LSPopUp = () => {
-    const [open, setOpen] = React.useState(false);
-    
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
+interface LSPopUpProps {
+    open: boolean;
+    handleClose: () => void;
+}
 
-    const handleClose = () => {
-        setOpen(false);
-    };
-    
+const LSPopUp = (props: LSPopUpProps) => {
     const [displayLI, displayLogin] = React.useState(true);
-    //const [displaySI, displaySignup] = React.useState(false);
-
-    const openLogin = () => {
-        displayLogin(true);
-        //displaySignup(false);
-    }
 
     return (
         <div>
-            <Dialog open={open} onClose={handleClose}>
+            <Dialog open={props.open} onClose={props.handleClose}>
                 <DialogActions>
-                <ButtonGroup variant="text" aria-label="text button group">
-                    <Button onClick={openLogin}> Log-In </Button>
-                    <LoginForm/>
-                    {/* <Button onClick={}> Sign-Up </Button> */}
-                </ButtonGroup>
+                    <ButtonGroup variant="text" aria-label="text button group">
+                        <Button onClick={()=>displayLogin(true)}> Log-In </Button>
+                        <Button onClick={()=>displayLogin(false)}> Sign-Up </Button>
+                    </ButtonGroup>
                 </DialogActions>
+                {displayLI ? (<LoginForm/>) : ("oop")}
             </Dialog>
         </div>
     )

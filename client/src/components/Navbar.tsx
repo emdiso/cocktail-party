@@ -4,6 +4,12 @@ import LSPopUp from './LSPopUp';
 import Login from './Login';
 
 const Navbar = () => {
+  const [openLogin, setOpenLogin] = React.useState(false);
+
+  const handleClose = () => {
+    setOpenLogin(false);
+  }
+  
   return (
     <div id="Navbar" className='Navbar'>
       <Link to='/'>
@@ -11,7 +17,8 @@ const Navbar = () => {
       </Link>
       <button color='secondary'> Generate </button>
       <button color='secondary'> Random </button>
-      <button color='secondary' onClick={LSPopUp}> Log In </button>
+      <button color='secondary' onClick={() => {setOpenLogin(true)}}> Log In </button>
+      <LSPopUp open={openLogin} handleClose={handleClose} />
     </div>
   )
 };
