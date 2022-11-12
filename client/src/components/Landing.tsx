@@ -5,6 +5,7 @@ import { alpha, Breadcrumbs, Button, ButtonGroup, Chip, Grid, Link, Pagination, 
 import TablePagination from '@mui/material/TablePagination';
 import { get } from "../axios.service";
 import { stringify } from 'querystring';
+import { AxiosResponse } from 'axios';
 
 function Landing() {
   const [isLoading, setLoading] = React.useState(true);
@@ -17,11 +18,12 @@ function Landing() {
   };
 
   if (isLoading) {
-    const data = get("/drinks_by_letter", {
-      "letter": letter
-    }).then(
-      (res: any) => {
-        setDrinks(res.drinks);
+    // TODO: handle for when the request doesn't work
+    get(
+      "/cocktail_api/drinks_by_letter",
+      {"letter": letter},
+      (res: AxiosResponse) => {
+        setDrinks(res.data.drinks);
         setLoading(false);
       }
     );
