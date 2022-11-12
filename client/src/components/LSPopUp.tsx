@@ -9,6 +9,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import LoginForm from './forms/LoginForm';
+import SignupForm from './forms/SignupForm';
 
 
 interface LSPopUpProps {
@@ -28,7 +29,7 @@ const LSPopUp = (props: LSPopUpProps) => {
                         <Button onClick={()=>displayLogin(false)}> Sign-Up </Button>
                     </ButtonGroup>
                 </DialogActions>
-                {displayLI ? (<LoginForm/>) : ("oop")}
+                {displayLI ? (<LoginForm/>) : (<SignupForm/>)}
             </Dialog>
         </div>
     )

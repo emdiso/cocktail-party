@@ -9,21 +9,26 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Landing from './Landing';
 
 function App() {
+  const [openLogin, setOpenLogin] = React.useState(false);
+
+  const handleClose = () => {
+    setOpenLogin(false);
+  }
+
   return (
     <div className="App">
       <Router>
         <header className="App-header">
           <Navbar />
+          <button color='secondary' onClick={() => {setOpenLogin(true)}}> Log In </button>
+          <LSPopUp open={openLogin} handleClose={handleClose} />
         </header>
         <div className="App-body">
           <Routes>
             <Route path='/' element={<Landing />}></Route>
-            <Route path='login' element={<Login />}></Route>
-            <Route path='signup' element={<Signup />}></Route>
           </Routes>
         </div>
       </Router>
-      {/* </header> */}
     </div>
   );
 }

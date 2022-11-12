@@ -4,24 +4,23 @@ import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import {post} from '../../axios.service';
 
-interface LoginInfo {
+interface SignupInfo {
     username: string;
+    email: string;
     password: string;
     showPassword: boolean;
 }
 
-const LoginForm = () => {
-
-    const [values, setValues] = React.useState<LoginInfo>({
+const SignupForm = () => {
+    const [values, setValues] = React.useState<SignupInfo>({
         username: '',
+        email: '',
         password: '',
         showPassword: false,
     });
 
-    const [displayError, setDisplayError] = React.useState<boolean>(false);
-    
     const handleChange =
-        (prop: keyof LoginInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
+        (prop: keyof SignupInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [prop]: event.target.value });
         };
     
@@ -31,15 +30,16 @@ const LoginForm = () => {
         showPassword: !values.showPassword,
         });
     };
-    
+
     const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
     };
 
     const handleSubmit = () => {
-        const response = post('/login', 
+        const response = post('/signup', 
             {
 			    username : values.username,
+                email : values.email,
                 password : values.password
 		    }, {});
 
@@ -48,20 +48,29 @@ const LoginForm = () => {
 
     return (
         <div>
-            {displayError && <p id='error-message'>Invalid username or password. Please try again.</p>}
             <InputLabel htmlFor='username-input'> Username </InputLabel>
             <TextField
-                required id='username-input'
+                required
+                id='username-input'
                 variant='filled'
                 value={values.username} 
                 onChange={handleChange('username')}
+            />
+
+            <InputLabel htmlFor='email-input'> Email </InputLabel>
+            <TextField
+                required
+                id='email-input'
+                variant='filled'
+                value={values.email} 
+                onChange={handleChange('email')}
             />
             
             <InputLabel htmlFor="filled-password"> Password </InputLabel>
             <FilledInput
                 id="filled-password"
                 type={values.showPassword ? 'text' : 'password'}
-                required
+                required                
                 value={values.password}
                 onChange={handleChange('password')}
                 endAdornment={
@@ -78,9 +87,9 @@ const LoginForm = () => {
                 }
             />
 
-            <button onClick={handleSubmit}> Log In </button> 
+            <button onClick={handleSubmit}> Sign Up </button> 
         </div>
-      );
+    )
 }
 
-export default LoginForm;
+export default SignupForm;
