@@ -1,4 +1,4 @@
-import express, { Response } from 'express';
+import express, { Request, Response } from 'express';
 import axios, { AxiosResponse } from 'axios';
 import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
 var cors = require('cors');
@@ -24,8 +24,21 @@ cocktailApiRouter.get('/list_ingredients', verifyToken, async (req: Authenticate
     });
 });
 
-cocktailApiRouter.get('/drinks_by_letter', async (req: AuthenticatedRequest, res: Response) => {
+cocktailApiRouter.get('/drinks_by_letter', async (req: Request, res: Response) => {
     axios.get(`${api_url}search.php?f=${req.query.letter}` , {
+        headers: {
+            "Authentication": `Bearer ${api_key}`,
+        }
+    }).then((response: AxiosResponse) => {
+        res.send(response.data);
+    }).catch((err: any) => {
+        console.log("ERROR "+err);
+        res.status(500).send();
+    });
+});
+
+cocktailApiRouter.get('/random-drink', async (req: Request, res: Response) => {
+    axios.get(`${api_url}random.php` , {
         headers: {
             "Authentication": `Bearer ${api_key}`,
         }

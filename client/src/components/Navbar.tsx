@@ -10,8 +10,10 @@ const Navbar = () => {
       <Link to='/'>
         <button color='secondary'> Home </button>
       </Link>
-      <button color='secondary'> Generate </button>
-      <button color='secondary'> Random </button>
+      <Link to='/random'>
+        <button color='secondary'> Random </button>
+      </Link>
+      <button color='secondary'> Generate Menu </button>
     </div>
   )
 };

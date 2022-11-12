@@ -3,6 +3,7 @@ import Button, { FilledInput, IconButton, InputAdornment, InputLabel } from '@mu
 import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import {post} from '../../axios.service';
+import { AxiosError, AxiosResponse } from 'axios';
 
 interface LoginInfo {
     username: string;
@@ -37,13 +38,15 @@ const LoginForm = () => {
     };
 
     const handleSubmit = () => {
-        const response = post('/login', 
+        const response = post('/auth/login', 
             {
 			    username : values.username,
                 password : values.password
-		    }, {});
+		    }, {}, (response: AxiosResponse) => {
+                
+            }, (error: AxiosError) => {
 
-        // -TODO- Implement Storing AccessToken on browser local storage
+            });
     }
 
     return (
