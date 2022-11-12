@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
 import axios, { AxiosResponse } from 'axios';
 import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
-var cors = require('cors');
-require('dotenv').config();
+import cors from 'cors';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const cocktailApiRouter = express.Router();
 cocktailApiRouter.use(cors());
 cocktailApiRouter.use(express.json());
@@ -12,14 +13,15 @@ const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
 const api_url = process.env.COCKTAIL_API_MAIN_URL; 
 
 cocktailApiRouter.get('/list_ingredients', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+    console.log(api_url);
     axios.get(api_url+"list.php?i=list", {
         headers: {
             "Authentication": `Bearer ${api_key}`,
         }
     }).then((response: AxiosResponse) => {
-        console.log(response);
         res.send(response.data);
-    }).catch(() => {
+    }).catch((err) => {
+        console.log("ERROR "+err);
         res.status(500).send();
     });
 });
