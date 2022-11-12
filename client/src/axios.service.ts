@@ -1,34 +1,35 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
-const baseUrl = "http://localhost:3001/cocktail_api";
+const baseUrl = "http://localhost:3001";
 const authToken = ""; 
 
-export async function get(endpoint: string, params: any) {
-    try {
-        const response = await axios.get(`${baseUrl}${endpoint}`, {
+export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
+    axios.get(
+        `${baseUrl}${endpoint}`,
+        {
             params: params,
             headers: {
                 "authorization": authToken
             }
-        });
-        return response.data;
-    } catch (err: any) {
+        }
+    ).then(resHandler).catch(errHandler || ((err: any) => {
         // TO DO - write some error dialog / snackbar to display this information
         console.log(err);
-    }
+    }));
 }
 
-export async function post(endpoint: string, data: any, params: any) {
-    try {
-        const response = await axios.post(`${baseUrl}${endpoint}`, data, {
+export function post(endpoint: string, data: any, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
+    axios.post(
+        `${baseUrl}${endpoint}`,
+        data,
+        {
             params: params, 
             headers: {
                 "authorization": authToken
             }
-        });
-        return response.data;
-    } catch (err: any) {
+        }
+    ).then(resHandler).catch(errHandler || ((err: any) => {
         // TO DO - write some error dialog / snackbar to display this information
         console.log(err);
-    }
+    }));
 }
