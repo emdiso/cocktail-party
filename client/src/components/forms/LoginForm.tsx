@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Button, { FilledInput, IconButton, InputAdornment, InputLabel } from '@mui/material';
-import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Cookie, Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
-import {post} from '../../axios.service';
+import {post, setAuthToken} from '../../axios.service';
 import { AxiosError, AxiosResponse } from 'axios';
 
 interface LoginInfo {
@@ -11,7 +11,11 @@ interface LoginInfo {
     showPassword: boolean;
 }
 
-const LoginForm = () => {
+interface LoginFormProps {
+    handleClose: () => void;
+}
+
+const LoginForm = (props: LoginFormProps) => {
 
     const [values, setValues] = React.useState<LoginInfo>({
         username: '',
@@ -38,14 +42,13 @@ const LoginForm = () => {
     };
 
     const handleSubmit = () => {
-        const response = post('/auth/login', 
+        post('/auth/login', 
             {
 			    username : values.username,
                 password : values.password
 		    }, {}, (response: AxiosResponse) => {
-                
-            }, (error: AxiosError) => {
-
+                setAuthToken(response.data.accessToken);
+                props.handleClose();
             });
     }
 

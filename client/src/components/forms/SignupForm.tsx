@@ -2,7 +2,7 @@ import * as React from 'react';
 import Button, { FilledInput, IconButton, InputAdornment, InputLabel } from '@mui/material';
 import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
-import {post} from '../../axios.service';
+import {post, setAuthToken} from '../../axios.service';
 
 interface SignupInfo {
     username: string;
@@ -11,7 +11,11 @@ interface SignupInfo {
     showPassword: boolean;
 }
 
-const SignupForm = () => {
+interface SignupFormProps {
+    handleClose: () => void;
+}
+
+const SignupForm = (props: SignupFormProps) => {
     const [values, setValues] = React.useState<SignupInfo>({
         username: '',
         email: '',
@@ -36,12 +40,15 @@ const SignupForm = () => {
     };
 
     const handleSubmit = () => {
-        const response = post('/signup', 
+        const response = post('/auth/signup', 
             {
 			    username : values.username,
                 email : values.email,
                 password : values.password
-		    }, {});
+		    }, {}, (response) => {
+                setAuthToken(response.data.accessToken);
+                props.handleClose();
+            });
 
         // -TODO- Implement Storing AccessToken on browser local storage
     }

@@ -29,7 +29,7 @@ const LSPopUp = (props: LSPopUpProps) => {
                         <Button onClick={()=>displayLogin(false)}> Sign-Up </Button>
                     </ButtonGroup>
                 </DialogActions>
-                {displayLI ? (<LoginForm/>) : (<SignupForm/>)}
+                {displayLI ? (<LoginForm handleClose={props.handleClose} />) : (<SignupForm handleClose={props.handleClose}/>)}
             </Dialog>
         </div>
     )

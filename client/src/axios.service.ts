@@ -1,7 +1,14 @@
 import axios, { AxiosResponse } from "axios";
 
 const baseUrl = "http://localhost:3001";
-const authToken = ""; 
+let authToken = "";
+
+export function setAuthToken(token: string) {
+    authToken = token;
+}
+
+// TODO: get token from cookie
+
 
 export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
     axios.get(
@@ -9,7 +16,7 @@ export function get(endpoint: string, params: any, resHandler?: (res: AxiosRespo
         {
             params: params,
             headers: {
-                "authorization": authToken
+                "authorization": "Bearer " + authToken
             }
         }
     ).then(resHandler).catch(errHandler || ((err: any) => {
@@ -25,7 +32,7 @@ export function post(endpoint: string, data: any, params: any, resHandler?: (res
         {
             params: params, 
             headers: {
-                "authorization": authToken
+                "authorization": "Bearer " + authToken
             }
         }
     ).then(resHandler).catch(errHandler || ((err: any) => {
