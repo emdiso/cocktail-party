@@ -8,7 +8,7 @@ const cocktailApiRouter = express.Router();
 cocktailApiRouter.use(cors());
 cocktailApiRouter.use(express.json());
 
-const api_key = process.env.COCKTAIL_API_KEY_DEV;
+const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
 const api_url = process.env.COCKTAIL_API_MAIN_URL; 
 
 cocktailApiRouter.get('/list_ingredients', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
