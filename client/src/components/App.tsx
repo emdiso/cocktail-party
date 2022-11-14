@@ -8,6 +8,7 @@ import Navbar from './Navbar';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Landing from './Landing';
 import Random from './Random';
+import MenuForm from './MenuForm';
 
 function App() {
   const [openLogin, setOpenLogin] = React.useState(false);
@@ -27,7 +28,13 @@ function App() {
         <div className="App-body">
           <Routes>
             <Route path='/' element={<Landing />}></Route>
+<<<<<<< HEAD
             <Route path='/random' element={<Random />}></Route>
+=======
+            <Route path='login' element={<Login />}></Route>
+            <Route path='signup' element={<Signup />}></Route>
+            <Route path='generate' element={<MenuForm />}></Route>
+>>>>>>> 92b5448 (Added MenuForm and MenuDetails components, started learning about dynamic forms in React)
           </Routes>
         </div>
       </Router>
