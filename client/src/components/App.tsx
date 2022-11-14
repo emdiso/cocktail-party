@@ -28,13 +28,10 @@ function App() {
         <div className="App-body">
           <Routes>
             <Route path='/' element={<Landing />}></Route>
-<<<<<<< HEAD
             <Route path='/random' element={<Random />}></Route>
-=======
             <Route path='login' element={<Login />}></Route>
             <Route path='signup' element={<Signup />}></Route>
             <Route path='generate' element={<MenuForm />}></Route>
->>>>>>> 92b5448 (Added MenuForm and MenuDetails components, started learning about dynamic forms in React)
           </Routes>
         </div>
       </Router>
