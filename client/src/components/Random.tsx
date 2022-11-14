@@ -8,7 +8,7 @@ import { stringify } from 'querystring';
 import { AxiosError, AxiosResponse } from 'axios';
 
 // -TODO- On server side, transform the data before returning it to the client, then adjust this interface to match the transformed data
-interface Drink {
+export interface Drink {
     idDrink: string;
     strDrink: string;
     strDrinkAlternate: string;

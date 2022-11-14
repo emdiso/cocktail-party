@@ -11,10 +11,10 @@ cocktailApiRouter.use(cors());
 cocktailApiRouter.use(express.json());
 
 const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
-const api_url = process.env.COCKTAIL_API_MAIN_URL; 
+const api_url = process.env.COCKTAIL_API_MAIN_URL;
 
 cocktailApiRouter.get('/list_ingredients', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
-    axios.get(api_url+"list.php?i=list", {
+    axios.get(api_url + "list.php?i=list", {
         headers: {
             "Authentication": `Bearer ${api_key}`,
         }
@@ -27,27 +27,32 @@ cocktailApiRouter.get('/list_ingredients', verifyToken, async (req: Authenticate
 });
 
 cocktailApiRouter.get('/drinks_by_letter', async (req: Request, res: Response) => {
-    axios.get(`${api_url}search.php?f=${req.query.letter}` , {
+    axios.get(`${api_url}search.php?f=${req.query.letter}`, {
         headers: {
             "Authentication": `Bearer ${api_key}`,
         }
     }).then((response: AxiosResponse) => {
         res.send(response.data);
     }).catch((err: any) => {
-        console.log("ERROR "+err);
+        console.log("ERROR " + err);
         res.status(500).send();
     });
 });
 
-cocktailApiRouter.get('/random_drink', async (req: Request, res: Response) => {
-    axios.get(`${api_url}random.php` , {
+
+const randomDrinkPromise = () => {
+    return axios.get(`${api_url}random.php`, {
         headers: {
             "Authentication": `Bearer ${api_key}`,
         }
-    }).then((response: AxiosResponse) => {
+    });
+}
+
+cocktailApiRouter.get('/random-drink', async (req: Request, res: Response) => {
+    randomDrinkPromise().then((response: AxiosResponse) => {
         res.send(response.data);
     }).catch((err: any) => {
-        console.log("ERROR "+err);
+        console.log("ERROR " + err);
         res.status(500).send();
     });
 });
@@ -66,6 +71,32 @@ cocktailApiRouter.get('/full_menu', verifyToken, async (req: AuthenticatedReques
         }
         return res.json(menu);
     });
+});
+
+cocktailApiRouter.get('/menu_by_size', async (req: AuthenticatedRequest, res: Response) => {
+    let drinks: any[] = [];
+    let size = Number(req.query.size);
+
+    for (let i = 0; i < size; i++) {
+        console.log(drinks.length);
+        randomDrinkPromise()
+            .then((response: AxiosResponse) => {
+                if (!drinks.includes(response.data.drinks[0])) {
+                    drinks.push(response.data.drinks[0]);
+                }
+                else {
+                    i--;
+                }
+
+                if (drinks.length === size) {
+                    res.send(drinks);
+                }
+            }).catch((err: any) => {
+                console.log("ERROR " + err);
+                return res.status(500).send();
+            });
+    }
+
 });
 
 export default cocktailApiRouter;

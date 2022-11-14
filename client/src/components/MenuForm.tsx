@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Button, Grid, Slider } from '@mui/material';
-import { Label, Liquor } from '@mui/icons-material';
+import { Label } from '@mui/icons-material';
 import MenuDetails from './MenuDetails';
 import { useFieldArray, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
 import { watch } from 'fs';
 import { get } from '../axios.service';
-
-export interface menu {
-  title: string,
-  drinks: any[] // string of drink ids
-}
+import { AxiosResponse } from 'axios';
+import { Drink } from './Random'
 
 export interface menuModel {
-  menu: menu,
+  menuDrinks: Drink[],
   size: number,
   numAlcoholic: number,
   liquorList: Map<string, number>, // liquor, num of drinks,
@@ -27,23 +22,24 @@ function MenuForm() {
   const { register, watch, getValues } = useForm<menuModel>();
 
   const watchMenuSize = watch("size", 0);
+  const [menuDrinks, setMenuDrinks] = useState<Drink[]>([]);
 
   // Callback version of watch.  It's your responsibility to unsubscribe when done.
   React.useEffect(() => {
     const subscription = watch((value, { name, type }) => {
-      console.log(value, name, type);
-      get("/menu_by_size", {"size" : value.size })
-        .then(
-          (response: any) => {
-            console.log(response);
-          }
-        )
+
+      get(
+        "/cocktail_api/menu_by_size", { "size": value.size! },
+        (res: AxiosResponse) => {
+          console.log(res);
+          // setMenuDrinks(current => [...current, res.data.drinks[0]]);
+        })
+        
     });
     return () => subscription.unsubscribe();
   }, [watch]);
 
   // const liquorReadyFields = () => {
-
   //   return liquorList.map((item, i) => (
   //     <div key={i} className="list-group list-group-flush">
   //       <div className="list-group-item">
@@ -52,7 +48,6 @@ function MenuForm() {
   //             <label>Liquor</label>
   //             <input defaultValue={item.liquor} />
   //           </div>
-
   //           <div className="form-group col-6">
   //             <label>Amount</label>
   //             <select>
@@ -65,7 +60,6 @@ function MenuForm() {
   //       </div>
   //     </div>
   //   ));
-
   // }
 
   return (
@@ -94,7 +88,6 @@ function MenuForm() {
                       </select>
                     </div>
                   </div>
-
                 </div>
               </div>
             </form>
