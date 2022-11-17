@@ -1,12 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './App.css';
-import Login from './Login';
-import Signup from './Signup';
-import Navbar from './Navbar';
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Landing from './Landing';
-import { Button, Grid } from '@mui/material';
 import { Drink } from './Random';
 
 export interface menu {
@@ -14,10 +7,15 @@ export interface menu {
   drinks: Drink[] // string of drink ids
 }
 
-function MenuDetails() {
+function MenuDetails(data: any) {
   return (
     <div>
-      <p>menu details here</p>
+      <h5>Menu Details</h5>
+      {data.data.map((item: any, index: number) =>
+        <li key={index} className={item.strAlcoholic}>
+          {item.strDrink} {item.strAlcoholic}
+        </li>
+      )}
     </div>
   );
 }

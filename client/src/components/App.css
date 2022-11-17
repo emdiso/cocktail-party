@@ -32,3 +32,11 @@
   border-width: .5px;
   border-color: #282c34;
 }
+
+.Alcoholic {
+  color: red;
+}
+
+.Nonalcoholic {
+  color: green;
+}
