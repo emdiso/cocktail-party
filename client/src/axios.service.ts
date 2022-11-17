@@ -5,10 +5,14 @@ let authToken = "";
 
 export function setAuthToken(token: string) {
     authToken = token;
+    localStorage.setItem("cocktailPartyAccessToken", token);
 }
 
-// TODO: get token from cookie
+export function getAuthToken() {
+    return authToken;
+}
 
+authToken = localStorage.getItem('cocktailPartyAccessToken') || "";
 
 export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
     axios.get(
@@ -19,10 +23,15 @@ export function get(endpoint: string, params: any, resHandler?: (res: AxiosRespo
                 "authorization": "Bearer " + authToken
             }
         }
-    ).then(resHandler).catch(errHandler || ((err: any) => {
+    ).then(resHandler).catch((error) => {
+        if (error.status === 401) {
+            localStorage.clear();
+        }
+
+        errHandler || ((err: any) => {
         // TO DO - write some error dialog / snackbar to display this information
         console.log(err);
-    }));
+    })});
 }
 
 export function post(endpoint: string, data: any, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
@@ -35,8 +44,13 @@ export function post(endpoint: string, data: any, params: any, resHandler?: (res
                 "authorization": "Bearer " + authToken
             }
         }
-    ).then(resHandler).catch(errHandler || ((err: any) => {
+    ).then(resHandler).catch((error) => {
+        if (error.status === 401) {
+            localStorage.clear();
+        }
+        
+        errHandler || ((err: any) => {
         // TO DO - write some error dialog / snackbar to display this information
         console.log(err);
-    }));
+    })});
 }

@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import LSPopUp from './LSPopUp';
-import Login from './Login';
 
 const Navbar = () => {
   

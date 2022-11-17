@@ -4,14 +4,14 @@ import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import {post, setAuthToken} from '../../axios.service';
 
-interface SignupInfo {
+export interface SignupInfo {
     username: string;
     email: string;
     password: string;
     showPassword: boolean;
 }
 
-interface SignupFormProps {
+export interface SignupFormProps {
     handleClose: () => void;
 }
 
@@ -48,9 +48,8 @@ const SignupForm = (props: SignupFormProps) => {
 		    }, {}, (response) => {
                 setAuthToken(response.data.accessToken);
                 props.handleClose();
+                window.location.reload();
             });
-
-        // -TODO- Implement Storing AccessToken on browser local storage
     }
 
     return (
