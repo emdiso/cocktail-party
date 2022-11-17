@@ -23,8 +23,6 @@ function App() {
   if (isLoggedIn) {
     get('/auth/userInfo', {}, (res) => {setUserInfo({username: res.data.username, email: res.data.email})});
   }
-  // console.log("Username: ", userInfo.username);
-  // console.log("Email: ", userInfo.email);
 
   const handleClose = () => {
     setOpenLogin(false);

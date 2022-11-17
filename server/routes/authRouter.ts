@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import psqlPool from '../utils/psqlConnection';
-import { generateAccessToken, UserInfo } from '../utils/authUtils';
+import { generateAccessToken, UserInfo, verifyToken } from '../utils/authUtils';
 var cors = require('cors');
 
 const authRouter = express.Router();
@@ -124,6 +124,22 @@ authRouter.post("/login", (req: Request, res: Response) => {
       console.log(error);
       res.status(500).send();
     });
+});
+
+authRouter.get("/userInfo", verifyToken, (req, res) => {
+  let userId = req.userId;
+
+  psqlPool.query("SELECT username, email FROM users WHERE id=$1", [userId])
+  .then((response) => {
+      console.log("Response: ", response);
+      let userInfo = response.rows[0];
+      console.log(userInfo);
+      res.json({"username":userInfo.username, "email":userInfo.email});
+  })
+  .catch((error) => {
+      console.log(error);
+      res.status(500).send();
+  });
 });
 
 export default authRouter;
