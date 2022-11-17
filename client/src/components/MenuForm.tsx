@@ -6,6 +6,7 @@ import { get, post } from '../axios.service';
 import { Axios, AxiosResponse } from 'axios';
 
 export interface Quantity {
+  id: number,
   item: string,
   amount: number
 }
@@ -25,8 +26,10 @@ function MenuForm() {
     menuDrinks: [], size: 0, alcoholicQuantity: 0, liquorMap: [], categoryMap: [], vetoList: []
   });
 
+  const [ingredientOptions, setIngredientOptions] = useState<any[]>([]);
+
   const menuSizeSelected = (e: any) => {
-    let size = e.target.value;
+    let size = Number(e.target.value);
     get(
       "/cocktail_api/menu_by_size", { "size": size },
       (res: AxiosResponse) => {
@@ -35,28 +38,34 @@ function MenuForm() {
           obj.size = size;
           obj.menuDrinks = res.data;
 
-          let alcCount = 0;
-          res.data.forEach((drink: any) => {
-            if (drink.strAlcoholic.includes("Alcoholic")) {
-              alcCount++;
-            }
-          });
+          let alcoholic = res.data.filter(function (item: any) {
+            return item.strAlcoholic.includes("Alcoholic");
+          })
+          obj.alcoholicQuantity = alcoholic.length;
 
-          obj.alcoholicQuantity = alcCount;
-          obj.liquorMap.push({
-            item: "vodka",
+          obj.liquorMap = [{
+            id: 0,
+            item: "None",
             amount: size
-          });
+          }];
+
           return obj;
         });
       })
+
+    get(
+      "/cocktail_api/ingredient_options", {},
+      (res: any) => {
+        setIngredientOptions(res.data.drinks);
+      }
+    )
   }
 
   const setMenuModelAlcoholicQuantity = (e: any) => {
     setMenuModel(
       (prev: MenuModel) => {
         let obj = { ...prev };
-        obj.alcoholicQuantity = e.target.value;
+        obj.alcoholicQuantity = Number(e.target.value);
         return obj;
       }
     );
@@ -67,6 +76,7 @@ function MenuForm() {
     post(
       '/cocktail_api/modify_menu_by_alcoholic', menuModel, {},
       (res: AxiosResponse) => {
+        console.log(res.data);
         setMenuModel(
           (prev: MenuModel) => {
             let obj = { ...prev };
@@ -77,6 +87,59 @@ function MenuForm() {
       }
     )
   }, [menuModel.alcoholicQuantity]);
+
+  const changeLiquorMapItemQuantity = (element: Quantity, e: any) => {
+    let newNum = Number(e.target.value);
+    if(newNum === element.amount) return;
+
+    if (newNum < menuModel.size) {
+      // want to push new field with the remaining difference as the amount
+      setMenuModel((prev: MenuModel) => {
+        let obj = { ...prev };
+
+        let elem = obj.liquorMap.find(function (item) {
+          return item.id === element.id;
+        });
+        elem!.amount = newNum;
+
+        let total = 0;
+        obj.liquorMap.forEach((item:Quantity) => {
+          total += item.amount;
+        })
+
+        if (total < obj.size ) {
+          obj.liquorMap.push({
+            id: obj.liquorMap.length,
+            item: "None",
+            amount: obj.size - total
+          });
+        }
+
+        // TO DO -- when total > obj.size and ====
+        
+        return obj;
+      });
+    }
+  }
+
+  React.useEffect(() => {
+    post(
+      '/cocktail_api/modify_menu_by_ingredient', menuModel, {},
+      (res: AxiosResponse) => {
+        setMenuModel(
+          (prev: MenuModel) => {
+            let obj = { ...prev };
+            obj.menuDrinks = res.data.menuDrinks;
+            return obj;
+          }
+        );
+      }
+    )
+  }, [menuModel.liquorMap]);
+
+  React.useEffect(() => {
+    console.log("menu model has changed", menuModel);
+  }, [menuModel]);
 
   const liquorFields = () => {
     menuModel.liquorMap.forEach((quantity: Quantity, index: number) => {
@@ -122,6 +185,26 @@ function MenuForm() {
                     </div>
                   </div>
 
+                  {menuModel.liquorMap.map((element: Quantity, index: number) =>
+                    <div key={index} className="form-row">
+                      <div className="form-group">
+                        <label>I want</label>
+                        <select onChange={(e: any) => changeLiquorMapItemQuantity(element, e)} defaultValue={element.amount}>
+                          {Array(menuModel.size + 1).fill(0).map((item: any, i: number) =>
+                            <option key={i} value={i}>{i}</option>
+                          )}
+                        </select>
+                        <label>drinks to contain</label>
+                        <select defaultValue={element.item}>
+                          <option key={-1} value={"None"}>{"Select an Ingredient"}</option>
+                          {ingredientOptions.map((item: any, i: number) =>
+                            <option key={i} value={item.strIngredient1}>{item.strIngredient1}</option>
+                          )}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               </div>
             </form>
@@ -135,7 +218,7 @@ function MenuForm() {
       </Grid>
 
       <button>Reset</button>
-      <button>Download</button>
+      <button>Save</button>
       <button>Format</button>
     </div>
   );

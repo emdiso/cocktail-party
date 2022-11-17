@@ -227,4 +227,21 @@ cocktailApiRouter.post('/modify_menu_by_alcoholic', async (req: AuthenticatedReq
 
 });
 
+cocktailApiRouter.get('/ingredient_options', async (req: Request, res: Response) => {
+    axios.get(`${api_url}list.php?i=list`, {
+        headers: {
+            "Authentication": `Bearer ${api_key}`,
+        }
+    }).then((response: AxiosResponse) => {
+        res.send(response.data);
+    })
+        .catch((err: any) => {
+            console.log("ERROR " + err);
+            res.status(500).send();
+        });
+});
+
+// cocktailApiRouter.post('/modify_menu_by_ingredient', async (req: AuthenticatedRequest, res: Response) => {
+// });
+
 export default cocktailApiRouter;
