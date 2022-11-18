@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './App.css';
+import './styling/App.css';
 import LSPopUp from './LSPopUp';
 import Navbar from './Navbar';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Landing from './Landing';
 import Random from './Random';
+import Profile from './Profile';
 import '../axios.service.ts';
 import { getAuthToken, get, post } from '../axios.service';
 
 export interface UserInfo {
+  userId: string;
   username: string;
   email: string;
 }
@@ -18,18 +20,14 @@ function App() {
   let myAuthToken = getAuthToken();
   const [isLoggedIn, setLoggedIn] = React.useState(myAuthToken !== "");
   const [openLogin, setOpenLogin] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<UserInfo>({username:"", email:""});
+  const [userInfo, setUserInfo] = React.useState<UserInfo>({userId:"", username:"", email:""});
 
   if (isLoggedIn) {
-    get('/auth/userInfo', {}, (res) => {setUserInfo({username: res.data.username, email: res.data.email})});
+    get('/auth/userInfo', {}, (res) => {setUserInfo({userId: res.data.userId, username: res.data.username, email: res.data.email})});
   }
 
   const handleClose = () => {
     setOpenLogin(false);
-  }
-
-  const openProfile = () => {
-    // -TODO-
   }
 
   return (
@@ -39,7 +37,9 @@ function App() {
 
           {isLoggedIn ? 
             <div>
-            <button> {userInfo.username} </button>
+              <Link to="/profile">
+                <button> {userInfo.username} </button>
+              </Link>
             </div>
             :
             <div>
@@ -53,7 +53,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Landing />}></Route>
             <Route path='/random' element={<Random />}></Route>
-            <Route path='/profile'></Route>
+            <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>
           </Routes>
         </div>
       </Router>

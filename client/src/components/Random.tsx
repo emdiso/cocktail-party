@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import RecipeCard from './RecipeCard';
 import { alpha, Breadcrumbs, Button, ButtonGroup, Chip, Grid, Link, Pagination, Stack, Typography } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';

@@ -44,7 +44,7 @@ const SignupForm = (props: SignupFormProps) => {
             {
 			    username : values.username,
                 email : values.email,
-                password : values.password
+                password : values.password,
 		    }, {}, (response) => {
                 setAuthToken(response.data.accessToken);
                 props.handleClose();
