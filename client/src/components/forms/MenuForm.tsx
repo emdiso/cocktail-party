@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { Button, Grid, Slider } from '@mui/material';
-import MenuDetails from './MenuDetails';
-import { get, post } from '../axios.service';
+import MenuRawDetails from '../MenuRawDetails';
+import { get, post } from '../../axios.service';
 import { Axios, AxiosResponse } from 'axios';
 import { TypeObject } from '@mui/material/styles/createPalette';
+import { Link } from 'react-router-dom';
 
 export interface Quantity {
   id: number,
@@ -20,7 +21,7 @@ export interface MenuModel {
   categoryMap: Quantity[],
 }
 
-export function usePreviousMenuModel(value: MenuModel) {
+function usePreviousMenuModel(value: MenuModel) {
   const ref = useRef<MenuModel>();
   useEffect(() => {
     ref.current = value; //assign the value of ref to the argument
@@ -231,13 +232,12 @@ function MenuForm() {
         </Grid>
 
         <Grid className="split-screen" item xs={5.8}>
-          <MenuDetails data={menuModel.menuDrinks} />
+          <MenuRawDetails data={menuModel.menuDrinks} />
         </Grid>
       </Grid>
 
       <button>Reset</button>
       <button>Save</button>
-      <button>Format</button>
     </div>
   );
 }

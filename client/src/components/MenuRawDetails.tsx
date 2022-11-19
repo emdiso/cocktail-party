@@ -1,13 +1,7 @@
 import React from 'react';
 import './App.css';
-import { Drink } from './Random';
 
-export interface menu {
-  title: string,
-  drinks: Drink[] // string of drink ids
-}
-
-function MenuDetails(data: any) {
+function MenuRawDetails(data: any) {
   return (
     <div>
       <h5>Menu Details</h5>
@@ -20,4 +14,4 @@ function MenuDetails(data: any) {
   );
 }
 
-export default MenuDetails;
+export default MenuRawDetails;

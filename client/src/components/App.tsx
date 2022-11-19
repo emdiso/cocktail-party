@@ -8,7 +8,7 @@ import Navbar from './Navbar';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Landing from './Landing';
 import Random from './Random';
-import MenuForm from './MenuForm';
+import MenuForm from './forms/MenuForm';
 
 function App() {
   const [openLogin, setOpenLogin] = React.useState(false);
