@@ -13,7 +13,7 @@ function MenuDetails(data: any) {
       <h5>Menu Details</h5>
       {data.data.map((item: any, index: number) =>
         <li key={index} className={item.strAlcoholic}>
-          {item.strDrink} {item.strAlcoholic}
+          {item.strDrink} {item.strGlass}
         </li>
       )}
     </div>
