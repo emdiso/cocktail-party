@@ -7,6 +7,7 @@ import { get } from "../axios.service";
 import { stringify } from 'querystring';
 import { AxiosResponse } from 'axios';
 
+
 function Landing() {
   const [isLoading, setLoading] = React.useState(true);
   const [drinks, setDrinks] = React.useState([]);
@@ -38,12 +39,11 @@ function Landing() {
   return (
     <div>
       <ButtonGroup size="small" color="secondary">
-        <Button onClick={() => update("a")}>a</Button>
-        <Button onClick={() => update("b")}>b</Button>
-        <Button onClick={() => update("c")}>c</Button>
-        <Button onClick={() => update("d")}>d</Button>
+        { "abcdefghijklmnopqrstuvwxyz".split("").map((letter: string) => {
+          return <Button onClick={() => update(letter)}>{letter}</Button>
+        })}
       </ButtonGroup>
-      <h4>Recipes that start with: {letter}</h4>
+      <h4>Recipes that start with: {letter.toUpperCase()}</h4>
       <Grid container spacing={{ xs: 2, md: 5 }} columns={{ xs: 6, sm: 8, md: 12 }}>
         {drinks.map((item, index) => (
           <Grid item xs={4} sm={4} md={2} key={index}>

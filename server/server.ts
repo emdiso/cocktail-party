@@ -2,6 +2,7 @@ import express, { Express, Response } from 'express';
 import dotenv from 'dotenv';
 import authRouter from './routes/authRouter';
 import cocktailApiRouter from './routes/cocktailApiRouter';
+import imageRouter from './routes/imageRouter';
 import { verifyToken, AuthenticatedRequest } from './utils/authUtils';
 
 
@@ -22,6 +23,7 @@ if (sysEnv === 'development') {
 
 app.use('/auth', authRouter);
 app.use('/cocktail_api', cocktailApiRouter);
+app.use('/image', imageRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
