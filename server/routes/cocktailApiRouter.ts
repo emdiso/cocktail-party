@@ -13,7 +13,6 @@ const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
 const api_url = process.env.COCKTAIL_API_MAIN_URL; 
 
 cocktailApiRouter.get('/list_ingredients', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
-    console.log(api_url);
     axios.get(api_url+"list.php?i=list", {
         headers: {
             "Authentication": `Bearer ${api_key}`,
