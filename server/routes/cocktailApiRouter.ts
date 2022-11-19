@@ -76,6 +76,21 @@ cocktailApiRouter.get('/full_menu', verifyToken, async (req: AuthenticatedReques
     });
 });
 
+cocktailApiRouter.get('/random_drink_by_ingredient', async (req: Request, res: Response) => {
+    const ingredient = req.query.ingredient;
+    return axios.get(`${api_url}filter.php?i=${ingredient}`, {
+        headers: {
+            "Authentication": `Bearer ${api_key}`,
+        }
+    }).then((response: AxiosResponse) => {
+        const randInt = Math.floor(Math.random() * response.data.drinks.length);
+        res.send(response.data.drinks[randInt]);
+    }).catch((err: any) => {
+        console.log("ERROR " + err);
+        res.status(500).send();
+    });
+});
+
 cocktailApiRouter.get('/menu_by_size', async (req: AuthenticatedRequest, res: Response) => {
     let drinks: any[] = [];
     let size = Number(req.query.size);
