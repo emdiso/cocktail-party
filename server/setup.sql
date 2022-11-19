@@ -10,7 +10,6 @@ CREATE TABLE images (
 	id SERIAL NOT NULL PRIMARY KEY,
 	user_id INTEGER,
 	file_name VARCHAR(200),
-	mime_type VARCHAR(30),
-	encoding_format VARCHAR(30),
+	mime_type VARCHAR(50),
 	img BYTEA
 );
