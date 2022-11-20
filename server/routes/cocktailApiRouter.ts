@@ -38,7 +38,7 @@ cocktailApiRouter.get('/drinks_by_letter', async (req: Request, res: Response) =
     });
 });
 
-cocktailApiRouter.get('/random-drink', async (req: Request, res: Response) => {
+cocktailApiRouter.get('/random_drink', async (req: Request, res: Response) => {
     axios.get(`${api_url}random.php` , {
         headers: {
             "Authentication": `Bearer ${api_key}`,
