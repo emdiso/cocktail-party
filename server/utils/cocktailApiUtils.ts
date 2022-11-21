@@ -1,67 +1,64 @@
 import { QueryResult } from "pg";
 import dotenv from 'dotenv';
 import psqlPool from "./psqlConnection";
+import Menu from "../models/Menu";
+import MenuItem from "../models/MenuItem";
+import { RecipeKeys } from "../models/Recipe";
 import axios from "axios";
 
-export interface Menu {
-    id: number;
-	user_id: number;
-	image_id: number;
-	title: number;
-    item_count: number;
-    menu_items?: MenuItem[];
-}
+// export interface Menu {
+//     id: number;
+// 	user_id: number;
+// 	image_id: number;
+// 	title: number;
+//     item_count: number;
+//     menu_items?: MenuItem[];
+// }
 
-export interface MenuItem {
-    id: number;
-    api_recipe_id?: number;
-    custom_recipe_id?: number;
-    image_id?: number;
-	strDrink: string;
-	strAlcoholic: string;
-	strCategory: string;
-	strGlass: string;
-    strInstructions: string;
-    strIngredient1: string;
-    strIngredient2: string;
-    strIngredient3: string;
-    strIngredient4: string;
-    strIngredient5: string;
-    strIngredient6: string;
-    strIngredient7: string;
-    strIngredient8: string;
-    strIngredient9: string;
-    strIngredient10: string;
-    strIngredient11: string;
-    strIngredient12: string;
-    strIngredient13: string;
-    strIngredient14: string;
-    strIngredient15: string;
-    strMeasure1: string;
-    strMeasure2: string;
-    strMeasure3: string;
-    strMeasure4: string;
-    strMeasure5: string;
-    strMeasure6: string;
-    strMeasure7: string;
-    strMeasure8: string;
-    strMeasure9: string;
-    strMeasure10: string;
-    strMeasure11: string;
-    strMeasure12: string;
-    strMeasure13: string;
-    strMeasure14: string;
-    strMeasure15: string;
-    dateModified: string;
-}
+// export interface MenuItem {
+//     id: number;
+//     api_recipe_id?: number;
+//     custom_recipe_id?: number;
+//     image_id?: number;
+// 	strDrink: string;
+// 	strAlcoholic: string;
+// 	strCategory: string;
+// 	strGlass: string;
+//     strInstructions: string;
+//     strIngredient1: string;
+//     strIngredient2: string;
+//     strIngredient3: string;
+//     strIngredient4: string;
+//     strIngredient5: string;
+//     strIngredient6: string;
+//     strIngredient7: string;
+//     strIngredient8: string;
+//     strIngredient9: string;
+//     strIngredient10: string;
+//     strIngredient11: string;
+//     strIngredient12: string;
+//     strIngredient13: string;
+//     strIngredient14: string;
+//     strIngredient15: string;
+//     strMeasure1: string;
+//     strMeasure2: string;
+//     strMeasure3: string;
+//     strMeasure4: string;
+//     strMeasure5: string;
+//     strMeasure6: string;
+//     strMeasure7: string;
+//     strMeasure8: string;
+//     strMeasure9: string;
+//     strMeasure10: string;
+//     strMeasure11: string;
+//     strMeasure12: string;
+//     strMeasure13: string;
+//     strMeasure14: string;
+//     strMeasure15: string;
+//     dateModified: string;
+// }
 
-// TODO: Possibly refactor later to generate list directly from Interface
-export const MenuItemKeys = ["id", "api_recipe_id", "custom_recipe_id", "image_id", "strDrink", "strAlcoholic", "strCategory",
-    "strGlass", "strInstructions", "strIngredient1", "strIngredient2", "strIngredient3", "strIngredient4", "strIngredient5",
-    "strIngredient6", "strIngredient7", "strIngredient8", "strIngredient9", "strIngredient10", "strIngredient11", "strIngredient12",
-    "strIngredient13", "strIngredient14", "strIngredient15", "strMeasure1", "strMeasure2", "strMeasure3", "strMeasure4", "strMeasure5",
-    "strMeasure6", "strMeasure7", "strMeasure8", "strMeasure9", "strMeasure10", "strMeasure11", "strMeasure12",
-    "strMeasure13", "strMeasure14", "strMeasure15", "dateModified"];
+
 
 dotenv.config();
 const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
@@ -79,9 +76,10 @@ export const retreiveAllMenuInfo = async (menuId: string, userId: string) => {
     menuResult.rows[0]["item_count"] = Number(menuResult.rows[0]["item_count"]);
     const menu: Menu = menuResult.rows[0];
 
+    // TODO: Add error handling
     const menuItemsResult: QueryResult = await psqlPool.query(
-        `SELECT mi.id, mi.api_recipe_id, cr.id as custom_recipe_id, cr.*
-         FROM menu_items mi LEFT JOIN custom_recipes cr ON mi.custom_recipe_id = cr.id
+        `SELECT mi.id, mi.api_recipe_id, mi.custom_recipe_id
+         FROM menu_items mi
          WHERE mi.menu_id = $1`,
         [ menuId ]);
     if (menuResult.rowCount > 0) {
@@ -89,15 +87,22 @@ export const retreiveAllMenuInfo = async (menuId: string, userId: string) => {
         for (const item of menuItemsResult.rows) {
             const newItem = item;
             if (item.api_recipe_id !== null && item.api_recipe_id !== undefined) {
-                const drink = (await axios.get(`${api_url}lookup.php?i=${item.api_recipe_id}`, {
+                // TODO: Add error handling!!!!!!
+                const drinkData = (await axios.get(`${api_url}lookup.php?i=${item.api_recipe_id}`, {
                     headers: {
                         "Authentication": `Bearer ${api_key}`,
                     }
                 })).data.drinks[0];
-                for (const key of MenuItemKeys) {
-                    if (key in drink) {
-                        newItem[key] = drink[key];
-                    }
+                newItem["recipe"] = drinkData;
+            } else if (item.custom_recipe_id !== null && item.custom_recipe_id !== undefined) {
+                // TODO: Remove user id from return, Add error Handling!!!!
+                const customRecipeData = await psqlPool.query(
+                    `SELECT cr.*
+                     FROM custom_recipes cr
+                     WHERE cr.id = $1`,
+                    [ item.custom_recipe_id ]);
+                if (customRecipeData.rowCount > 0) {
+                    newItem["recipe"] = customRecipeData.rows[0];
                 }
             }
             newItems.push(newItem);
