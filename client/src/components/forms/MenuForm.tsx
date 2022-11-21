@@ -20,12 +20,6 @@ export interface MenuModel {
   categoryMap: Quantity[],
 }
 
-export interface Category {
-  id: number,
-  category: string,
-  alcoholic: string
-}
-
 function usePreviousMenuModel(value: MenuModel) {
   const ref = useRef<MenuModel>();
   useEffect(() => {
@@ -42,7 +36,7 @@ function MenuForm() {
 
   const previousMenu = usePreviousMenuModel(menuModel); // allows us to track what actually changed in the object
 
-  const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<any[]>([]);
   const [categoryOptionsChanged, setCategoryOptionsChanged] = useState<Boolean>(false);
 
   const menuSizeSelected = (e: any) => {
@@ -115,17 +109,39 @@ function MenuForm() {
           });
         }
 
-        // TO DO -- when total > obj.size and ====
+        // TO DO
+        if (total > obj.size) {
+
+        }
 
         return obj;
       });
-
       setCategoryOptionsChanged(true);
+    }
+
+    if (newNum === menuModel.size) {
+      console.log("the amount");
+      setMenuModel((prev: MenuModel) => {
+        let obj = { ...prev };
+
+        obj.categoryMap = [];
+
+        obj.categoryMap.push({
+          id: obj.categoryMap.length,
+          amount: newNum,
+          item: element.item
+        });
+
+        return obj;
+      });
+      setCategoryOptionsChanged(true);
+
+
     }
   }
 
   const changeCategoryMapQuantityItem = (element: Quantity, e: any) => {
-    let glass = e.target.value;
+    let category = e.target.value;
 
     setMenuModel((prev: MenuModel) => {
       let obj = { ...prev };
@@ -133,16 +149,15 @@ function MenuForm() {
       let elem = obj.categoryMap.find(function (item) {
         return item.id === element.id;
       });
-      elem!.item = glass;
+      elem!.item = category;
 
+      setCategoryOptionsChanged(true);
       return obj;
     });
 
-    setCategoryOptionsChanged(true);
   }
 
   React.useEffect(() => {
-
     if (previousMenu && previousMenu.alcoholicQuantity !== menuModel.alcoholicQuantity) {
       console.log("alcoholic quant changed", menuModel.alcoholicQuantity);
       post(
@@ -160,7 +175,6 @@ function MenuForm() {
       )
     }
 
-    // NEEDS CONDITIONAL FOR THE ABOVE TO WORK
     if (previousMenu && categoryOptionsChanged) {
       post(
         '/cocktail_api/modify_menu_by_category', menuModel, {},
@@ -172,6 +186,7 @@ function MenuForm() {
               return obj;
             }
           );
+          setCategoryOptionsChanged(false);
         }
       )
     }
@@ -185,7 +200,7 @@ function MenuForm() {
         direction="row"
         justifyContent="space-evenly"
         alignItems="stretch">
-        <Grid className="split-screen" item xs={5.8} >
+        <Grid item xs={5.8} >
 
           <div>
             <h5>Menu Form</h5>
@@ -243,14 +258,14 @@ function MenuForm() {
 
         </Grid>
 
-        <Grid className="split-screen" item xs={5.8}>
+        <Grid item xs={5.8}>
           <MenuRawDetails data={menuModel.menuDrinks} />
         </Grid>
       </Grid>
 
-      <button>Reset</button>
-      <button>Save</button>
-      <button>Save and Format</button>
+      <Button variant="outlined">Reset</Button>
+      <Button variant="outlined">Submit</Button>
+      <Button variant="outlined">Design</Button>
     </div>
   );
 }

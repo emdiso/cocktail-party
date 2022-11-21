@@ -10,6 +10,8 @@ import Profile from './Profile';
 import '../axios.service.ts';
 import { getAuthToken, get, post } from '../axios.service';
 import MenuForm from './forms/MenuForm';
+import { Button } from 'react-bootstrap';
+import { Box, Fab } from '@mui/material';
 
 export interface UserInfo {
   userId: string;
@@ -21,10 +23,10 @@ function App() {
   let myAuthToken = getAuthToken();
   const [isLoggedIn, setLoggedIn] = React.useState(myAuthToken !== "");
   const [openLogin, setOpenLogin] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<UserInfo>({userId:"", username:"", email:""});
+  const [userInfo, setUserInfo] = React.useState<UserInfo>({ userId: "", username: "", email: "" });
 
   if (isLoggedIn) {
-    get('/auth/userInfo', {}, (res) => {setUserInfo({userId: res.data.userId, username: res.data.username, email: res.data.email})});
+    get('/auth/userInfo', {}, (res) => { setUserInfo({ userId: res.data.userId, username: res.data.username, email: res.data.email }) });
   }
 
   const handleClose = () => {
@@ -34,28 +36,31 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <header className="App-header">
-
-          {isLoggedIn ? 
-            <div>
+        <header>
+          <Navbar />
+          {isLoggedIn ?
+            <div style={{position:"absolute", top:"1vw", right:"2vw"}}>
               <Link to="/profile">
-                <button> {userInfo.username} </button>
+                <Fab variant="extended" size="small">
+                  {userInfo.username}
+                </Fab>
               </Link>
             </div>
             :
-            <div>
-              <button color='secondary' onClick={() => {setOpenLogin(true)}}> Log In </button>
+            <div style={{position:"absolute", top:"1vw", right:"2vw"}}>
+              <Fab variant="extended" onClick={() => { setOpenLogin(true) }} size="small">
+                Log In
+              </Fab>
               <LSPopUp open={openLogin} handleClose={handleClose} />
             </div>
           }
-          <Navbar />
         </header>
         <div className="App-body">
           <Routes>
             <Route path='/' element={<Landing />}></Route>
             <Route path='/random' element={<Random />}></Route>
-            <Route path='generate' element={<MenuForm />}></Route>
-            <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>
+            <Route path='/generate' element={<MenuForm />}></Route>
+            <Route path='/profile' element={<Profile userInfo={userInfo} />}></Route>
           </Routes>
         </div>
       </Router>
