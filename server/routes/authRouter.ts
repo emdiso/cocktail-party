@@ -1,8 +1,9 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import psqlPool from '../utils/psqlConnection';
-import { generateAccessToken, UserInfo } from '../utils/authUtils';
+import { AuthenticatedRequest, generateAccessToken, UserInfo, verifyToken } from '../utils/authUtils';
 import cors from 'cors';
+var cors = require('cors');
 
 const authRouter = express.Router();
 authRouter.use(cors());
@@ -20,7 +21,9 @@ function validEmail(email: any) {
   if (email === undefined
     || typeof email != "string" ||
     !(email.length <= 50 && email.length > 0) ||
-    email.substring(email.length - 4, email.length) != ".com" ||
+    (email.substring(email.length - 4, email.length) != ".com" &&
+    email.substring(email.length - 4, email.length) != ".edu" &&
+    email.substring(email.length - 4, email.length) != ".org") ||
     !/[.@]/g.test(email)) {
     return false;
   }
@@ -39,7 +42,6 @@ function validPassword(password: any) {
 
 // TODO: add the endpoints for auth below to a router inside of "authRoute" then import the router here and use it instead
 authRouter.post("/signup", (req: Request, res: Response) => {
-  console.log("test");
   let username = req.body.username;
   let plaintextPassword = req.body.password;
   let email = req.body.email;
@@ -124,6 +126,20 @@ authRouter.post("/login", (req: Request, res: Response) => {
       console.log(error);
       res.status(500).send();
     });
+});
+
+authRouter.get("/userInfo", verifyToken, (req: AuthenticatedRequest, res: Response) => {
+  let userId = req.userId;
+
+  psqlPool.query("SELECT username, email FROM users WHERE id=$1", [userId])
+  .then((response) => {
+      let userInfo = response.rows[0];
+      res.json({"userid":userId, "username":userInfo.username, "email":userInfo.email});
+  })
+  .catch((error) => {
+      console.log(error);
+      res.status(500).send();
+  });
 });
 
 export default authRouter;

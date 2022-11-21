@@ -2,7 +2,7 @@ import * as React from 'react';
 import Button, { FilledInput, IconButton, InputAdornment, InputLabel } from '@mui/material';
 import { Cookie, Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
-import {post, setAuthToken} from '../../axios.service';
+import {post, setAuthToken, get} from '../../axios.service';
 import { AxiosError, AxiosResponse } from 'axios';
 
 interface LoginInfo {
@@ -49,6 +49,7 @@ const LoginForm = (props: LoginFormProps) => {
 		    }, {}, (response: AxiosResponse) => {
                 setAuthToken(response.data.accessToken);
                 props.handleClose();
+                window.location.reload();
             });
     }
 

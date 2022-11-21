@@ -1,5 +1,5 @@
 import React from 'react';
-import './App.css';
+import './styling/App.css';
 
 function MenuRawDetails(data: any) {
   return (
