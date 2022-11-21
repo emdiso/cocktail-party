@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './../styling/App.css';
+import './../styling/MenuForms.css';
 import { Button, Grid, Slider } from '@mui/material';
 import MenuRawDetails from '../MenuRawDetails';
 import { get, post } from '../../axios.service';
@@ -20,6 +20,12 @@ export interface MenuModel {
   categoryMap: Quantity[],
 }
 
+export interface Category {
+  id: number,
+  category: string,
+  alcoholic: string
+}
+
 function usePreviousMenuModel(value: MenuModel) {
   const ref = useRef<MenuModel>();
   useEffect(() => {
@@ -36,7 +42,8 @@ function MenuForm() {
 
   const previousMenu = usePreviousMenuModel(menuModel); // allows us to track what actually changed in the object
 
-  const [categoryOptions, setCategoryOptions] = useState<any[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
+  const [categoryOptionsChanged, setCategoryOptionsChanged] = useState<Boolean>(false);
 
   const menuSizeSelected = (e: any) => {
     let size = Number(e.target.value);
@@ -112,6 +119,8 @@ function MenuForm() {
 
         return obj;
       });
+
+      setCategoryOptionsChanged(true);
     }
   }
 
@@ -128,6 +137,8 @@ function MenuForm() {
 
       return obj;
     });
+
+    setCategoryOptionsChanged(true);
   }
 
   React.useEffect(() => {
@@ -150,18 +161,20 @@ function MenuForm() {
     }
 
     // NEEDS CONDITIONAL FOR THE ABOVE TO WORK
-    // post(
-    //   '/cocktail_api/modify_menu_by_category', menuModel, {},
-    //   (res: AxiosResponse) => {
-    //     setMenuModel(
-    //       (prev: MenuModel) => {
-    //         let obj = { ...prev };
-    //         obj.menuDrinks = res.data.menuDrinks;
-    //         return obj;
-    //       }
-    //     );
-    //   }
-    // )
+    if (previousMenu && categoryOptionsChanged) {
+      post(
+        '/cocktail_api/modify_menu_by_category', menuModel, {},
+        (res: AxiosResponse) => {
+          setMenuModel(
+            (prev: MenuModel) => {
+              let obj = { ...prev };
+              obj.menuDrinks = res.data.menuDrinks;
+              return obj;
+            }
+          );
+        }
+      )
+    }
 
   }, [menuModel]);
 
