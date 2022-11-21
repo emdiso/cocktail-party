@@ -9,7 +9,6 @@ export function setAuthToken(token: string) {
 
 // TODO: get token from cookie
 
-
 export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
     axios.get(
         `${baseUrl}${endpoint}`,

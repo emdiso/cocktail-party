@@ -8,6 +8,7 @@ import Navbar from './Navbar';
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Landing from './Landing';
 import Random from './Random';
+import MenuForm from './forms/MenuForm';
 
 function App() {
   const [openLogin, setOpenLogin] = React.useState(false);
@@ -28,6 +29,9 @@ function App() {
           <Routes>
             <Route path='/' element={<Landing />}></Route>
             <Route path='/random' element={<Random />}></Route>
+            <Route path='login' element={<Login />}></Route>
+            <Route path='signup' element={<Signup />}></Route>
+            <Route path='generate' element={<MenuForm />}></Route>
           </Routes>
         </div>
       </Router>
