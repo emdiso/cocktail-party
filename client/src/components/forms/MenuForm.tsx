@@ -151,18 +151,18 @@ function MenuForm() {
     }
 
     // NEEDS CONDITIONAL FOR THE ABOVE TO WORK
-    post(
-      '/cocktail_api/modify_menu_by_glass', menuModel, {},
-      (res: AxiosResponse) => {
-        setMenuModel(
-          (prev: MenuModel) => {
-            let obj = { ...prev };
-            obj.menuDrinks = res.data.menuDrinks;
-            return obj;
-          }
-        );
-      }
-    )
+    // post(
+    //   '/cocktail_api/modify_menu_by_glass', menuModel, {},
+    //   (res: AxiosResponse) => {
+    //     setMenuModel(
+    //       (prev: MenuModel) => {
+    //         let obj = { ...prev };
+    //         obj.menuDrinks = res.data.menuDrinks;
+    //         return obj;
+    //       }
+    //     );
+    //   }
+    // )
 
   }, [menuModel]);
 
