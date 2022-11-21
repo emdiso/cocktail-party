@@ -1,5 +1,7 @@
 import { QueryResult } from "pg";
+import dotenv from 'dotenv';
 import psqlPool from "./psqlConnection";
+import axios from "axios";
 
 export interface Menu {
     id: number;
@@ -14,8 +16,7 @@ export interface MenuItem {
     id: number;
     api_recipe_id?: number;
     custom_recipe_id?: number;
-    // add attributes of recipe tables -- I made them look like the external api's data (even though we all dislike their naming/structure)
-	image_id?: number;
+    image_id?: number;
 	strDrink: string;
 	strAlcoholic: string;
 	strCategory: string;
@@ -51,7 +52,20 @@ export interface MenuItem {
     strMeasure13: string;
     strMeasure14: string;
     strMeasure15: string;
+    dateModified: string;
 }
+
+// TODO: Possibly refactor later to generate list directly from Interface
+export const MenuItemKeys = ["id", "api_recipe_id", "custom_recipe_id", "image_id", "strDrink", "strAlcoholic", "strCategory",
+    "strGlass", "strInstructions", "strIngredient1", "strIngredient2", "strIngredient3", "strIngredient4", "strIngredient5",
+    "strIngredient6", "strIngredient7", "strIngredient8", "strIngredient9", "strIngredient10", "strIngredient11", "strIngredient12",
+    "strIngredient13", "strIngredient14", "strIngredient15", "strMeasure1", "strMeasure2", "strMeasure3", "strMeasure4", "strMeasure5",
+    "strMeasure6", "strMeasure7", "strMeasure8", "strMeasure9", "strMeasure10", "strMeasure11", "strMeasure12",
+    "strMeasure13", "strMeasure14", "strMeasure15", "dateModified"];
+
+dotenv.config();
+const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
+const api_url = process.env.COCKTAIL_API_MAIN_URL; 
 
 export const retreiveAllMenuInfo = async (menuId: string, userId: string) => {
     const menuResult: QueryResult = await psqlPool.query(
@@ -71,14 +85,25 @@ export const retreiveAllMenuInfo = async (menuId: string, userId: string) => {
          WHERE mi.menu_id = $1`,
         [ menuId ]);
     if (menuResult.rowCount > 0) {
-        menu["menu_items"] = menuItemsResult.rows;
-        for (const item of menu["menu_items"]) {
-            if (item.api_recipe_id !== null) {
-                // make api call to external
+        const newItems = [] as MenuItem[];
+        for (const item of menuItemsResult.rows) {
+            const newItem = item;
+            if (item.api_recipe_id !== null && item.api_recipe_id !== undefined) {
+                const drink = (await axios.get(`${api_url}lookup.php?i=${item.api_recipe_id}`, {
+                    headers: {
+                        "Authentication": `Bearer ${api_key}`,
+                    }
+                })).data.drinks[0];
+                for (const key of MenuItemKeys) {
+                    if (key in drink) {
+                        newItem[key] = drink[key];
+                    }
+                }
             }
+            newItems.push(newItem);
         }
+        menu["menu_items"] = newItems;
     }
-    
 
     return menu;
 };
