@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import axios, { AxiosResponse } from 'axios';
 import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
-import cors from 'cors';
 import dotenv from 'dotenv';
 import { retreiveAllMenuInfo } from '../utils/cocktailApiUtils';
 import { Quantity } from '../utils/models';
