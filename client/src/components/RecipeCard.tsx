@@ -37,6 +37,13 @@ function RecipeCard(data: any) {
         setExpanded(!expanded);
     };
 
+    let ingredients: string[] = [];
+
+    for (let i = 1; i < 16; i++) {
+        if (data.data[`strIngredient${i}`])
+            ingredients.push(data.data[`strIngredient${i}`])
+    }
+
     return (
         <Card sx={{ maxWidth: 345 }}>
             <CardHeader title={data.data.strDrink} />
@@ -47,7 +54,7 @@ function RecipeCard(data: any) {
                 alt="Recipe img not available"
             />
             <CardContent>
-                Category: {data.data.strCategory}
+                Ingredients: {ingredients}
             </CardContent>
             <CardActions disableSpacing>
                 <button>Modify</button>
@@ -64,7 +71,7 @@ function RecipeCard(data: any) {
                 <CardContent>
                     <Typography paragraph>Recipe:</Typography>
                     <Typography paragraph>
-                        more work needed here
+                        {data.data.strInstructions}
                     </Typography>
                 </CardContent>
             </Collapse>

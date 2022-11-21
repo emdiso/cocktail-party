@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import psqlPool from '../utils/psqlConnection';
 import { AuthenticatedRequest, generateAccessToken, UserInfo, verifyToken } from '../utils/authUtils';
+import cors from 'cors';
 var cors = require('cors');
 
 const authRouter = express.Router();
