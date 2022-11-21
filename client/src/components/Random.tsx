@@ -33,7 +33,7 @@ const Random = () => {
     const [randDrink, setRandDrink] = React.useState<Drink | undefined>(undefined);
 
     const getRandomDrink = () => {
-        get('/cocktail_api/random-drink', {}, (response: AxiosResponse) => {
+        get('/cocktail_api/random_drink', {}, (response: AxiosResponse) => {
             console.log(response.data.drinks);
             setRandDrink(response.data.drinks[0]);
         }, (error: AxiosError) => {
