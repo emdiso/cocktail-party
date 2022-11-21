@@ -50,7 +50,7 @@ const randomDrinkPromise = () => {
     });
 }
 
-cocktailApiRouter.get('/random-drink', async (req: Request, res: Response) => {
+cocktailApiRouter.get('/random_drink', async (req: Request, res: Response) => {
     randomDrinkPromise().then((response: AxiosResponse) => {
         res.send(response.data);
     }).catch((err: any) => {
@@ -226,8 +226,8 @@ cocktailApiRouter.get('/ingredient_options', async (req: Request, res: Response)
         });
 });
 
-cocktailApiRouter.get('/glass_options', async (req: Request, res: Response) => {
-    axios.get(`${api_url}list.php?g=list`, {
+cocktailApiRouter.get('/category_options', async (req: Request, res: Response) => {
+    axios.get(`${api_url}list.php?c=list`, {
         headers: {
             "Authentication": `Bearer ${api_key}`,
         }
@@ -240,9 +240,9 @@ cocktailApiRouter.get('/glass_options', async (req: Request, res: Response) => {
         });
 });
 
-cocktailApiRouter.post('/modify_menu_by_glass', async (req: AuthenticatedRequest, res: Response) => {
+cocktailApiRouter.post('/modify_menu_by_category', async (req: AuthenticatedRequest, res: Response) => {
     let menu = req.body;
-    let glassMap = req.body.glassMap;
+    let glassMap = req.body.categoryMap;
     let drinks = req.body.menuDrinks;
 
     console.log(glassMap);

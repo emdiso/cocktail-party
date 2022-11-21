@@ -1,11 +1,10 @@
 import express, { Request, Response } from 'express';
 import psqlPool from '../utils/psqlConnection';
 import dotenv from 'dotenv';
-import cors from 'cors';
 import multer from 'multer';
 import { AuthenticatedRequest, verifyToken } from '../utils/authUtils';
 
-
+var cors = require('cors');
 dotenv.config();
 const imageRouter = express.Router();
 imageRouter.use(cors());

@@ -17,7 +17,6 @@ export interface MenuModel {
   menuDrinks: any[],
   size: number,
   alcoholicQuantity: number,
-  glassMap: Quantity[],
   categoryMap: Quantity[],
 }
 
@@ -32,12 +31,12 @@ function usePreviousMenuModel(value: MenuModel) {
 function MenuForm() {
 
   const [menuModel, setMenuModel] = useState<MenuModel>({
-    menuDrinks: [], size: 0, alcoholicQuantity: 0, glassMap: [], categoryMap: []
+    menuDrinks: [], size: 0, alcoholicQuantity: 0, categoryMap: []
   });
 
   const previousMenu = usePreviousMenuModel(menuModel); // allows us to track what actually changed in the object
 
-  const [glassOptions, setGlassOptions] = useState<any[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<any[]>([]);
 
   const menuSizeSelected = (e: any) => {
     let size = Number(e.target.value);
@@ -54,7 +53,7 @@ function MenuForm() {
           })
           obj.alcoholicQuantity = alcoholic.length;
 
-          obj.glassMap = [{
+          obj.categoryMap = [{
             id: 0,
             item: "None",
             amount: size
@@ -65,9 +64,9 @@ function MenuForm() {
       })
 
     get(
-      "/cocktail_api/glass_options", {},
+      "/cocktail_api/category_options", {},
       (res: any) => {
-        setGlassOptions(res.data.drinks);
+        setCategoryOptions(res.data.drinks);
       }
     )
   }
@@ -82,7 +81,7 @@ function MenuForm() {
     );
   }
 
-  const changeGlassMapItemQuantity = (element: Quantity, e: any) => {
+  const changeCategoryMapQuantityAmount = (element: Quantity, e: any) => {
     let newNum = Number(e.target.value);
     if (newNum === element.amount) return;
 
@@ -91,19 +90,19 @@ function MenuForm() {
       setMenuModel((prev: MenuModel) => {
         let obj = { ...prev };
 
-        let elem = obj.glassMap.find(function (item) {
+        let elem = obj.categoryMap.find(function (item) {
           return item.id === element.id;
         });
         elem!.amount = newNum;
 
         let total = 0;
-        obj.glassMap.forEach((item: Quantity) => {
+        obj.categoryMap.forEach((item: Quantity) => {
           total += item.amount;
         })
 
         if (total < obj.size) {
-          obj.glassMap.push({
-            id: obj.glassMap.length,
+          obj.categoryMap.push({
+            id: obj.categoryMap.length,
             item: "None",
             amount: obj.size - total
           });
@@ -116,13 +115,13 @@ function MenuForm() {
     }
   }
 
-  const changeGlassMapItem = (element: Quantity, e: any) => {
+  const changeCategoryMapQuantityItem = (element: Quantity, e: any) => {
     let glass = e.target.value;
 
     setMenuModel((prev: MenuModel) => {
       let obj = { ...prev };
 
-      let elem = obj.glassMap.find(function (item) {
+      let elem = obj.categoryMap.find(function (item) {
         return item.id === element.id;
       });
       elem!.item = glass;
@@ -152,7 +151,7 @@ function MenuForm() {
 
     // NEEDS CONDITIONAL FOR THE ABOVE TO WORK
     // post(
-    //   '/cocktail_api/modify_menu_by_glass', menuModel, {},
+    //   '/cocktail_api/modify_menu_by_category', menuModel, {},
     //   (res: AxiosResponse) => {
     //     setMenuModel(
     //       (prev: MenuModel) => {
@@ -204,20 +203,20 @@ function MenuForm() {
                     </div>
                   </div>
 
-                  {menuModel.glassMap.map((element: Quantity, index: number) =>
+                  {menuModel.categoryMap.map((element: Quantity, index: number) =>
                     <div key={index} className="form-row">
                       <div className="form-group">
                         <label>I want</label>
-                        <select onChange={(e: any) => changeGlassMapItemQuantity(element, e)} defaultValue={element.amount}>
+                        <select onChange={(e: any) => changeCategoryMapQuantityAmount(element, e)} defaultValue={element.amount}>
                           {Array(menuModel.size + 1).fill(0).map((item: any, i: number) =>
                             <option key={i} value={i}>{i}</option>
                           )}
                         </select>
-                        <label>drinks to be served in a</label>
-                        <select onChange={(e: any) => changeGlassMapItem(element, e)} defaultValue={element.item}>
-                          <option key={-1} value={"None"}>{"Select a glass"}</option>
-                          {glassOptions.map((item: any, i: number) =>
-                            <option key={i} value={item.strGlass}>{item.strGlass}</option>
+                        <label>drinks to be of category</label>
+                        <select onChange={(e: any) => changeCategoryMapQuantityItem(element, e)} defaultValue={element.item}>
+                          <option key={-1} value={"None"}>{"Select a category"}</option>
+                          {categoryOptions.map((item: any, i: number) =>
+                            <option key={i} value={item.strCategory}>{item.strCategory}</option>
                           )}
                         </select>
                       </div>
@@ -238,6 +237,7 @@ function MenuForm() {
 
       <button>Reset</button>
       <button>Save</button>
+      <button>Save and Format</button>
     </div>
   );
 }
