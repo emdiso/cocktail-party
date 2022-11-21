@@ -50,7 +50,7 @@ const randomDrinkPromise = () => {
     });
 }
 
-cocktailApiRouter.get('/random-drink', async (req: Request, res: Response) => {
+cocktailApiRouter.get('/random_drink', async (req: Request, res: Response) => {
     randomDrinkPromise().then((response: AxiosResponse) => {
         res.send(response.data);
     }).catch((err: any) => {
