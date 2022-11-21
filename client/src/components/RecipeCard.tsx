@@ -14,6 +14,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material';
 import React from 'react';
+import { getIn } from 'yup/lib/util/reach';
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -30,6 +31,15 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
     }),
 }));
 
+export function getIngredients(data: any){
+    let ingredients: string[] = [];
+    for (let i = 1; i < 16; i++) {
+        if (data.data[`strIngredient${i}`])
+            ingredients.push(data.data[`strIngredient${i}`])
+    }
+    return ingredients;
+}
+
 function RecipeCard(data: any) {
     const [expanded, setExpanded] = React.useState(false);
 
@@ -37,12 +47,7 @@ function RecipeCard(data: any) {
         setExpanded(!expanded);
     };
 
-    let ingredients: string[] = [];
-
-    for (let i = 1; i < 16; i++) {
-        if (data.data[`strIngredient${i}`])
-            ingredients.push(data.data[`strIngredient${i}`])
-    }
+    let ingredients: string[] = getIngredients(data);
 
     return (
         <Card sx={{ maxWidth: 345 }}>
