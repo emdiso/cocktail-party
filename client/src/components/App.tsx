@@ -54,8 +54,6 @@ function App() {
           <Routes>
             <Route path='/' element={<Landing />}></Route>
             <Route path='/random' element={<Random />}></Route>
-            <Route path='login' element={<Login />}></Route>
-            <Route path='signup' element={<Signup />}></Route>
             <Route path='generate' element={<MenuForm />}></Route>
             <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>
           </Routes>

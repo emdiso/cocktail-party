@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './App.css';
+import './../styling/App.css';
 import { Button, Grid, Slider } from '@mui/material';
 import MenuRawDetails from '../MenuRawDetails';
 import { get, post } from '../../axios.service';
