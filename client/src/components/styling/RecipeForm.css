@@ -1,0 +1,17 @@
+.form {
+    text-align: left;
+}
+
+.cocktail-specifications {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+}
+
+#ingredients {
+    padding-right: 10px;
+}
+
+.submit {
+    padding-top: 10px;
+}

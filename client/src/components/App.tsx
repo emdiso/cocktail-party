@@ -10,6 +10,7 @@ import Profile from './Profile';
 import '../axios.service.ts';
 import { getAuthToken, get, post } from '../axios.service';
 import MenuForm from './forms/MenuForm';
+import RecipeForm from './forms/RecipeForm';
 
 export interface UserInfo {
   userId: string;
@@ -56,6 +57,7 @@ function App() {
             <Route path='/random' element={<Random />}></Route>
             <Route path='generate' element={<MenuForm />}></Route>
             <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>
+            <Route path='/recipe' element={<RecipeForm />}></Route>
           </Routes>
         </div>
       </Router>

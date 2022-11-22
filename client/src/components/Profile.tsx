@@ -5,9 +5,11 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {UserInfo} from './App';
+import App, {UserInfo} from './App';
 import './styling/Profile.css';
+import RecipeForm from './forms/RecipeForm';
 import { getAuthToken, get, post } from '../axios.service';
+import { Link } from 'react-router-dom';
 
 interface profileProps {
     userInfo: UserInfo;
@@ -37,7 +39,7 @@ const Profile = (props: profileProps) => {
 
             <Container className='recipes'>
                 <Row>
-                    <Col sm={2}> My Recipes </Col> <Col> <Button> + </Button> </Col>
+                    <Col sm={2}> My Recipes </Col> <Col> <Link to='/recipe'> <Button> + </Button> </Link> </Col>
                 </Row>
                 <Row> Recipes will be loaded here </Row>
             </Container>
