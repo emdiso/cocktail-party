@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { HtmlHTMLAttributes, ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import './../styling/MenuForms.css';
-import { Button, Grid, Slider } from '@mui/material';
+import { Box, Button, Grid, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import MenuRawDetails from '../MenuRawDetails';
 import { get, post } from '../../axios.service';
-import { Axios, AxiosResponse } from 'axios';
-import { TypeObject } from '@mui/material/styles/createPalette';
-import { Link } from 'react-router-dom';
+import { AxiosResponse } from 'axios';
+import { StringifyOptions } from 'querystring';
 
 export interface Quantity {
   id: number,
@@ -18,6 +17,11 @@ export interface MenuModel {
   size: number,
   alcoholicQuantity: number,
   categoryMap: Quantity[],
+}
+
+interface StepModel {
+  title: string,
+  html: ReactNode
 }
 
 function usePreviousMenuModel(value: MenuModel) {
@@ -38,6 +42,21 @@ function MenuForm() {
 
   const [categoryOptions, setCategoryOptions] = useState<any[]>([]);
   const [categoryOptionsChanged, setCategoryOptionsChanged] = useState<Boolean>(false);
+
+
+  const [activeStep, setActiveStep] = React.useState(0);
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    setMenuModel({ menuDrinks: [], size: 0, alcoholicQuantity: 0, categoryMap: [] });
+    setActiveStep(0);
+  };
 
   const menuSizeSelected = (e: any) => {
     let size = Number(e.target.value);
@@ -99,7 +118,8 @@ function MenuForm() {
         let total = 0;
         obj.categoryMap.forEach((item: Quantity) => {
           total += item.amount;
-        })
+        });
+        console.log(total, obj.size)
 
         if (total < obj.size) {
           obj.categoryMap.push({
@@ -111,6 +131,7 @@ function MenuForm() {
 
         // TO DO
         if (total > obj.size) {
+
 
         }
 
@@ -135,8 +156,6 @@ function MenuForm() {
         return obj;
       });
       setCategoryOptionsChanged(true);
-
-
     }
   }
 
@@ -193,6 +212,63 @@ function MenuForm() {
 
   }, [menuModel]);
 
+  const steps: StepModel[] = [
+    {
+      title: "Menu Size",
+      html:
+        <div className="form-row">
+          <div className="form-group">
+            <label>Menu Size: </label>
+            <select onChange={menuSizeSelected} value={menuModel.size}>
+              {[0, 1, 5, 10, 15, 25, 30].map(i =>
+                <option key={i} value={i}>{i}</option>
+              )}
+            </select>
+          </div>
+        </div>
+    },
+    {
+      title: "How many should contain alcohol?",
+      html:
+        <div className="form-row">
+          <div className="form-group">
+            <label>Alcoholic Drink Quantity</label>
+            <select onChange={setMenuModelAlcoholicQuantity} value={menuModel.alcoholicQuantity}>
+              {menuModel.menuDrinks.map((item: any, i: number) =>
+                <option key={i + 1} value={i + 1}>{i + 1}</option>
+              )}
+            </select>
+            <h5>{menuModel.alcoholicQuantity} drinks contain alcohol, {menuModel.menuDrinks.length - menuModel.alcoholicQuantity} are kid friendly.</h5>
+          </div>
+        </div>
+    },
+    {
+      title: "Do you want any specific categories included?",
+      html:
+        <div>
+          {menuModel.categoryMap.map((element: Quantity, index: number) =>
+            <div key={index} className="form-row">
+              <div className="form-group">
+                <label>I want</label>
+                <select onChange={(e: any) => changeCategoryMapQuantityAmount(element, e)} defaultValue={element.amount}>
+                  {Array(menuModel.size + 1).fill(0).map((item: any, i: number) =>
+                    <option key={i} value={i}>{i}</option>
+                  )}
+                </select>
+                <label>drinks to be of category </label>
+                <select onChange={(e: any) => changeCategoryMapQuantityItem(element, e)} defaultValue={element.item}>
+                  <option key={-1} value={"None"}>{"Select a category"}</option>
+                  {categoryOptions.map((item: any, i: number) =>
+                    <option key={i} value={item.strCategory}>{item.strCategory}</option>
+                  )}
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
+    }
+  ]
+
   return (
     <div>
       <Grid
@@ -201,61 +277,59 @@ function MenuForm() {
         justifyContent="space-evenly"
         alignItems="stretch">
         <Grid item xs={5.8} >
-
           <div>
             <h5>Menu Form</h5>
-            <form >
-              <div className="card m-3">
-                <div className="card-body border-bottom">
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Menu Size</label>
-                      <select onChange={menuSizeSelected}>
-                        {[0, 1, 5, 10, 15, 25, 30].map(i =>
-                          <option key={i} value={i}>{i}</option>
-                        )}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Alcoholic Drink Quantity</label>
-                      <select onChange={setMenuModelAlcoholicQuantity} value={menuModel.alcoholicQuantity}>
-                        {menuModel.menuDrinks.map((item: any, i: number) =>
-                          <option key={i + 1} value={i + 1}>{i + 1}</option>
-                        )}
-                      </select>
-                      <h5>{menuModel.alcoholicQuantity} drinks contain alcohol, {menuModel.menuDrinks.length - menuModel.alcoholicQuantity} are kid friendly.</h5>
-                    </div>
-                  </div>
-
-                  {menuModel.categoryMap.map((element: Quantity, index: number) =>
-                    <div key={index} className="form-row">
-                      <div className="form-group">
-                        <label>I want</label>
-                        <select onChange={(e: any) => changeCategoryMapQuantityAmount(element, e)} defaultValue={element.amount}>
-                          {Array(menuModel.size + 1).fill(0).map((item: any, i: number) =>
-                            <option key={i} value={i}>{i}</option>
-                          )}
-                        </select>
-                        <label>drinks to be of category</label>
-                        <select onChange={(e: any) => changeCategoryMapQuantityItem(element, e)} defaultValue={element.item}>
-                          <option key={-1} value={"None"}>{"Select a category"}</option>
-                          {categoryOptions.map((item: any, i: number) =>
-                            <option key={i} value={item.strCategory}>{item.strCategory}</option>
-                          )}
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-              </div>
-            </form>
+            <Box className="card m-3">
+              <Stepper activeStep={activeStep} orientation="vertical" style={{ width: "100%" }}>
+                {steps.map((step, index) => (
+                  <Step key={step.title}>
+                    <StepLabel
+                      optional={
+                        index === 2 ? (
+                          <Typography variant="caption">Last step</Typography>
+                        ) : null
+                      }
+                    >
+                      {step.title}
+                    </StepLabel>
+                    <StepContent>
+                      {step.html}
+                      <Box sx={{ mb: 2 }}>
+                        <div>
+                          <Button
+                            disabled={index === 0}
+                            onClick={handleBack}
+                            sx={{ mt: 1, mr: 1 }}
+                            variant="outlined"
+                          >
+                            Back
+                          </Button>
+                          <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }} variant="outlined">
+                            Reset
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={handleNext}
+                            sx={{ mt: 1, mr: 1 }}
+                          >
+                            {index === steps.length - 1 ? 'Finish' : 'Continue'}
+                          </Button>
+                        </div>
+                      </Box>
+                    </StepContent>
+                  </Step>
+                ))}
+              </Stepper>
+              {activeStep === steps.length && (
+                <Paper square elevation={0} sx={{ p: 3 }}>
+                  <Typography>All steps completed - you&apos;re finished</Typography>
+                  <Button variant="outlined">Submit</Button>
+                  <Button onClick={handleReset} variant="outlined">Reset</Button>
+                  <Button variant="outlined">Design</Button>
+                </Paper>
+              )}
+            </Box>
           </div>
-
         </Grid>
 
         <Grid item xs={5.8}>
@@ -263,10 +337,8 @@ function MenuForm() {
         </Grid>
       </Grid>
 
-      <Button variant="outlined">Reset</Button>
-      <Button variant="outlined">Submit</Button>
-      <Button variant="outlined">Design</Button>
-    </div>
+
+    </div >
   );
 }
 
