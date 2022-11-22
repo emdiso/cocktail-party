@@ -7,10 +7,9 @@ function getIngredients(data: any) {
   for (let i = 1; i < 16; i++) {
     if (data[`strIngredient${i}`]) {
       ingredients.push(data[`strIngredient${i}`])
-      ingredients.push(",");
     }
   }
-  return ingredients.slice(0, ingredients.length - 2).toString();
+  return ingredients;
 }
 
 function MenuRawDetails(data: any) {

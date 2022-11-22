@@ -1,10 +1,10 @@
 import React, { HtmlHTMLAttributes, ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
 import './../styling/MenuForms.css';
-import { Box, Button, Grid, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
+import { Box, Button, Checkbox, Chip, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import MenuRawDetails from '../MenuRawDetails';
 import { get, post } from '../../axios.service';
 import { AxiosResponse } from 'axios';
-import { StringifyOptions } from 'querystring';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 export interface Quantity {
   id: number,
@@ -16,7 +16,8 @@ export interface MenuModel {
   menuDrinks: any[],
   size: number,
   alcoholicQuantity: number,
-  categoryMap: Quantity[],
+  ingriedientsYes: string[],
+  ingriedientsNo: string[]
 }
 
 interface StepModel {
@@ -27,24 +28,35 @@ interface StepModel {
 function usePreviousMenuModel(value: MenuModel) {
   const ref = useRef<MenuModel>();
   useEffect(() => {
-    ref.current = value; //assign the value of ref to the argument
-  }, [value]); //this code will run when the value of 'value' changes
-  return ref.current; //in the end, return the current ref value.
+    ref.current = value;
+  }, [value]);
+  return ref.current;
 }
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 function MenuForm() {
 
   const [menuModel, setMenuModel] = useState<MenuModel>({
-    menuDrinks: [], size: 0, alcoholicQuantity: 0, categoryMap: []
+    menuDrinks: [], size: 0, alcoholicQuantity: 0, ingriedientsYes: [], ingriedientsNo: []
   });
 
-  const previousMenu = usePreviousMenuModel(menuModel); // allows us to track what actually changed in the object
-
-  const [categoryOptions, setCategoryOptions] = useState<any[]>([]);
-  const [categoryOptionsChanged, setCategoryOptionsChanged] = useState<Boolean>(false);
-
+  const previousMenu = usePreviousMenuModel(menuModel);
+  const [ingredientOptions, setIngredientOptions] = useState<string[]>([]);
+  const [ingredientsYesChanged, setIngredientsYesChanged] = useState<Boolean>(false);
+  const [ingredientsNoChanged, setIngredientsNoChanged] = useState<Boolean>(false);
 
   const [activeStep, setActiveStep] = React.useState(0);
+
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -54,7 +66,7 @@ function MenuForm() {
   };
 
   const handleReset = () => {
-    setMenuModel({ menuDrinks: [], size: 0, alcoholicQuantity: 0, categoryMap: [] });
+    setMenuModel({ menuDrinks: [], size: 0, alcoholicQuantity: 0, ingriedientsYes: [], ingriedientsNo: [] });
     setActiveStep(0);
   };
 
@@ -73,20 +85,22 @@ function MenuForm() {
           })
           obj.alcoholicQuantity = alcoholic.length;
 
-          obj.categoryMap = [{
-            id: 0,
-            item: "None",
-            amount: size
-          }];
-
           return obj;
         });
       })
 
     get(
-      "/cocktail_api/category_options", {},
-      (res: any) => {
-        setCategoryOptions(res.data.drinks);
+      "/cocktail_api/ingredient_options", {},
+      (res: AxiosResponse) => {
+        res.data.drinks.forEach((ingriedient: any) => {
+          setIngredientOptions(
+            (prev: string[]) => {
+              let obj = [...prev];
+              obj.push(ingriedient.strIngredient1);
+              return obj;
+            }
+          );
+        });
       }
     )
   }
@@ -101,86 +115,44 @@ function MenuForm() {
     );
   }
 
-  const changeCategoryMapQuantityAmount = (element: Quantity, e: any) => {
-    let newNum = Number(e.target.value);
-    if (newNum === element.amount) return;
+  const handleChangeIngriedientsYes = (event: any) => {
+    const {
+      target: { value },
+    } = event;
 
-    if (newNum < menuModel.size) {
-      // want to push new field with the remaining difference as the amount
-      setMenuModel((prev: MenuModel) => {
+    setMenuModel(
+      (prev: MenuModel) => {
         let obj = { ...prev };
 
-        let elem = obj.categoryMap.find(function (item) {
-          return item.id === element.id;
-        });
-        elem!.amount = newNum;
-
-        let total = 0;
-        obj.categoryMap.forEach((item: Quantity) => {
-          total += item.amount;
-        });
-        console.log(total, obj.size)
-
-        if (total < obj.size) {
-          obj.categoryMap.push({
-            id: obj.categoryMap.length,
-            item: "None",
-            amount: obj.size - total
-          });
-        }
-
-        // TO DO
-        if (total > obj.size) {
-
-
-        }
-
+        let stringify = String(value);
+        obj.ingriedientsYes = stringify.split(",");
+        setIngredientsYesChanged(true);
         return obj;
-      });
-      setCategoryOptionsChanged(true);
-    }
+      }
+    );
+  };
 
-    if (newNum === menuModel.size) {
-      console.log("the amount");
-      setMenuModel((prev: MenuModel) => {
+  const handleChangeIngriedientsNo = (event: any) => {
+    const {
+      target: { value },
+    } = event;
+
+    setMenuModel(
+      (prev: MenuModel) => {
         let obj = { ...prev };
 
-        obj.categoryMap = [];
-
-        obj.categoryMap.push({
-          id: obj.categoryMap.length,
-          amount: newNum,
-          item: element.item
-        });
-
+        let stringify = String(value);
+        obj.ingriedientsNo = stringify.split(",");
+        setIngredientsNoChanged(true);
         return obj;
-      });
-      setCategoryOptionsChanged(true);
-    }
-  }
-
-  const changeCategoryMapQuantityItem = (element: Quantity, e: any) => {
-    let category = e.target.value;
-
-    setMenuModel((prev: MenuModel) => {
-      let obj = { ...prev };
-
-      let elem = obj.categoryMap.find(function (item) {
-        return item.id === element.id;
-      });
-      elem!.item = category;
-
-      setCategoryOptionsChanged(true);
-      return obj;
-    });
-
-  }
+      }
+    );
+  };
 
   React.useEffect(() => {
     if (previousMenu && previousMenu.alcoholicQuantity !== menuModel.alcoholicQuantity) {
-      console.log("alcoholic quant changed", menuModel.alcoholicQuantity);
       post(
-        '/cocktail_api/modify_menu_by_alcoholic', menuModel, {},
+        '/cocktail_api/menu_model/modify_menu_by_alcoholic', menuModel, {},
         (res: AxiosResponse) => {
           console.log(res.data);
           setMenuModel(
@@ -194,10 +166,11 @@ function MenuForm() {
       )
     }
 
-    if (previousMenu && categoryOptionsChanged) {
+    if (previousMenu && ingredientsYesChanged) {
       post(
-        '/cocktail_api/modify_menu_by_category', menuModel, {},
+        '/cocktail_api/menu_model/add_drink_with_ingredient', menuModel, {},
         (res: AxiosResponse) => {
+          console.log(res.data);
           setMenuModel(
             (prev: MenuModel) => {
               let obj = { ...prev };
@@ -205,7 +178,24 @@ function MenuForm() {
               return obj;
             }
           );
-          setCategoryOptionsChanged(false);
+          setIngredientsYesChanged(false);
+        }
+      )
+    }
+
+    if (previousMenu && ingredientsNoChanged) {
+      post(
+        '/cocktail_api/menu_model/remove_drink_with_ingredient', menuModel, {},
+        (res: AxiosResponse) => {
+          console.log(res.data);
+          setMenuModel(
+            (prev: MenuModel) => {
+              let obj = { ...prev };
+              obj.menuDrinks = res.data.menuDrinks;
+              return obj;
+            }
+          );
+          setIngredientsNoChanged(false);
         }
       )
     }
@@ -228,7 +218,7 @@ function MenuForm() {
         </div>
     },
     {
-      title: "How many should contain alcohol?",
+      title: "How many drinks should contain alcohol?",
       html:
         <div className="form-row">
           <div className="form-group">
@@ -243,28 +233,64 @@ function MenuForm() {
         </div>
     },
     {
-      title: "Do you want any specific categories included?",
+      title: "Want us to add a drink by ingredient?",
       html:
         <div>
-          {menuModel.categoryMap.map((element: Quantity, index: number) =>
-            <div key={index} className="form-row">
-              <div className="form-group">
-                <label>I want</label>
-                <select onChange={(e: any) => changeCategoryMapQuantityAmount(element, e)} defaultValue={element.amount}>
-                  {Array(menuModel.size + 1).fill(0).map((item: any, i: number) =>
-                    <option key={i} value={i}>{i}</option>
-                  )}
-                </select>
-                <label>drinks to be of category </label>
-                <select onChange={(e: any) => changeCategoryMapQuantityItem(element, e)} defaultValue={element.item}>
-                  <option key={-1} value={"None"}>{"Select a category"}</option>
-                  {categoryOptions.map((item: any, i: number) =>
-                    <option key={i} value={item.strCategory}>{item.strCategory}</option>
-                  )}
-                </select>
-              </div>
-            </div>
-          )}
+          <FormControl sx={{ m: 1, width: 350 }}>
+            <InputLabel id="demo-multiple-chip-label">Ingriedients</InputLabel>
+            <Select
+              labelId="demo-multiple-checkbox-label"
+              id="demo-multiple-checkbox"
+              multiple
+              value={menuModel.ingriedientsYes}
+              onChange={handleChangeIngriedientsYes}
+              input={<OutlinedInput label="Tag" />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+            >
+              {ingredientOptions.map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={menuModel.ingriedientsYes.includes(name)} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+    },
+    {
+      title: "Want us to remove a drink by ingredient?",
+      html:
+        <div>
+          <FormControl sx={{ m: 1, width: 350 }}>
+            <InputLabel id="demo-multiple-chip-label">Ingriedients</InputLabel>
+            <Select
+              labelId="demo-multiple-checkbox-label"
+              id="demo-multiple-checkbox"
+              multiple
+              value={menuModel.ingriedientsNo}
+              onChange={handleChangeIngriedientsNo}
+              input={<OutlinedInput label="Tag" />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+            >
+              {ingredientOptions.filter((element) => {
+                return !menuModel.ingriedientsYes.includes(element);
+              }).map((name) => (
+                <MenuItem key={name} value={name}>
+                  <Checkbox checked={menuModel.ingriedientsNo.includes(name)} />
+                  <ListItemText primary={name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
+    },
+    {
+      title: "Do you want to add one of your drink recipes to the menu?",
+      html:
+        <div>
+          <p>You have no recipes saved to your profile.</p>
         </div>
     }
   ]
@@ -285,7 +311,7 @@ function MenuForm() {
                   <Step key={step.title}>
                     <StepLabel
                       optional={
-                        index === 2 ? (
+                        index === 4 ? (
                           <Typography variant="caption">Last step</Typography>
                         ) : null
                       }
@@ -336,7 +362,6 @@ function MenuForm() {
           <MenuRawDetails data={menuModel.menuDrinks} />
         </Grid>
       </Grid>
-
 
     </div >
   );
