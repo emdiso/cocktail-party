@@ -23,7 +23,7 @@ cocktailApiRouter.get('/list_ingredients', verifyToken, async (req: Authenticate
     }).then((response: AxiosResponse) => {
         res.send(response.data);
     }).catch((err) => {
-        console.log("ERROR "+err);
+        console.log("ERROR " + err);
         res.status(500).send();
     });
 });
@@ -131,8 +131,8 @@ const drinkByIdPromise = (id: string) => {
     });
 }
 
-const drinkByGlassPromise = (glass: string) => {
-    return axios.get(`${api_url}filter.php?g=${glass}`, {
+const drinkByCategoryPromise = (category: string) => {
+    return axios.get(`${api_url}filter.php?c=${category}`, {
         headers: {
             "Authentication": `Bearer ${api_key}`,
         }
@@ -242,78 +242,78 @@ cocktailApiRouter.get('/category_options', async (req: Request, res: Response) =
 
 cocktailApiRouter.post('/modify_menu_by_category', async (req: AuthenticatedRequest, res: Response) => {
     let menu = req.body;
-    let glassMap = req.body.categoryMap;
+    let categoryMap = req.body.categoryMap;
     let drinks = req.body.menuDrinks;
 
-    console.log(glassMap);
-    glassMap.forEach((quant: Quantity) => {
-        let glass = quant.item;
+    console.log(categoryMap);
+    categoryMap.forEach((quant: Quantity) => {
+        let category = quant.item;
 
-        if (glass !== "None") {
+        if (category !== "None") {
             // drinks to replace
             let replaceThese: any[] = [];
             let expendable = drinks.filter(function (x: any) {
-                return !x.strGlass.includes(glass);
+                return !x.strCategory.includes(category);
             });
             replaceThese.push(...expendable);
 
             let notExpendable = drinks.filter(function (x: any) {
-                return x.strGlass.includes(glass);
+                return x.strCategory.includes(category);
             });
             let expected = quant.amount;
             let actual = notExpendable.length;
 
             let difference = 0;
             if (expected > actual) {
-                console.log(`we have to add ${expected - actual} drinks that use glass ${glass}`);
+                console.log(`we have to add ${expected - actual} drinks that has category ${category}`);
                 difference = expected - actual;
             }
 
             if (actual > expected) {
-                console.log(`we have to remove ${actual - expected} drinks that use glass ${glass}`);
+                console.log(`we have to remove ${actual - expected} drinks that has category ${category}`);
                 difference = actual - expected;
             }
 
             // now actually do the replacing with this logic but by glass -- 
-            // let replaceWith: string[] = [];
-            // for (let i = 0; i < difference; i++) {
-            //     drinkByAlcoholicPromise(filter).then(
-            //         (response: AxiosResponse) => {
-            //             let randomIndex = Math.floor(Math.random() * response.data.drinks.length);
-            //             let searchId: string[] = menu.menuDrinks.filter(function (item: any) {
-            //                 return item.idDrink.includes(response.data.drinks[randomIndex].idDrink);
-            //             });
+            let replaceWith: any[] = [];
+            for (let i = 0; i < difference; i++) {
+                drinkByCategoryPromise(category).then(
+                    (response: AxiosResponse) => {
+                        let randomIndex = Math.floor(Math.random() * response.data.drinks.length);
+                        let searchId: string[] = menu.menuDrinks.filter(function (item: any) {
+                            return item.idDrink.includes(response.data.drinks[randomIndex].idDrink);
+                        });
 
-            //             if (searchId.length === 0 && !replaceWith.includes(response.data.drinks[randomIndex].idDrink)) {
-            //                 replaceWith.push(response.data.drinks[randomIndex].idDrink);
-            //             } else {
-            //                 i--;
-            //             }
+                        if (searchId.length === 0 && !replaceWith.includes(response.data.drinks[randomIndex].idDrink)) {
+                            replaceWith.push(response.data.drinks[randomIndex].idDrink);
+                        } else {
+                            i--;
+                        }
 
-            //             if (replaceWith.length === difference) {
-            //                 let replaced = 0;
-            //                 replaceWith.forEach((drinkid: string, index: number) => {
-            //                     drinkByIdPromise(drinkid).then(
-            //                         (response: any) => {
-            //                             let replace = list[index];
-            //                             const i = menu.menuDrinks.indexOf(replace, 0);
-            //                             menu.menuDrinks.splice(i, 1);
-            //                             menu.menuDrinks.push(response.data.drinks[0]);
-            //                             replaced++;
+                        if (replaceWith.length === difference) {
+                            let replaced = 0;
+                            replaceWith.forEach((drinkid: string, index: number) => {
+                                drinkByIdPromise(drinkid).then(
+                                    (response: any) => {
+                                        let replace = replaceThese[index];
+                                        const i = menu.menuDrinks.indexOf(replace, 0);
+                                        menu.menuDrinks.splice(i, 1);
+                                        menu.menuDrinks.push(response.data.drinks[0]);
+                                        replaced++;
 
-            //                             if (replaced === difference) {
-            //                                 return res.send(menu);
-            //                             }
-            //                         }
-            //                     )
-            //                 });
-            //             }
-            //         }
-            //     ).catch((err: any) => {
-            //         console.log("ERROR " + err);
-            //         return res.status(500).send();
-            //     });
-            // }
+                                        if (replaced === difference) {
+                                            return res.send(menu);
+                                        }
+                                    }
+                                )
+                            });
+                        }
+                    }
+                ).catch((err: any) => {
+                    console.log("ERROR " + err);
+                    return res.status(500).send();
+                });
+            }
         }
     });
 });
