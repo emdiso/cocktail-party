@@ -204,11 +204,11 @@ function MenuForm() {
 
   const steps: StepModel[] = [
     {
-      title: "Menu Size",
+      title: "Generate drinks",
       html:
         <div className="form-row">
           <div className="form-group">
-            <label>Menu Size: </label>
+            <label>Number of drinks to generate: </label>
             <select onChange={menuSizeSelected} value={menuModel.size}>
               {[0, 1, 5, 10, 15, 25, 30].map(i =>
                 <option key={i} value={i}>{i}</option>
@@ -218,7 +218,7 @@ function MenuForm() {
         </div>
     },
     {
-      title: "How many drinks should contain alcohol?",
+      title: "How many generated drinks should contain alcohol?",
       html:
         <div className="form-row">
           <div className="form-group">
@@ -233,7 +233,7 @@ function MenuForm() {
         </div>
     },
     {
-      title: "Want us to add a drink by ingredient?",
+      title: "Want us to generate a drink by ingredient?",
       html:
         <div>
           <FormControl sx={{ m: 1, width: 350 }}>
@@ -259,7 +259,7 @@ function MenuForm() {
         </div>
     },
     {
-      title: "Want us to remove a drink by ingredient?",
+      title: "Want us to remove a generated drink by ingredient?",
       html:
         <div>
           <FormControl sx={{ m: 1, width: 350 }}>
@@ -287,10 +287,10 @@ function MenuForm() {
         </div>
     },
     {
-      title: "Do you want to add one of your drink recipes to the menu?",
+      title: "Add your drinks to the menu",
       html:
         <div>
-          <p>You have no recipes saved to your profile.</p>
+          <p>cj do ur code here, im on line 293 in MenuForm.tsx</p>
         </div>
     }
   ]
