@@ -7,5 +7,6 @@ export interface MenuModel {
     menuDrinks: any[],
     size: number,
     alcoholicQuantity: number,
-    categoryMap: Quantity[],
+    ingriedientsYes: string[],
+    ingriedientsNo: string[]
 }
