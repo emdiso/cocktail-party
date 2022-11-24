@@ -1,10 +1,10 @@
-import React, { HtmlHTMLAttributes, ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import './../styling/MenuForms.css';
-import { Box, Button, Checkbox, Chip, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
 import MenuRawDetails from '../MenuRawDetails';
 import { get, post } from '../../axios.service';
 import { AxiosResponse } from 'axios';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 
 export interface Quantity {
   id: number,
@@ -70,10 +70,17 @@ function MenuForm() {
     setActiveStep(0);
   };
 
+  const handleSubmit = () => {
+    post("/cocktail_api/insert_full_menu", {}, {}, () => {
+      // TODO: Do something with returned menu id
+    });
+    handleReset();
+  }
+
   const menuSizeSelected = (e: any) => {
     let size = Number(e.target.value);
     get(
-      "/cocktail_api/menu_by_size", { "size": size },
+      "/menu_gen/menu_by_size", { "size": size },
       (res: AxiosResponse) => {
         setMenuModel((prev: MenuModel) => {
           let obj = { ...prev };
@@ -152,7 +159,7 @@ function MenuForm() {
   React.useEffect(() => {
     if (previousMenu && previousMenu.alcoholicQuantity !== menuModel.alcoholicQuantity) {
       post(
-        '/cocktail_api/menu_model/modify_menu_by_alcoholic', menuModel, {},
+        '/menu_gen/modify_menu_by_alcoholic', menuModel, {},
         (res: AxiosResponse) => {
           console.log(res.data);
           setMenuModel(
@@ -168,7 +175,7 @@ function MenuForm() {
 
     if (previousMenu && ingredientsYesChanged) {
       post(
-        '/cocktail_api/menu_model/add_drink_with_ingredient', menuModel, {},
+        '/menu_gen/add_drink_with_ingredient', menuModel, {},
         (res: AxiosResponse) => {
           console.log(res.data);
           setMenuModel(
@@ -185,7 +192,7 @@ function MenuForm() {
 
     if (previousMenu && ingredientsNoChanged) {
       post(
-        '/cocktail_api/menu_model/remove_drink_with_ingredient', menuModel, {},
+        '/menu_gen/remove_drink_with_ingredient', menuModel, {},
         (res: AxiosResponse) => {
           console.log(res.data);
           setMenuModel(
@@ -349,7 +356,7 @@ function MenuForm() {
               {activeStep === steps.length && (
                 <Paper square elevation={0} sx={{ p: 3 }}>
                   <Typography>All steps completed - you&apos;re finished</Typography>
-                  <Button variant="outlined">Submit</Button>
+                  <Button onClick={handleSubmit} variant="outlined">Submit</Button>
                   <Button onClick={handleReset} variant="outlined">Reset</Button>
                   <Button variant="outlined">Design</Button>
                 </Paper>
