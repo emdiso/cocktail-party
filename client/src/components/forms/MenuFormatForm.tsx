@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
-import { Button, Grid, Slider } from '@mui/material';
+import { Grid } from '@mui/material';
+// import { Button, Grid, Slider } from '@mui/material';
 import MenuPrettyDetails from '../MenuPrettyDetails';
 import { Drink } from '../Random';
-import { MenuModel } from './MenuForm';
-import { useLocation } from 'react-router-dom';
+// import { MenuGenModel } from './MenuForm';
+// import { useLocation } from 'react-router-dom';
 
 export interface PrettyDrink {
     number: number,

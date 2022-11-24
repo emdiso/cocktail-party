@@ -4,8 +4,8 @@ import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
 import dotenv from 'dotenv';
 import { randomDrinkPromise } from '../utils/cocktailApiUtils';
 import cors from 'cors';
-import Menu from '../models/Menu';
 import psqlPool from '../utils/psqlConnection';
+import { Recipe, CustomRecipe } from '../models';
 require('dotenv').config();
 
 
@@ -17,7 +17,7 @@ menuGenRouter.use(express.json());
 const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
 const api_url = process.env.COCKTAIL_API_MAIN_URL;
 
-menuGenRouter.get('/menu_by_size', async (req: AuthenticatedRequest, res: Response) => {
+menuGenRouter.get('/menu_by_size', async (req: Request, res: Response) => {
     let drinks: any[] = [];
     let size = Number(req.query.size);
 
@@ -66,7 +66,7 @@ const drinkByIngredientPromise = (ingredient: string) => {
     });
 }
 
-menuGenRouter.post('/modify_menu_by_alcoholic', async (req: AuthenticatedRequest, res: Response) => {
+menuGenRouter.post('/modify_menu_by_alcoholic', async (req: Request, res: Response) => {
     let menu = req.body;
     let expectedAlcoholic = Number(menu.alcoholicQuantity);
     let drinks = menu.menuDrinks;
@@ -137,7 +137,7 @@ menuGenRouter.post('/modify_menu_by_alcoholic', async (req: AuthenticatedRequest
 
 });
 
-menuGenRouter.post('/add_drink_with_ingredient', async (req: AuthenticatedRequest, res: Response) => {
+menuGenRouter.post('/add_drink_with_ingredient', async (req: Request, res: Response) => {
     let menu = req.body;
     let ingriedientsYes = menu.ingriedientsYes;
     let drinks = menu.menuDrinks;
@@ -201,7 +201,7 @@ function hasIngredient(drink: any, listToCheck: string[]) {
     return found;
 }
 
-menuGenRouter.post('/remove_drink_with_ingredient', async (req: AuthenticatedRequest, res: Response) => {
+menuGenRouter.post('/remove_drink_with_ingredient', async (req: Request, res: Response) => {
     let menu = req.body;
     let ingredientsNo = menu.ingriedientsNo;
     let drinks = menu.menuDrinks;
@@ -267,8 +267,13 @@ menuGenRouter.post('/remove_drink_with_ingredient', async (req: AuthenticatedReq
     }
 });
 
+interface InsertFullMenuBody {
+    title: string;
+    recipes: Recipe[] | CustomRecipe[];
+}
+
 menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
-    const menu: Menu = req.body;
+    const body: InsertFullMenuBody = req.body;
 
     // TODO: validate menu info more
 
@@ -277,14 +282,14 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
     }
     
     // TODO: Add error handling
-    psqlPool.query(`INSERT INTO menus (user_id, title) VALUES ($1, $2) RETURNING id`, [req.userId, menu.title]).then(async (result) => {
-        if (menu.menu_items === undefined) {
+    psqlPool.query(`INSERT INTO menus (user_id, title) VALUES ($1, $2) RETURNING id`, [req.userId, body.title]).then(async (result) => {
+        if (body.recipes === undefined) {
             return res.status(400).send("Missing Menu Items");
         }
         // TODO: change to gather all the promises and await the for loop.
-        for (const item of menu.menu_items) {
+        for (const recipe of body.recipes) {
             let cr_id = undefined as unknown as number;
-            if (item.api_recipe_id === null || item.api_recipe_id === undefined) {
+            if ((recipe as Recipe).idDrink === null || (recipe as Recipe).idDrink === undefined) {
                 // TODO: rewrite this using a for loop so it's not a mess
                 cr_id = (await psqlPool.query(
                     `INSERT INTO custom_recipes
@@ -296,17 +301,17 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
                          "strMeasure8", "strMeasure9", "strMeasure10", "strMeasure11", "strMeasure12", "strMeasure13", "strMeasure14", "strMeasure15", "dateModified")
                       VALUES
                      ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37)
-                     RETURNING id`, [req.userId, item.recipe.strDrink, item.recipe.strAlcoholic, item.recipe.strCategory, item.recipe.strGlass, item.recipe.strInstructions,
-                        item.recipe.strIngredient1, item.recipe.strIngredient2, item.recipe.strIngredient3, item.recipe.strIngredient4, item.recipe.strIngredient5,
-                        item.recipe.strIngredient6, item.recipe.strIngredient7, item.recipe.strIngredient8, item.recipe.strIngredient9, item.recipe.strIngredient10,
-                        item.recipe.strIngredient11, item.recipe.strIngredient12, item.recipe.strIngredient13, item.recipe.strIngredient14, item.recipe.strIngredient15,
-                        item.recipe.strMeasure1, item.recipe.strMeasure2, item.recipe.strMeasure3, item.recipe.strMeasure4, item.recipe.strMeasure5, item.recipe.strMeasure6, item.recipe.strMeasure7,
-                        item.recipe.strMeasure8, item.recipe.strMeasure9, item.recipe.strMeasure10, item.recipe.strMeasure11, item.recipe.strMeasure12, item.recipe.strMeasure13,
-                        item.recipe.strMeasure14, item.recipe.strMeasure15, item.recipe.dateModified])).rows[0].id;
+                     RETURNING id`, [req.userId, recipe.strDrink, recipe.strAlcoholic, recipe.strCategory, recipe.strGlass, recipe.strInstructions,
+                        recipe.strIngredient1, recipe.strIngredient2, recipe.strIngredient3, recipe.strIngredient4, recipe.strIngredient5,
+                        recipe.strIngredient6, recipe.strIngredient7, recipe.strIngredient8, recipe.strIngredient9, recipe.strIngredient10,
+                        recipe.strIngredient11, recipe.strIngredient12, recipe.strIngredient13, recipe.strIngredient14, recipe.strIngredient15,
+                        recipe.strMeasure1, recipe.strMeasure2, recipe.strMeasure3, recipe.strMeasure4, recipe.strMeasure5, recipe.strMeasure6, recipe.strMeasure7,
+                        recipe.strMeasure8, recipe.strMeasure9, recipe.strMeasure10, recipe.strMeasure11, recipe.strMeasure12, recipe.strMeasure13,
+                        recipe.strMeasure14, recipe.strMeasure15, recipe.dateModified])).rows[0].id;
             }
             await psqlPool.query(
                 `INSERT INTO menu_items (menu_id, api_recipe_id, custom_recipe_id) VALUES ($1, $2, $3)`, 
-                [result.rows[0].id, item.api_recipe_id || null, cr_id || null] // TODO: change to get custom id from prior insert
+                [result.rows[0].id, (recipe as Recipe).idDrink || null, cr_id || null] // TODO: change to get custom id from prior insert
                 );
         }
         return res.json({ menu_id: result.rows[0].id });
