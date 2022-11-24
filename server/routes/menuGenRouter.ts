@@ -4,6 +4,8 @@ import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
 import dotenv from 'dotenv';
 import { randomDrinkPromise } from '../utils/cocktailApiUtils';
 import cors from 'cors';
+import Menu from '../models/Menu';
+import psqlPool from '../utils/psqlConnection';
 require('dotenv').config();
 
 
@@ -264,5 +266,54 @@ menuGenRouter.post('/remove_drink_with_ingredient', async (req: AuthenticatedReq
 
     }
 });
+
+menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+    const menu: Menu = req.body;
+
+    // TODO: validate menu info more
+
+    if (req.userId === undefined) {
+        return res.sendStatus(401);
+    }
+    
+    // TODO: Add error handling
+    psqlPool.query(`INSERT INTO menus (user_id, title) VALUES ($1, $2) RETURNING id`, [req.userId, menu.title]).then(async (result) => {
+        if (menu.menu_items === undefined) {
+            return res.status(400).send("Missing Menu Items");
+        }
+        // TODO: change to gather all the promises and await the for loop.
+        for (const item of menu.menu_items) {
+            let cr_id = undefined as unknown as number;
+            if (item.api_recipe_id === null || item.api_recipe_id === undefined) {
+                // TODO: rewrite this using a for loop so it's not a mess
+                cr_id = (await psqlPool.query(
+                    `INSERT INTO custom_recipes
+                     (user_id, "strDrink", "strAlcoholic", "strCategory", "strGlass", "strInstructions",
+                         "strIngredient1", "strIngredient2", "strIngredient3", "strIngredient4", "strIngredient5",
+                         "strIngredient6", "strIngredient7", "strIngredient8", "strIngredient9", "strIngredient10",
+                         "strIngredient11", "strIngredient12", "strIngredient13", "strIngredient14", "strIngredient15",
+                         "strMeasure1", "strMeasure2", "strMeasure3", "strMeasure4", "strMeasure5", "strMeasure6", "strMeasure7",
+                         "strMeasure8", "strMeasure9", "strMeasure10", "strMeasure11", "strMeasure12", "strMeasure13", "strMeasure14", "strMeasure15", "dateModified")
+                      VALUES
+                     ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37)
+                     RETURNING id`, [req.userId, item.recipe.strDrink, item.recipe.strAlcoholic, item.recipe.strCategory, item.recipe.strGlass, item.recipe.strInstructions,
+                        item.recipe.strIngredient1, item.recipe.strIngredient2, item.recipe.strIngredient3, item.recipe.strIngredient4, item.recipe.strIngredient5,
+                        item.recipe.strIngredient6, item.recipe.strIngredient7, item.recipe.strIngredient8, item.recipe.strIngredient9, item.recipe.strIngredient10,
+                        item.recipe.strIngredient11, item.recipe.strIngredient12, item.recipe.strIngredient13, item.recipe.strIngredient14, item.recipe.strIngredient15,
+                        item.recipe.strMeasure1, item.recipe.strMeasure2, item.recipe.strMeasure3, item.recipe.strMeasure4, item.recipe.strMeasure5, item.recipe.strMeasure6, item.recipe.strMeasure7,
+                        item.recipe.strMeasure8, item.recipe.strMeasure9, item.recipe.strMeasure10, item.recipe.strMeasure11, item.recipe.strMeasure12, item.recipe.strMeasure13,
+                        item.recipe.strMeasure14, item.recipe.strMeasure15, item.recipe.dateModified])).rows[0].id;
+            }
+            await psqlPool.query(
+                `INSERT INTO menu_items (menu_id, api_recipe_id, custom_recipe_id) VALUES ($1, $2, $3)`, 
+                [result.rows[0].id, item.api_recipe_id || null, cr_id || null] // TODO: change to get custom id from prior insert
+                );
+        }
+        return res.json({ menu_id: result.rows[0].id });
+    }).catch((error) => {
+        return res.status(500).send(error);
+    });
+});
+
 
 export default menuGenRouter;
