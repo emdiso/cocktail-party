@@ -5,6 +5,7 @@ import TablePagination from '@mui/material/TablePagination';
 import { get } from "../axios.service";
 import { stringify } from 'querystring';
 import { AxiosError, AxiosResponse } from 'axios';
+import Recipe from './../models/Recipe';
 import { ContactSupportOutlined } from '@mui/icons-material';
 
 // -TODO- On server side, transform the data before returning it to the client, then adjust this interface to match the transformed data
@@ -64,7 +65,7 @@ interface random {
 }
 
 const Random = () => {
-    const [randDrink, setRandDrink] = React.useState<Drink | undefined>(undefined);
+    const [randDrink, setRandDrink] = React.useState<Recipe | undefined>(undefined);
     const [ingredients, setIngredients] = React.useState<any[]>([]);
 
     const [drinksByIngredient, setDrinksByIngredient] = React.useState<random[]>([]);
@@ -93,7 +94,6 @@ const Random = () => {
 
     const getRandomDrink = () => {
         get('/cocktail_api/random_drink', {}, (response: AxiosResponse) => {
-            console.log(response.data.drinks);
             setRandDrink(response.data.drinks[0]);
         }, (error: AxiosError) => {
             console.log(error);
