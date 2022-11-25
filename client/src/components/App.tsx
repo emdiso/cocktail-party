@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React, { useEffect } from 'react';
 import './styling/App.css';
 import LSPopUp from './LSPopUp';
 import Navbar from './Navbar';
@@ -8,13 +7,11 @@ import Landing from './Landing';
 import Random from './Random';
 import Profile from './Profile';
 import '../axios.service.ts';
-import { getAuthToken, get, post } from '../axios.service';
+import { getAuthToken, get } from '../axios.service';
 import MenuForm from './forms/MenuForm';
-import { Button } from 'react-bootstrap';
-import { Box, Fab } from '@mui/material';
+import { Fab } from '@mui/material';
 
 export interface UserInfo {
-  userId: string;
   username: string;
   email: string;
 }
@@ -23,11 +20,12 @@ function App() {
   let myAuthToken = getAuthToken();
   const [isLoggedIn, setLoggedIn] = React.useState(myAuthToken !== "");
   const [openLogin, setOpenLogin] = React.useState(false);
-  const [userInfo, setUserInfo] = React.useState<UserInfo>({ userId: "", username: "", email: "" });
+  const [userInfo, setUserInfo] = React.useState<UserInfo>({ username: "", email: "" });
 
-  if (isLoggedIn) {
-    get('/auth/userInfo', {}, (res) => { setUserInfo({ userId: res.data.userId, username: res.data.username, email: res.data.email }) });
-  }
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    get('/auth/userInfo', {}, (res) => { setUserInfo({ username: res.data.username, email: res.data.email }) });
+  }, [isLoggedIn]);
 
   const handleClose = () => {
     setOpenLogin(false);
