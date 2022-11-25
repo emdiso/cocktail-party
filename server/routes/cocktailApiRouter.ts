@@ -1,9 +1,10 @@
-import express, { Request, Response } from 'express';
+import express, { Request, response, Response } from 'express';
 import axios, { AxiosResponse } from 'axios';
 import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
 import dotenv from 'dotenv';
 import { randomDrinkPromise, retreiveAllMenuInfo } from '../utils/cocktailApiUtils';
 import cors from 'cors';
+import psqlPool from '../utils/psqlConnection';
 require('dotenv').config();
 
 
@@ -92,11 +93,10 @@ const ingredientOptionsPromise = () => {
 cocktailApiRouter.get('/ingredient_options', async (req: Request, res: Response) => {
     ingredientOptionsPromise().then((response: AxiosResponse) => {
         res.send(response.data);
-    })
-        .catch((err: any) => {
-            console.log("ERROR " + err);
-            res.status(500).send();
-        });
+    }).catch((err: any) => {
+        console.log("ERROR " + err);
+        res.status(500).send();
+    });
 });
 
 cocktailApiRouter.get('/category_options', async (req: Request, res: Response) => {
@@ -106,11 +106,22 @@ cocktailApiRouter.get('/category_options', async (req: Request, res: Response) =
         }
     }).then((response: AxiosResponse) => {
         res.send(response.data);
-    })
-        .catch((err: any) => {
-            console.log("ERROR " + err);
-            res.status(500).send();
-        });
+    }).catch((err: any) => {
+        console.log("ERROR " + err);
+        res.status(500).send();
+    });
+});
+
+cocktailApiRouter.get('/list_menus', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.userId) return res.sendStatus(401);
+    psqlPool.query(
+        'SELECT m.id, m.title, m.image_id FROM menus m WHERE m.user_id = $1',
+        [ req.userId ]
+    ).then((result) => {
+        res.json({ menus: result.rows });
+    }).catch(() => {
+        res.sendStatus(500);
+    });
 });
 
 
