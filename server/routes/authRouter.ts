@@ -133,7 +133,7 @@ authRouter.get("/userInfo", verifyToken, (req: AuthenticatedRequest, res: Respon
   psqlPool.query("SELECT username, email FROM users WHERE id=$1", [userId])
   .then((response) => {
       let userInfo = response.rows[0];
-      res.json({"userid":userId, "username":userInfo.username, "email":userInfo.email});
+      res.json({ "username":userInfo.username, "email":userInfo.email });
   })
   .catch((error) => {
       console.log(error);
