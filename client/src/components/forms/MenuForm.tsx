@@ -1,23 +1,26 @@
-import React, { HtmlHTMLAttributes, ReactElement, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import './../styling/MenuForms.css';
-import { Box, Button, Checkbox, Chip, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Step, StepContent, StepLabel, Stepper, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography } from '@mui/material';
 import MenuRawDetails from '../MenuRawDetails';
 import { get, post } from '../../axios.service';
 import { AxiosResponse } from 'axios';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
+import { CustomRecipe, Recipe } from '../../models';
 
-export interface Quantity {
-  id: number,
-  item: string,
-  amount: number
-}
+// export interface Quantity {
+//   id: number,
+//   item: string,
+//   amount: number
+// }
 
-export interface MenuModel {
-  menuDrinks: any[],
-  size: number,
-  alcoholicQuantity: number,
-  ingriedientsYes: string[],
-  ingriedientsNo: string[]
+export interface MenuGenModel {
+  title: string;
+  menuRecipes: Recipe[];
+  menuCustomRecipes: CustomRecipe[];
+  size: number;
+  alcoholicQuantity: number;
+  ingriedientsYes: string[];
+  ingriedientsNo: string[];
 }
 
 interface StepModel {
@@ -25,8 +28,8 @@ interface StepModel {
   html: ReactNode
 }
 
-function usePreviousMenuModel(value: MenuModel) {
-  const ref = useRef<MenuModel>();
+function usePreviousMenuGenModel(value: MenuGenModel) {
+  const ref = useRef<MenuGenModel>();
   useEffect(() => {
     ref.current = value;
   }, [value]);
@@ -46,14 +49,22 @@ const MenuProps = {
 
 function MenuForm() {
 
-  const [menuModel, setMenuModel] = useState<MenuModel>({
-    menuDrinks: [], size: 0, alcoholicQuantity: 0, ingriedientsYes: [], ingriedientsNo: []
+  const [menuGenModel, setMenuGenModel] = useState<MenuGenModel>({
+    title: "", menuRecipes: [], menuCustomRecipes: [], size: 0, alcoholicQuantity: 0, ingriedientsYes: [], ingriedientsNo: []
   });
 
-  const previousMenu = usePreviousMenuModel(menuModel);
+  const previousMenu = usePreviousMenuGenModel(menuGenModel);
   const [ingredientOptions, setIngredientOptions] = useState<string[]>([]);
   const [ingredientsYesChanged, setIngredientsYesChanged] = useState<Boolean>(false);
   const [ingredientsNoChanged, setIngredientsNoChanged] = useState<Boolean>(false);
+  const [myCustomRecipes, setMyCustomRecipes] = useState<CustomRecipe[] | undefined>(undefined);
+
+  useEffect(() => {
+    if (myCustomRecipes !== undefined) return;
+    get("/cocktail_api/list_custom_recipes", {}, (response) => {
+      setMyCustomRecipes(response.data.custom_recipes);
+    });
+  }, [myCustomRecipes]);
 
   const [activeStep, setActiveStep] = React.useState(0);
 
@@ -66,19 +77,41 @@ function MenuForm() {
   };
 
   const handleReset = () => {
-    setMenuModel({ menuDrinks: [], size: 0, alcoholicQuantity: 0, ingriedientsYes: [], ingriedientsNo: [] });
+    setMenuGenModel({ title: "", menuRecipes: [], menuCustomRecipes: [], size: 0, alcoholicQuantity: 0, ingriedientsYes: [], ingriedientsNo: [] });
     setActiveStep(0);
+  };
+
+  const handleSubmit = () => {
+    post("/menu_gen/insert_full_menu", {
+      title: menuGenModel.title,
+      recipes: (menuGenModel.menuRecipes as (Recipe | CustomRecipe)[]).concat(menuGenModel.menuCustomRecipes)
+    }, {}, (response: AxiosResponse) => {
+      // TODO: Do something with returned menu id (for example link them to the menu page after we build it)
+      // console.log("Menu id: "+response.data.menu_id.toString());
+      handleReset();
+    }, () => {
+      // TODO: Announce that they need to be logged in to submit/save the menu
+    });
+  }
+
+  const setMenuTitle = (e: any) => {
+    setMenuGenModel((prev: MenuGenModel) => {
+      let obj = { ...prev };
+      obj.title = e.target.value;
+
+      return obj;
+    });
   };
 
   const menuSizeSelected = (e: any) => {
     let size = Number(e.target.value);
     get(
-      "/cocktail_api/menu_by_size", { "size": size },
+      "/menu_gen/menu_by_size", { "size": size },
       (res: AxiosResponse) => {
-        setMenuModel((prev: MenuModel) => {
+        setMenuGenModel((prev: MenuGenModel) => {
           let obj = { ...prev };
           obj.size = size;
-          obj.menuDrinks = res.data;
+          obj.menuRecipes = res.data;
 
           let alcoholic = res.data.filter(function (item: any) {
             return item.strAlcoholic.includes("Alcoholic");
@@ -105,9 +138,9 @@ function MenuForm() {
     )
   }
 
-  const setMenuModelAlcoholicQuantity = (e: any) => {
-    setMenuModel(
-      (prev: MenuModel) => {
+  const setMenuGenModelAlcoholicQuantity = (e: any) => {
+    setMenuGenModel(
+      (prev: MenuGenModel) => {
         let obj = { ...prev };
         obj.alcoholicQuantity = Number(e.target.value);
         return obj;
@@ -120,8 +153,8 @@ function MenuForm() {
       target: { value },
     } = event;
 
-    setMenuModel(
-      (prev: MenuModel) => {
+    setMenuGenModel(
+      (prev: MenuGenModel) => {
         let obj = { ...prev };
 
         let stringify = String(value);
@@ -137,8 +170,8 @@ function MenuForm() {
       target: { value },
     } = event;
 
-    setMenuModel(
-      (prev: MenuModel) => {
+    setMenuGenModel(
+      (prev: MenuGenModel) => {
         let obj = { ...prev };
 
         let stringify = String(value);
@@ -149,16 +182,32 @@ function MenuForm() {
     );
   };
 
+  const handleChangeCustomRecipes = (event: any) => {
+    const {
+      target: { value },
+    } = event;
+
+    setMenuGenModel(
+      (prev: MenuGenModel) => {
+        let obj = { ...prev };
+        
+        obj.menuCustomRecipes = !myCustomRecipes ? [] : myCustomRecipes.filter((cr) => {
+          return value.includes(cr.id);
+        });
+        return obj;
+      }
+    );
+  };
+
   React.useEffect(() => {
-    if (previousMenu && previousMenu.alcoholicQuantity !== menuModel.alcoholicQuantity) {
+    if (previousMenu && previousMenu.alcoholicQuantity !== menuGenModel.alcoholicQuantity) {
       post(
-        '/cocktail_api/menu_model/modify_menu_by_alcoholic', menuModel, {},
+        '/menu_gen/modify_menu_by_alcoholic', menuGenModel, {},
         (res: AxiosResponse) => {
-          console.log(res.data);
-          setMenuModel(
-            (prev: MenuModel) => {
+          setMenuGenModel(
+            (prev: MenuGenModel) => {
               let obj = { ...prev };
-              obj.menuDrinks = res.data.menuDrinks;
+              obj.menuRecipes = res.data.menuRecipes;
               return obj;
             }
           );
@@ -168,13 +217,12 @@ function MenuForm() {
 
     if (previousMenu && ingredientsYesChanged) {
       post(
-        '/cocktail_api/menu_model/add_drink_with_ingredient', menuModel, {},
+        '/menu_gen/add_drink_with_ingredient', menuGenModel, {},
         (res: AxiosResponse) => {
-          console.log(res.data);
-          setMenuModel(
-            (prev: MenuModel) => {
+          setMenuGenModel(
+            (prev: MenuGenModel) => {
               let obj = { ...prev };
-              obj.menuDrinks = res.data.menuDrinks;
+              obj.menuRecipes = res.data.menuRecipes;
               return obj;
             }
           );
@@ -185,13 +233,12 @@ function MenuForm() {
 
     if (previousMenu && ingredientsNoChanged) {
       post(
-        '/cocktail_api/menu_model/remove_drink_with_ingredient', menuModel, {},
+        '/menu_gen/remove_drink_with_ingredient', menuGenModel, {},
         (res: AxiosResponse) => {
-          console.log(res.data);
-          setMenuModel(
-            (prev: MenuModel) => {
+          setMenuGenModel(
+            (prev: MenuGenModel) => {
               let obj = { ...prev };
-              obj.menuDrinks = res.data.menuDrinks;
+              obj.menuRecipes = res.data.menuRecipes;
               return obj;
             }
           );
@@ -200,16 +247,23 @@ function MenuForm() {
       )
     }
 
-  }, [menuModel]);
+  }, [menuGenModel]);
 
   const steps: StepModel[] = [
+    {
+      title: "Menu Title",
+      html:
+        <div>
+          <TextField onChange={setMenuTitle} value={menuGenModel.title} />
+        </div>
+    },
     {
       title: "Generate drinks",
       html:
         <div className="form-row">
           <div className="form-group">
             <label>Number of drinks to generate: </label>
-            <select onChange={menuSizeSelected} value={menuModel.size}>
+            <select onChange={menuSizeSelected} value={menuGenModel.size}>
               {[0, 1, 5, 10, 15, 25, 30].map(i =>
                 <option key={i} value={i}>{i}</option>
               )}
@@ -223,12 +277,12 @@ function MenuForm() {
         <div className="form-row">
           <div className="form-group">
             <label>Alcoholic Drink Quantity</label>
-            <select onChange={setMenuModelAlcoholicQuantity} value={menuModel.alcoholicQuantity}>
-              {menuModel.menuDrinks.map((item: any, i: number) =>
+            <select onChange={setMenuGenModelAlcoholicQuantity} value={menuGenModel.alcoholicQuantity}>
+              {menuGenModel.menuRecipes.map((item: any, i: number) =>
                 <option key={i + 1} value={i + 1}>{i + 1}</option>
               )}
             </select>
-            <h5>{menuModel.alcoholicQuantity} drinks contain alcohol, {menuModel.menuDrinks.length - menuModel.alcoholicQuantity} are kid friendly.</h5>
+            <h5>{menuGenModel.alcoholicQuantity} drinks contain alcohol, {menuGenModel.menuRecipes.length - menuGenModel.alcoholicQuantity} are kid friendly.</h5>
           </div>
         </div>
     },
@@ -242,7 +296,7 @@ function MenuForm() {
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
               multiple
-              value={menuModel.ingriedientsYes}
+              value={menuGenModel.ingriedientsYes}
               onChange={handleChangeIngriedientsYes}
               input={<OutlinedInput label="Tag" />}
               renderValue={(selected) => selected.join(', ')}
@@ -250,7 +304,7 @@ function MenuForm() {
             >
               {ingredientOptions.map((name) => (
                 <MenuItem key={name} value={name}>
-                  <Checkbox checked={menuModel.ingriedientsYes.includes(name)} />
+                  <Checkbox checked={menuGenModel.ingriedientsYes.includes(name)} />
                   <ListItemText primary={name} />
                 </MenuItem>
               ))}
@@ -268,17 +322,17 @@ function MenuForm() {
               labelId="demo-multiple-checkbox-label"
               id="demo-multiple-checkbox"
               multiple
-              value={menuModel.ingriedientsNo}
+              value={menuGenModel.ingriedientsNo}
               onChange={handleChangeIngriedientsNo}
               input={<OutlinedInput label="Tag" />}
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
             >
               {ingredientOptions.filter((element) => {
-                return !menuModel.ingriedientsYes.includes(element);
+                return !menuGenModel.ingriedientsYes.includes(element);
               }).map((name) => (
                 <MenuItem key={name} value={name}>
-                  <Checkbox checked={menuModel.ingriedientsNo.includes(name)} />
+                  <Checkbox checked={menuGenModel.ingriedientsNo.includes(name)} />
                   <ListItemText primary={name} />
                 </MenuItem>
               ))}
@@ -290,7 +344,27 @@ function MenuForm() {
       title: "Add your drinks to the menu",
       html:
         <div>
-          <p>cj do ur code here, im on line 293 in MenuForm.tsx</p>
+          {myCustomRecipes === undefined ? (<p>Login to add your Custom Recipes</p>) : (
+            <FormControl sx={{ m: 1, width: 350 }}>
+            <InputLabel id="custom-recipe-select-label">Custom Recipes</InputLabel>
+            <Select
+              labelId="custom-recipe-select-label"
+              multiple
+              value={menuGenModel.menuCustomRecipes.map((cr: CustomRecipe) => cr.id)}
+              onChange={handleChangeCustomRecipes}
+              input={<OutlinedInput label="Tag" />}
+              renderValue={(selected) => selected.length+" Selected"}
+              MenuProps={MenuProps}
+            >
+              {myCustomRecipes.map((cr) => (
+                <MenuItem key={cr.id} value={cr.id}>
+                  <Checkbox checked={menuGenModel.menuCustomRecipes.map((mcr: CustomRecipe) => mcr.id).includes(cr.id)} />
+                  <ListItemText primary={cr.strDrink} />
+                </MenuItem>
+              ))}
+            </Select>
+            </FormControl>
+          )}
         </div>
     }
   ]
@@ -311,7 +385,7 @@ function MenuForm() {
                   <Step key={step.title}>
                     <StepLabel
                       optional={
-                        index === 4 ? (
+                        index === 5 ? (
                           <Typography variant="caption">Last step</Typography>
                         ) : null
                       }
@@ -349,7 +423,7 @@ function MenuForm() {
               {activeStep === steps.length && (
                 <Paper square elevation={0} sx={{ p: 3 }}>
                   <Typography>All steps completed - you&apos;re finished</Typography>
-                  <Button variant="outlined">Submit</Button>
+                  <Button onClick={handleSubmit} variant="outlined">Submit</Button>
                   <Button onClick={handleReset} variant="outlined">Reset</Button>
                   <Button variant="outlined">Design</Button>
                 </Paper>
@@ -359,7 +433,7 @@ function MenuForm() {
         </Grid>
 
         <Grid item xs={5.8}>
-          <MenuRawDetails data={menuModel.menuDrinks} />
+          <MenuRawDetails data={(menuGenModel.menuRecipes as (Recipe | CustomRecipe)[]).concat(menuGenModel.menuCustomRecipes)} />
         </Grid>
       </Grid>
 

@@ -2,10 +2,11 @@ import express, { Request, response, Response } from 'express';
 import axios, { AxiosResponse } from 'axios';
 import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
 import dotenv from 'dotenv';
-import { retreiveAllMenuInfo } from '../utils/cocktailApiUtils';
-import { Quantity } from '../utils/models';
-var cors = require('cors');
+import { randomDrinkPromise, retreiveAllMenuInfo } from '../utils/cocktailApiUtils';
+import cors from 'cors';
+import psqlPool from '../utils/psqlConnection';
 require('dotenv').config();
+
 
 dotenv.config();
 const cocktailApiRouter = express.Router();
@@ -57,15 +58,6 @@ cocktailApiRouter.get('/drinks_by_letter', async (req: Request, res: Response) =
     });
 });
 
-
-const randomDrinkPromise = () => {
-    return axios.get(`${api_url}random.php`, {
-        headers: {
-            "Authentication": `Bearer ${api_key}`,
-        }
-    });
-}
-
 cocktailApiRouter.get('/random_drink', async (req: Request, res: Response) => {
     randomDrinkPromise().then((response: AxiosResponse) => {
         res.send(response.data);
@@ -74,8 +66,6 @@ cocktailApiRouter.get('/random_drink', async (req: Request, res: Response) => {
         res.status(500).send();
     });
 });
-
-
 
 cocktailApiRouter.get('/random_drink_by_ingredient', async (req: Request, res: Response) => {
     const ingredient = req.query.ingredient;
@@ -103,11 +93,10 @@ const ingredientOptionsPromise = () => {
 cocktailApiRouter.get('/ingredient_options', async (req: Request, res: Response) => {
     ingredientOptionsPromise().then((response: AxiosResponse) => {
         res.send(response.data);
-    })
-        .catch((err: any) => {
-            console.log("ERROR " + err);
-            res.status(500).send();
-        });
+    }).catch((err: any) => {
+        console.log("ERROR " + err);
+        res.status(500).send();
+    });
 });
 
 cocktailApiRouter.get('/category_options', async (req: Request, res: Response) => {
@@ -117,262 +106,50 @@ cocktailApiRouter.get('/category_options', async (req: Request, res: Response) =
         }
     }).then((response: AxiosResponse) => {
         res.send(response.data);
-    })
-        .catch((err: any) => {
-            console.log("ERROR " + err);
-            res.status(500).send();
-        });
+    }).catch((err: any) => {
+        console.log("ERROR " + err);
+        res.status(500).send();
+    });
 });
 
-cocktailApiRouter.get('/menu_by_size', async (req: AuthenticatedRequest, res: Response) => {
-    let drinks: any[] = [];
-    let size = Number(req.query.size);
-
-    for (let i = 0; i < size; i++) {
-        randomDrinkPromise()
-            .then((response: AxiosResponse) => {
-                if (!drinks.includes(response.data.drinks[0])) {
-                    drinks.push(response.data.drinks[0]);
-                }
-                else {
-                    i--;
-                }
-
-                if (drinks.length === size) {
-                    res.send(drinks);
-                }
-            }).catch((err: any) => {
-                console.log("ERROR " + err);
-                return res.status(500).send();
-            });
-    }
-
+cocktailApiRouter.get('/list_menus', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.userId) return res.sendStatus(401);
+    psqlPool.query(
+        'SELECT m.id, m.title, m.image_id FROM menus m WHERE m.user_id = $1',
+        [ req.userId ]
+    ).then((result) => {
+        res.json({ menus: result.rows });
+    }).catch(() => {
+        res.sendStatus(500);
+    });
 });
 
-const drinkByAlcoholicPromise = (alcoholic: string) => {
-    return axios.get(`${api_url}filter.php?a=${alcoholic}`, {
-        headers: {
-            "Authentication": `Bearer ${api_key}`,
-        }
+// cocktailApiRouter.get('/list_custom_recipe_names', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+//     if (!req.userId) return res.sendStatus(401);
+//     psqlPool.query(
+//         'SELECT cr.id, cr."strDrink" FROM custom_recipes cr WHERE cr.user_id = $1',
+//         [ req.userId ]
+//     ).then((result) => {
+//         res.json({ custom_recipes: result.rows });
+//     }).catch(() => {
+//         res.sendStatus(500);
+//     });
+// });
+
+cocktailApiRouter.get('/list_custom_recipes', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.userId) return res.sendStatus(401);
+    psqlPool.query(
+        `SELECT cr.id, cr.image_id, cr."strDrink", cr."strAlcoholic", cr."strCategory", cr."strGlass", cr."strInstructions", cr."strIngredient1", cr."strIngredient2", cr."strIngredient3", cr."strIngredient4", cr."strIngredient5", cr."strIngredient6", cr."strIngredient7", cr."strIngredient8", cr."strIngredient9", cr."strIngredient10", cr."strIngredient11", cr."strIngredient12", cr."strIngredient13", cr."strIngredient14", cr."strIngredient15", cr."strMeasure1", cr."strMeasure2", cr."strMeasure3", cr."strMeasure4", cr."strMeasure5", cr."strMeasure6", cr."strMeasure7", cr."strMeasure8", cr."strMeasure9", cr."strMeasure10", cr."strMeasure11", cr."strMeasure12", cr."strMeasure13", cr."strMeasure14", cr."strMeasure15", cr."dateModified"
+         FROM custom_recipes cr WHERE cr.user_id = $1`,
+        [ req.userId ]
+    ).then((result) => {
+        res.json({ custom_recipes: result.rows });
+    }).catch(() => {
+        res.sendStatus(500);
     });
-}
-
-const drinkByIdPromise = (id: string) => {
-    return axios.get(`${api_url}lookup.php?i=${id}`, {
-        headers: {
-            "Authentication": `Bearer ${api_key}`,
-        }
-    });
-}
-
-const drinkByIngredientPromise = (ingredient: string) => {
-    return axios.get(`${api_url}filter.php?i=${ingredient}`, {
-        headers: {
-            "Authentication": `Bearer ${api_key}`,
-        }
-    });
-}
-
-cocktailApiRouter.post('/menu_model/modify_menu_by_alcoholic', async (req: AuthenticatedRequest, res: Response) => {
-    let menu = req.body;
-    let expectedAlcoholic = Number(menu.alcoholicQuantity);
-    let drinks = menu.menuDrinks;
-
-    let alcoholicDrinks: any[] = drinks.filter(function (drink: any) {
-        return drink.strAlcoholic.includes("Alcoholic");
-    });
-    let nonAlcoholicDrinks: any[] = drinks.filter(function (drink: any) {
-        return drink.strAlcoholic.includes("Non");
-    });
-
-    let actualAlcoholic = alcoholicDrinks.length;
-    let difference = 0;
-    let filter = "";
-    let list: any[] = [];
-
-    if (actualAlcoholic > expectedAlcoholic) {
-        difference = actualAlcoholic - expectedAlcoholic;
-        filter = "Non_Alcoholic";
-        list = alcoholicDrinks;
-    }
-
-    if (expectedAlcoholic > actualAlcoholic) {
-        difference = expectedAlcoholic - actualAlcoholic;
-        filter = "Alcoholic";
-        list = nonAlcoholicDrinks;
-    }
-
-    let replaceWith: string[] = [];
-    for (let i = 0; i < difference; i++) {
-        drinkByAlcoholicPromise(filter).then(
-            (response: AxiosResponse) => {
-                let randomIndex = Math.floor(Math.random() * response.data.drinks.length);
-                let searchId: string[] = menu.menuDrinks.filter(function (item: any) {
-                    return item.idDrink.includes(response.data.drinks[randomIndex].idDrink);
-                });
-
-                if (searchId.length === 0 && !replaceWith.includes(response.data.drinks[randomIndex].idDrink)) {
-                    replaceWith.push(response.data.drinks[randomIndex].idDrink);
-                } else {
-                    i--;
-                }
-
-                if (replaceWith.length === difference) {
-                    let replaced = 0;
-                    replaceWith.forEach((drinkid: string, index: number) => {
-                        drinkByIdPromise(drinkid).then(
-                            (response: any) => {
-                                let replace = list[index];
-                                const i = menu.menuDrinks.indexOf(replace, 0);
-                                menu.menuDrinks.splice(i, 1);
-                                menu.menuDrinks.push(response.data.drinks[0]);
-                                replaced++;
-
-                                if (replaced === difference) {
-                                    return res.send(menu);
-                                }
-                            }
-                        )
-                    });
-                }
-            }
-        ).catch((err: any) => {
-            console.log("ERROR " + err);
-            return res.status(500).send();
-        });
-    }
-
 });
 
-cocktailApiRouter.post('/menu_model/add_drink_with_ingredient', async (req: AuthenticatedRequest, res: Response) => {
-    let menu = req.body;
-    let ingriedientsYes = menu.ingriedientsYes;
-    let drinks = menu.menuDrinks;
 
-    let alcoholicDrinks: any[] = drinks.filter(function (drink: any) {
-        return drink.strAlcoholic.includes("Alcoholic");
-    });
-    let nonAlcoholicDrinks: any[] = drinks.filter(function (drink: any) {
-        return drink.strAlcoholic.includes("Non");
-    });
-
-    let replaceWith: string[] = [];
-    for (let i = 0; i < ingriedientsYes.length; i++) {
-        let ingredient = ingriedientsYes[i];
-
-        drinkByIngredientPromise(ingredient).then(
-            (response: any) => {
-                let randomIndex = Math.floor(Math.random() * response.data.drinks.length);
-                let searchId: string[] = menu.menuDrinks.filter(function (item: any) {
-                    return item.idDrink.includes(response.data.drinks[randomIndex].idDrink);
-                });
-
-                if (searchId.length === 0 && !replaceWith.includes(response.data.drinks[randomIndex].idDrink)) {
-                    replaceWith.push(response.data.drinks[randomIndex].idDrink);
-                } else {
-                    i--;
-                }
-
-                if (replaceWith.length === ingriedientsYes.length) {
-                    let replaced = 0;
-                    replaceWith.forEach((drinkid: string, index: number) => {
-                        drinkByIdPromise(drinkid).then(
-                            (response: any) => {
-                                let alcoholic = response.data.drinks[0].strAlcoholic === "Alcoholic";
-
-                                let replace = alcoholic ? alcoholicDrinks[index] : nonAlcoholicDrinks[index];
-                                const i = menu.menuDrinks.indexOf(replace, 0);
-                                menu.menuDrinks.splice(i, 1);
-                                menu.menuDrinks.push(response.data.drinks[0]);
-                                replaced++;
-
-                                if (replaced === ingriedientsYes.length) {
-                                    return res.send(menu);
-                                }
-                            }
-                        )
-                    });
-                }
-            }
-        )
-    }
-});
-
-function hasIngredient(drink: any, listToCheck: string[]) {
-    let ingredients: string[] = [];
-    for (let i = 1; i < 16; i++) {
-        ingredients.push(drink[`strIngredient${i}`])
-    }
-    const found = ingredients.some(r => listToCheck.includes(r));
-
-    return found;
-}
-
-cocktailApiRouter.post('/menu_model/remove_drink_with_ingredient', async (req: AuthenticatedRequest, res: Response) => {
-    let menu = req.body;
-    let ingredientsNo = menu.ingriedientsNo;
-    let drinks = menu.menuDrinks;
-
-    let alcoholicDrinks: any[] = drinks.filter(function (drink: any) {
-        return drink.strAlcoholic.includes("Alcoholic");
-    });
-    let nonAlcoholicDrinks: any[] = drinks.filter(function (drink: any) {
-        return drink.strAlcoholic.includes("Non");
-    });
-
-    // find out what to replace
-    let expendable: any[] = [];
-    drinks.forEach((drink: any) => {
-        const found = hasIngredient(drink, ingredientsNo);
-        if (found) {
-            expendable.push(drink);
-        };
-    });
-
-    let replaceWith: string[] = [];
-    for (let i = 0; i < expendable.length; i++) {
-        let drink = expendable[i];
-        let filter = drink.strAlcoholic.includes("Alcoholic") ? "Alcoholic" : "Non_Alcoholic";
-        let list = drink.strAlcoholic.includes("Alcoholic") ? alcoholicDrinks : nonAlcoholicDrinks;
-        drinkByAlcoholicPromise(filter).then(
-            (response: AxiosResponse) => {
-                let randomIndex = Math.floor(Math.random() * response.data.drinks.length);
-                let searchId: string[] = menu.menuDrinks.filter(function (item: any) {
-                    return item.idDrink.includes(response.data.drinks[randomIndex].idDrink);
-                });
-
-                if (searchId.length === 0 && !replaceWith.includes(response.data.drinks[randomIndex].idDrink) && !hasIngredient(response.data.drinks[randomIndex], ingredientsNo)) {
-                    replaceWith.push(response.data.drinks[randomIndex].idDrink);
-                } else {
-                    i--;
-                }
-
-                if (replaceWith.length === expendable.length) {
-                    let replaced = 0;
-                    replaceWith.forEach((drinkid: string, index: number) => {
-                        drinkByIdPromise(drinkid).then(
-                            (response: any) => {
-                                let replace = list[index];
-                                const i = menu.menuDrinks.indexOf(replace, 0);
-                                menu.menuDrinks.splice(i, 1);
-                                menu.menuDrinks.push(response.data.drinks[0]);
-                                replaced++;
-
-                                if (replaced === expendable.length) {
-                                    return res.send(menu);
-                                }
-                            }
-                        )
-                    });
-                }
-            }
-        ).catch((err: any) => {
-            console.log("ERROR " + err);
-            return res.status(500).send();
-        });
-
-    }
-});
 
 export default cocktailApiRouter;
 
