@@ -124,6 +124,32 @@ cocktailApiRouter.get('/list_menus', verifyToken, async (req: AuthenticatedReque
     });
 });
 
+// cocktailApiRouter.get('/list_custom_recipe_names', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+//     if (!req.userId) return res.sendStatus(401);
+//     psqlPool.query(
+//         'SELECT cr.id, cr."strDrink" FROM custom_recipes cr WHERE cr.user_id = $1',
+//         [ req.userId ]
+//     ).then((result) => {
+//         res.json({ custom_recipes: result.rows });
+//     }).catch(() => {
+//         res.sendStatus(500);
+//     });
+// });
+
+cocktailApiRouter.get('/list_custom_recipes', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+    if (!req.userId) return res.sendStatus(401);
+    psqlPool.query(
+        `SELECT cr.id, cr.image_id, cr."strDrink", cr."strAlcoholic", cr."strCategory", cr."strGlass", cr."strInstructions", cr."strIngredient1", cr."strIngredient2", cr."strIngredient3", cr."strIngredient4", cr."strIngredient5", cr."strIngredient6", cr."strIngredient7", cr."strIngredient8", cr."strIngredient9", cr."strIngredient10", cr."strIngredient11", cr."strIngredient12", cr."strIngredient13", cr."strIngredient14", cr."strIngredient15", cr."strMeasure1", cr."strMeasure2", cr."strMeasure3", cr."strMeasure4", cr."strMeasure5", cr."strMeasure6", cr."strMeasure7", cr."strMeasure8", cr."strMeasure9", cr."strMeasure10", cr."strMeasure11", cr."strMeasure12", cr."strMeasure13", cr."strMeasure14", cr."strMeasure15", cr."dateModified"
+         FROM custom_recipes cr WHERE cr.user_id = $1`,
+        [ req.userId ]
+    ).then((result) => {
+        res.json({ custom_recipes: result.rows });
+    }).catch(() => {
+        res.sendStatus(500);
+    });
+});
+
+
 
 export default cocktailApiRouter;
 

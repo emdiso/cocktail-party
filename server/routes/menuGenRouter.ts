@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import { randomDrinkPromise } from '../utils/cocktailApiUtils';
 import cors from 'cors';
 import psqlPool from '../utils/psqlConnection';
-import { Recipe, CustomRecipe } from '../models';
+import { Recipe, CustomRecipe, MenuGenModel } from '../models';
 require('dotenv').config();
 
 
@@ -18,7 +18,7 @@ const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
 const api_url = process.env.COCKTAIL_API_MAIN_URL;
 
 menuGenRouter.get('/menu_by_size', async (req: Request, res: Response) => {
-    let drinks: any[] = [];
+    let drinks: Recipe[] = [];
     let size = Number(req.query.size);
 
     for (let i = 0; i < size; i++) {
@@ -67,9 +67,12 @@ const drinkByIngredientPromise = (ingredient: string) => {
 }
 
 menuGenRouter.post('/modify_menu_by_alcoholic', async (req: Request, res: Response) => {
-    let menu = req.body;
+    let menu: MenuGenModel = req.body;
     let expectedAlcoholic = Number(menu.alcoholicQuantity);
-    let drinks = menu.menuDrinks;
+    let drinks: Recipe[] = menu.menuRecipes;
+    if (drinks === undefined) {
+        return;
+    }
 
     let alcoholicDrinks: any[] = drinks.filter(function (drink: any) {
         return drink.strAlcoholic.includes("Alcoholic");
@@ -100,7 +103,7 @@ menuGenRouter.post('/modify_menu_by_alcoholic', async (req: Request, res: Respon
         drinkByAlcoholicPromise(filter).then(
             (response: AxiosResponse) => {
                 let randomIndex = Math.floor(Math.random() * response.data.drinks.length);
-                let searchId: string[] = menu.menuDrinks.filter(function (item: any) {
+                let searchId = menu.menuRecipes.filter(function (item: any) {
                     return item.idDrink.includes(response.data.drinks[randomIndex].idDrink);
                 });
 
@@ -116,9 +119,9 @@ menuGenRouter.post('/modify_menu_by_alcoholic', async (req: Request, res: Respon
                         drinkByIdPromise(drinkid).then(
                             (response: any) => {
                                 let replace = list[index];
-                                const i = menu.menuDrinks.indexOf(replace, 0);
-                                menu.menuDrinks.splice(i, 1);
-                                menu.menuDrinks.push(response.data.drinks[0]);
+                                const i = menu.menuRecipes.indexOf(replace, 0);
+                                menu.menuRecipes.splice(i, 1);
+                                menu.menuRecipes.push(response.data.drinks[0]);
                                 replaced++;
 
                                 if (replaced === difference) {
@@ -138,9 +141,9 @@ menuGenRouter.post('/modify_menu_by_alcoholic', async (req: Request, res: Respon
 });
 
 menuGenRouter.post('/add_drink_with_ingredient', async (req: Request, res: Response) => {
-    let menu = req.body;
+    let menu: MenuGenModel = req.body;
     let ingriedientsYes = menu.ingriedientsYes;
-    let drinks = menu.menuDrinks;
+    let drinks = menu.menuRecipes;
 
     let alcoholicDrinks: any[] = drinks.filter(function (drink: any) {
         return drink.strAlcoholic.includes("Alcoholic");
@@ -156,7 +159,7 @@ menuGenRouter.post('/add_drink_with_ingredient', async (req: Request, res: Respo
         drinkByIngredientPromise(ingredient).then(
             (response: any) => {
                 let randomIndex = Math.floor(Math.random() * response.data.drinks.length);
-                let searchId: string[] = menu.menuDrinks.filter(function (item: any) {
+                let searchId = menu.menuRecipes.filter(function (item: any) {
                     return item.idDrink.includes(response.data.drinks[randomIndex].idDrink);
                 });
 
@@ -174,9 +177,9 @@ menuGenRouter.post('/add_drink_with_ingredient', async (req: Request, res: Respo
                                 let alcoholic = response.data.drinks[0].strAlcoholic === "Alcoholic";
 
                                 let replace = alcoholic ? alcoholicDrinks[index] : nonAlcoholicDrinks[index];
-                                const i = menu.menuDrinks.indexOf(replace, 0);
-                                menu.menuDrinks.splice(i, 1);
-                                menu.menuDrinks.push(response.data.drinks[0]);
+                                const i = menu.menuRecipes.indexOf(replace, 0);
+                                menu.menuRecipes.splice(i, 1);
+                                menu.menuRecipes.push(response.data.drinks[0]);
                                 replaced++;
 
                                 if (replaced === ingriedientsYes.length) {
@@ -202,9 +205,9 @@ function hasIngredient(drink: any, listToCheck: string[]) {
 }
 
 menuGenRouter.post('/remove_drink_with_ingredient', async (req: Request, res: Response) => {
-    let menu = req.body;
+    let menu: MenuGenModel = req.body;
     let ingredientsNo = menu.ingriedientsNo;
-    let drinks = menu.menuDrinks;
+    let drinks = menu.menuRecipes;
 
     let alcoholicDrinks: any[] = drinks.filter(function (drink: any) {
         return drink.strAlcoholic.includes("Alcoholic");
@@ -230,7 +233,8 @@ menuGenRouter.post('/remove_drink_with_ingredient', async (req: Request, res: Re
         drinkByAlcoholicPromise(filter).then(
             (response: AxiosResponse) => {
                 let randomIndex = Math.floor(Math.random() * response.data.drinks.length);
-                let searchId: string[] = menu.menuDrinks.filter(function (item: any) {
+                // TODO: seems inefficient, re-evaluate later. If updated, change it across the rest of the file
+                let searchId = menu.menuRecipes.filter(function (item: any) {
                     return item.idDrink.includes(response.data.drinks[randomIndex].idDrink);
                 });
 
@@ -246,9 +250,9 @@ menuGenRouter.post('/remove_drink_with_ingredient', async (req: Request, res: Re
                         drinkByIdPromise(drinkid).then(
                             (response: any) => {
                                 let replace = list[index];
-                                const i = menu.menuDrinks.indexOf(replace, 0);
-                                menu.menuDrinks.splice(i, 1);
-                                menu.menuDrinks.push(response.data.drinks[0]);
+                                const i = menu.menuRecipes.indexOf(replace, 0);
+                                menu.menuRecipes.splice(i, 1);
+                                menu.menuRecipes.push(response.data.drinks[0]);
                                 replaced++;
 
                                 if (replaced === expendable.length) {
