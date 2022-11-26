@@ -34,7 +34,7 @@ export function get(endpoint: string, params: any, resHandler?: (res: AxiosRespo
     })});
 }
 
-export function post(endpoint: string, data: any, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
+export function post(endpoint: string, data: any, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
     axios.post(
         `${baseUrl}${endpoint}`,
         data,
