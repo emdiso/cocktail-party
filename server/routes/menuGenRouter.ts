@@ -273,7 +273,7 @@ menuGenRouter.post('/remove_drink_with_ingredient', async (req: Request, res: Re
 
 interface InsertFullMenuBody {
     title: string;
-    recipes: Recipe[] | CustomRecipe[];
+    recipes: (Recipe | CustomRecipe)[];
 }
 
 menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
