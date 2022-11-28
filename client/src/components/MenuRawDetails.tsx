@@ -1,6 +1,12 @@
 import { Avatar, Divider, List, ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import React from 'react';
+import { Recipe, CustomRecipe } from '../models';
 import './styling/App.css';
+
+export interface MenuRawDetailsModel {
+  title: string;
+  menuRecipes: Recipe[] | CustomRecipe[];
+}
 
 function getIngredients(data: any) {
   let ingredients: string[] = [];
@@ -13,15 +19,19 @@ function getIngredients(data: any) {
 }
 
 function MenuRawDetails(data: any) {
+  console.log(data);
+  let recipes = data.data.menuRecipes;
+  let title = data.data.title;
 
   return (
     <div>
       <h5>Menu Details</h5>
       <div className="card m-3">
         <div className="card-body border-bottom">
+          <h5>{title}</h5>
           <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-            {data.data.length > 0 ?
-              data.data.map((item: any, index: number) =>
+            {recipes.length > 0 ?
+              recipes.map((item: any, index: number) =>
                 <div key={index}>
                   <ListItem alignItems="flex-start">
                     <ListItemAvatar>
