@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import authRouter from './routes/authRouter';
 import cocktailApiRouter from './routes/cocktailApiRouter';
 import imageRouter from './routes/imageRouter';
+import recipesRouter from './routes/recipesRouter';
 import { verifyToken, AuthenticatedRequest } from './utils/authUtils';
 import menuRouter from './routes/menuGenRouter';
 
@@ -26,6 +27,7 @@ app.use('/auth', authRouter);
 app.use('/cocktail_api', cocktailApiRouter);
 app.use('/image', imageRouter);
 app.use('/menu_gen', menuRouter);
+app.use('/recipe', recipesRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

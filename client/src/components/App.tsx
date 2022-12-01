@@ -59,8 +59,8 @@ function App() {
             <Route path='/' element={<Landing />}></Route>
             <Route path='/random' element={<Random />}></Route>
             <Route path='generate' element={<MenuForm />}></Route>
-            {isLoggedIn && <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>
-            <Route path='/recipe' element={<RecipeForm />}></Route>}
+            {isLoggedIn && <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>}
+            {isLoggedIn &&<Route path='/recipe' element={<RecipeForm />}></Route>}
           </Routes>
         </div>
       </Router>

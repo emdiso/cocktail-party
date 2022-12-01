@@ -2,11 +2,12 @@ import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { Button, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, Slider, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { get, post } from '../../axios.service';
-import { Axios, AxiosResponse } from 'axios';
+import axios, { Axios, AxiosResponse } from 'axios';
 import './../styling/App.css';
 import { Label } from '@mui/icons-material';
 import CustomRecipe from './../../models/CustomRecipe';
 import './../styling/RecipeForm.css';
+import { isDOMComponent } from 'react-dom/test-utils';
 
 const RecipeForm = () => {
     const [values, setValues] = React.useState<CustomRecipe>({
@@ -50,13 +51,12 @@ const RecipeForm = () => {
         dateModified: '',
     });
 
-    const [imgUploaded, setImageUploaded] = useState('');
+    const [imgUploaded, setImageUploaded] = useState<File>();
     const [specifications, setSpecifications] = useState([{ingredient: '', measurement: ''}]);
 
-    const handleChange =
-        (prop: keyof CustomRecipe) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (prop: keyof CustomRecipe) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [prop]: event.target.value });
-        };
+    };
 
     const handleNewSpec = () => {
         setSpecifications([...specifications, {ingredient: '', measurement: ''}]);
@@ -86,14 +86,101 @@ const RecipeForm = () => {
 
     const handleImageUpload = (event: React.FormEvent<HTMLInputElement>) => {
         if (!event.currentTarget.files) {
-            setImageUploaded('');
+            setImageUploaded(undefined);
         } else {
-            setImageUploaded(URL.createObjectURL(event.currentTarget.files[0]));
+            setImageUploaded(event.currentTarget.files[0]);
         }
     }
 
     const removeImage = () => {
-        setImageUploaded('');
+        setImageUploaded(undefined);
+    }
+
+    const handleSubmit = () => {
+        // Ingredients and Measurements Data
+        for (let i = 0; i < specifications.length; i++) {
+            let customCocktailIngredient = 'strIngredient' + (i+1);
+            let customCocktailMeasurement = 'strMeasure' + (i+1);
+
+            if (customCocktailIngredient === 'strIngredient1' && customCocktailMeasurement === 'strMeasure1') {
+                values.strIngredient1 = specifications[0].ingredient;
+                values.strMeasure1 = specifications[0].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient2' && customCocktailMeasurement === 'strMeasure2') {
+                values.strIngredient2 = specifications[1].ingredient;
+                values.strMeasure2 = specifications[1].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient3' && customCocktailMeasurement === 'strMeasure3') {
+                values.strIngredient3 = specifications[2].ingredient;
+                values.strMeasure3 = specifications[2].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient4' && customCocktailMeasurement === 'strMeasure4') {
+                values.strIngredient4 = specifications[3].ingredient;
+                values.strMeasure4 = specifications[3].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient5' && customCocktailMeasurement === 'strMeasure5') {
+                values.strIngredient5 = specifications[4].ingredient;
+                values.strMeasure5 = specifications[4].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient6' && customCocktailMeasurement === 'strMeasure6') {
+                values.strIngredient6 = specifications[5].ingredient;
+                values.strMeasure6 = specifications[5].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient7' && customCocktailMeasurement === 'strMeasure7') {
+                values.strIngredient7 = specifications[6].ingredient;
+                values.strMeasure7 = specifications[6].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient8' && customCocktailMeasurement === 'strMeasure8') {
+                values.strIngredient8 = specifications[7].ingredient;
+                values.strMeasure8 = specifications[7].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient9' && customCocktailMeasurement === 'strMeasure9') {
+                values.strIngredient9 = specifications[8].ingredient;
+                values.strMeasure9 = specifications[8].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient10' && customCocktailMeasurement === 'strMeasure10') {
+                values.strIngredient10 = specifications[9].ingredient;
+                values.strMeasure10 = specifications[9].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient11' && customCocktailMeasurement === 'strMeasure11') {
+                values.strIngredient11 = specifications[10].ingredient;
+                values.strMeasure11 = specifications[10].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient12' && customCocktailMeasurement === 'strMeasure12') {
+                values.strIngredient12 = specifications[11].ingredient;
+                values.strMeasure12 = specifications[11].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient13' && customCocktailMeasurement === 'strMeasure13') {
+                values.strIngredient13 = specifications[12].ingredient;
+                values.strMeasure13 = specifications[12].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient14' && customCocktailMeasurement === 'strMeasure14') {
+                values.strIngredient14 = specifications[13].ingredient;
+                values.strMeasure14 = specifications[13].measurement;
+            }
+            else if (customCocktailIngredient === 'strIngredient15' && customCocktailMeasurement === 'strMeasure15') {
+                values.strIngredient15 = specifications[14].ingredient;
+                values.strMeasure15 = specifications[14].measurement;
+            }
+        }
+
+        // Save/insert recipe in db
+        let formData = new FormData();
+        const reader = new FileReader();
+
+        reader.readAsDataURL(imgUploaded!);
+        formData.append('file', imgUploaded!);
+
+        // post('/recipe/insert', {'formData': formData, 'recipe': values});
+        post('/recipe/insert', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+
+        // window.location.reload();
+        // window.location.href = '/profile';
     }
 
     return (
@@ -102,17 +189,15 @@ const RecipeForm = () => {
                 <h1> Recipes </h1>
 
                 <div className='imgContainer'>
-                    {imgUploaded!='' && <img id='image' src={imgUploaded}></img>}
+                    {imgUploaded!=undefined && <img id='image' src={URL.createObjectURL(imgUploaded)}></img>}
 
-                        {imgUploaded=='' ? <div> <Button variant="outlined" component="label">
-                            Upload Image
-                            <input id='image' hidden accept="image/*" multiple type="file" onChange={handleImageUpload}/>
-                        </Button> </div>
-                        : 
-                        <div className='imgButtonsAfter'> <Button variant="outlined" component="label">
-                            Change Image
-                            <input id='image' hidden accept="image/*" multiple type="file" onChange={handleImageUpload}/>
-                        </Button> <Button variant="outlined" component="label" onClick={removeImage}> Remove Image </Button> </div>}
+                    <div>
+                        <Button variant="outlined" component="label">
+                            {imgUploaded==undefined ? "Upload Image" : "Change Image"}
+                            <input id='imgInput' hidden accept="image/*" type="file" onChange={handleImageUpload}/>
+                        </Button>
+                        {imgUploaded !== undefined && <Button variant="outlined" component="label" onClick={removeImage}> Remove Image </Button>}
+                    </div>
                 </div>
 
                 <InputLabel htmlFor='cocktail-name'> Cocktail Name: </InputLabel>
@@ -178,7 +263,7 @@ const RecipeForm = () => {
                 </div>
 
                 <div className='submit'>
-                    <Button variant='outlined'> Create Recipe </Button>
+                    <Button variant='outlined' onClick={handleSubmit}> Create Recipe </Button>
                 </div>
             </Grid>
         </div>
