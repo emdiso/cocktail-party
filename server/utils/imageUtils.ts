@@ -3,8 +3,7 @@ import { InternalServiceResult } from "./generalUtils";
 import psqlPool from "./psqlConnection";
 
 export const insertFile: (req: AuthenticatedRequest) => Promise<InternalServiceResult> = async (req: AuthenticatedRequest) => {
-    console.log(req);
-    const file = req.body.formData.image;
+    const file = req.file;
     if (file === undefined) {
         return { statusCode: 400, message: "No File Found" };
     } else {

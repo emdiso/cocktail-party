@@ -35,9 +35,9 @@ imageRouter.post("/store", verifyToken, upload.single("image"), (req: Authentica
     const promise = insertFile(req);
     return promise.then((result) => {
         if (result.statusCode !== 200) {
-            res.status(result.statusCode).send(result.message);
+            return res.status(result.statusCode).send(result.message);
         }
-        res.send(result.data.toString());
+        return res.send(result.data.toString());
     })
     // const file = req.file;
     // if (file === undefined) {
