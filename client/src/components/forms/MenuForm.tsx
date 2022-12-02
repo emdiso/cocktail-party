@@ -1,17 +1,11 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import './../styling/MenuForms.css';
-import { Box, Button, Checkbox, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Step, StepContent, StepLabel, Stepper, TextField, Tooltip, Typography } from '@mui/material';
 import MenuRawDetails from '../MenuRawDetails';
 import { get, post } from '../../axios.service';
 import { AxiosResponse } from 'axios';
 import Select from '@mui/material/Select';
 import { CustomRecipe, Recipe } from '../../models';
-
-// export interface Quantity {
-//   id: number,
-//   item: string,
-//   amount: number
-// }
 
 export interface MenuGenModel {
   title: string;
@@ -81,6 +75,10 @@ function MenuForm() {
     setActiveStep(0);
   };
 
+  const handleUndo = () => {
+    setMenuGenModel(previousMenu!);
+  };
+
   const handleSubmit = () => {
     post("/menu_gen/insert_full_menu", {
       title: menuGenModel.title,
@@ -103,6 +101,24 @@ function MenuForm() {
     });
   };
 
+  React.useEffect(() => {
+    if (ingredientOptions.length > 0) return;
+    get(
+      "/cocktail_api/ingredient_options", {},
+      (res: AxiosResponse) => {
+        res.data.drinks.forEach((ingriedient: any) => {
+          setIngredientOptions(
+            (prev: string[]) => {
+              let obj = [...prev];
+              obj.push(ingriedient.strIngredient1);
+              return obj;
+            }
+          );
+        });
+      }
+    )
+  }, [ingredientOptions]);
+
   const menuSizeSelected = (e: any) => {
     let size = Number(e.target.value);
     get(
@@ -121,21 +137,6 @@ function MenuForm() {
           return obj;
         });
       })
-
-    get(
-      "/cocktail_api/ingredient_options", {},
-      (res: AxiosResponse) => {
-        res.data.drinks.forEach((ingriedient: any) => {
-          setIngredientOptions(
-            (prev: string[]) => {
-              let obj = [...prev];
-              obj.push(ingriedient.strIngredient1);
-              return obj;
-            }
-          );
-        });
-      }
-    )
   }
 
   const setMenuGenModelAlcoholicQuantity = (e: any) => {
@@ -190,7 +191,7 @@ function MenuForm() {
     setMenuGenModel(
       (prev: MenuGenModel) => {
         let obj = { ...prev };
-        
+
         obj.menuCustomRecipes = !myCustomRecipes ? [] : myCustomRecipes.filter((cr) => {
           return value.includes(cr.id);
         });
@@ -282,7 +283,7 @@ function MenuForm() {
                 <option key={i + 1} value={i + 1}>{i + 1}</option>
               )}
             </select>
-            <h5>{menuGenModel.alcoholicQuantity} drinks contain alcohol, {menuGenModel.menuRecipes.length - menuGenModel.alcoholicQuantity} are kid friendly.</h5>
+            <h5 style={{ fontSize: "12px" }}>{menuGenModel.alcoholicQuantity} drinks contain alcohol, {menuGenModel.menuRecipes.length - menuGenModel.alcoholicQuantity} are kid friendly.</h5>
           </div>
         </div>
     },
@@ -310,6 +311,7 @@ function MenuForm() {
               ))}
             </Select>
           </FormControl>
+          <h5 style={{ color: "red", fontSize: "12px" }}>Disclaimer: this may affect your alcoholic quantity based on what you choose. <br></br>You can always undo your choice, with the undo button.</h5>
         </div>
     },
     {
@@ -338,6 +340,7 @@ function MenuForm() {
               ))}
             </Select>
           </FormControl>
+          <h5 style={{ color: "red", fontSize: "12px" }}>Disclaimer: this may affect your alcoholic quantity based on what you choose. <br></br>You can always undo your choice, with the undo button.</h5>
         </div>
     },
     {
@@ -346,23 +349,23 @@ function MenuForm() {
         <div>
           {myCustomRecipes === undefined ? (<p>Login to add your Custom Recipes</p>) : (
             <FormControl sx={{ m: 1, width: 350 }}>
-            <InputLabel id="custom-recipe-select-label">Custom Recipes</InputLabel>
-            <Select
-              labelId="custom-recipe-select-label"
-              multiple
-              value={menuGenModel.menuCustomRecipes.map((cr: CustomRecipe) => cr.id)}
-              onChange={handleChangeCustomRecipes}
-              input={<OutlinedInput label="Tag" />}
-              renderValue={(selected) => selected.length+" Selected"}
-              MenuProps={MenuProps}
-            >
-              {myCustomRecipes.map((cr) => (
-                <MenuItem key={cr.id} value={cr.id}>
-                  <Checkbox checked={menuGenModel.menuCustomRecipes.map((mcr: CustomRecipe) => mcr.id).includes(cr.id)} />
-                  <ListItemText primary={cr.strDrink} />
-                </MenuItem>
-              ))}
-            </Select>
+              <InputLabel id="custom-recipe-select-label">Custom Recipes</InputLabel>
+              <Select
+                labelId="custom-recipe-select-label"
+                multiple
+                value={menuGenModel.menuCustomRecipes.map((cr: CustomRecipe) => cr.id)}
+                onChange={handleChangeCustomRecipes}
+                input={<OutlinedInput label="Tag" />}
+                renderValue={(selected) => selected.length + " Selected"}
+                MenuProps={MenuProps}
+              >
+                {myCustomRecipes.map((cr) => (
+                  <MenuItem key={cr.id} value={cr.id}>
+                    <Checkbox checked={menuGenModel.menuCustomRecipes.map((mcr: CustomRecipe) => mcr.id).includes(cr.id)} />
+                    <ListItemText primary={cr.strDrink} />
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
           )}
         </div>
@@ -400,17 +403,16 @@ function MenuForm() {
                             disabled={index === 0}
                             onClick={handleBack}
                             sx={{ mt: 1, mr: 1 }}
-                            variant="outlined"
+                            variant="contained"
+                            size="small"
                           >
                             Back
                           </Button>
-                          <Button onClick={handleReset} sx={{ mt: 1, mr: 1 }} variant="outlined">
-                            Reset
-                          </Button>
                           <Button
-                            variant="outlined"
+                            variant="contained"
                             onClick={handleNext}
                             sx={{ mt: 1, mr: 1 }}
+                            size="small"
                           >
                             {index === steps.length - 1 ? 'Finish' : 'Continue'}
                           </Button>
@@ -420,20 +422,24 @@ function MenuForm() {
                   </Step>
                 ))}
               </Stepper>
-              {activeStep === steps.length && (
-                <Paper square elevation={0} sx={{ p: 3 }}>
-                  <Typography>All steps completed - you&apos;re finished</Typography>
-                  <Button onClick={handleSubmit} variant="outlined">Submit</Button>
-                  <Button onClick={handleReset} variant="outlined">Reset</Button>
-                  <Button variant="outlined">Design</Button>
-                </Paper>
-              )}
             </Box>
+            <Button onClick={handleUndo} variant="contained" color="error" sx={{ mt: 1, mr: 1 }}>
+              Undo
+            </Button>
+            <Button onClick={handleReset} variant="contained" color="error" sx={{ mt: 1, mr: 1 }}>
+              Reset
+            </Button>
+            <Tooltip title="Design my menu">
+              <Button variant="contained" sx={{ mt: 1, mr: 1 }}>Design</Button>
+            </Tooltip>
+            <Tooltip title="Save to my profile">
+              <Button onClick={handleSubmit} variant="contained" sx={{ mt: 1, mr: 1 }}>Submit</Button>
+            </Tooltip>
           </div>
         </Grid>
 
         <Grid item xs={5.8}>
-          <MenuRawDetails data={(menuGenModel.menuRecipes as (Recipe | CustomRecipe)[]).concat(menuGenModel.menuCustomRecipes)} />
+          <MenuRawDetails data={{ title: menuGenModel.title, menuRecipes: (menuGenModel.menuRecipes as (Recipe | CustomRecipe)[]).concat(menuGenModel.menuCustomRecipes) }} />
         </Grid>
       </Grid>
 
