@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Response } from 'express';
 import psqlPool from '../utils/psqlConnection';
 import dotenv from 'dotenv';
 import multer from 'multer';
@@ -12,6 +12,22 @@ dotenv.config();
 const recipesRouter = express.Router();
 recipesRouter.use(cors());
 const upload = multer({ storage: multer.memoryStorage() });
+
+recipesRouter.get('/get_custom_recipe', verifyToken, (req: AuthenticatedRequest, res: Response) => {
+    return psqlPool.query("SELECT cr.* FROM custom_recipes cr WHERE cr.id = $1", [req.query.id]).then((result) => {
+        if (result.rowCount > 0) {
+            const cr: CustomRecipe = result.rows[0];
+            if (cr.user_id == req.userId) {
+                cr.user_id = undefined;
+                return res.json(cr);
+            }
+            return res.status(401).send();
+        }
+        return res.status(400).send();
+    }).catch(() => {
+        return res.status(500).send();
+    });
+});
 
 recipesRouter.post('/insert', verifyToken, upload.single("image"), (req: AuthenticatedRequest, res: Response) => {
     let recipe = {} as CustomRecipe;
