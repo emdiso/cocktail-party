@@ -8,6 +8,7 @@ import { Label } from '@mui/icons-material';
 import CustomRecipe from './../../models/CustomRecipe';
 import './../styling/RecipeForm.css';
 import { isDOMComponent } from 'react-dom/test-utils';
+import FormData from 'form-data';
 
 const RecipeForm = () => {
     const [values, setValues] = React.useState<CustomRecipe>({
@@ -51,7 +52,7 @@ const RecipeForm = () => {
         dateModified: '',
     });
 
-    const [imgUploaded, setImageUploaded] = useState<File>();
+    const [imgUploaded, setImageUploaded] = useState<File | undefined>(undefined);
     const [specifications, setSpecifications] = useState([{ingredient: '', measurement: ''}]);
 
     const handleChange = (prop: keyof CustomRecipe) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,23 +165,61 @@ const RecipeForm = () => {
             }
         }
 
-        // Save/insert recipe in db
         let formData = new FormData();
-        const reader = new FileReader();
 
-        reader.readAsDataURL(imgUploaded!);
-        formData.append('file', imgUploaded!);
+        if (imgUploaded !== undefined)
+            formData.append('image', imgUploaded);
+
+        formData.append('id', values.id);
+        formData.append('image_id', values.image_id);
+        formData.append('strDrink', values.strDrink);
+        formData.append('strAlcoholic', values.strAlcoholic);
+        formData.append('strCategory', values.strCategory);
+        formData.append('strGlass', values.strGlass);
+        formData.append('strInstructions', values.strInstructions);
+        formData.append('strIngredient1', values.strIngredient1);
+        formData.append('strIngredient2', values.strIngredient2);
+        formData.append('strIngredient3', values.strIngredient3);
+        formData.append('strIngredient4', values.strIngredient4);
+        formData.append('strIngredient5', values.strIngredient5);
+        formData.append('strIngredient6', values.strIngredient6);
+        formData.append('strIngredient7', values.strIngredient7);
+        formData.append('strIngredient8', values.strIngredient8);
+        formData.append('strIngredient9', values.strIngredient9);
+        formData.append('strIngredient10', values.strIngredient10);
+        formData.append('strIngredient11', values.strIngredient11);
+        formData.append('strIngredient12', values.strIngredient12);
+        formData.append('strIngredient13', values.strIngredient13);
+        formData.append('strIngredient14', values.strIngredient14);
+        formData.append('strIngredient15', values.strIngredient15);
+        formData.append('strMeasure1', values.strMeasure1);
+        formData.append('strMeasure2', values.strMeasure2);
+        formData.append('strMeasure3', values.strMeasure3);
+        formData.append('strMeasure4', values.strMeasure4);
+        formData.append('strMeasure5', values.strMeasure5);
+        formData.append('strMeasure6', values.strMeasure6);
+        formData.append('strMeasure7', values.strMeasure7);
+        formData.append('strMeasure8', values.strMeasure8);
+        formData.append('strMeasure9', values.strMeasure9);
+        formData.append('strMeasure10', values.strMeasure10);
+        formData.append('strMeasure11', values.strMeasure11);
+        formData.append('strMeasure12', values.strMeasure12);
+        formData.append('strMeasure13', values.strMeasure13);
+        formData.append('strMeasure14', values.strMeasure14);
+        formData.append('strMeasure15', values.strMeasure15);
+        formData.append('dateModified', values.dateModified);
 
         // post('/recipe/insert', {'formData': formData, 'recipe': values});
         post('/recipe/insert', formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'Multipart/form-data'
             }
+        }, (result) => {
+            window.location.reload();
+            window.location.href = '/profile';
+        }, (error) => {
+            console.log(error);
         });
-
-
-        // window.location.reload();
-        // window.location.href = '/profile';
     }
 
     return (
@@ -211,7 +250,7 @@ const RecipeForm = () => {
                 <InputLabel htmlFor='cocktail-alcoholic'> Will this drink contain alcohol? </InputLabel>
                 <RadioGroup
                     id='cocktail-alcoholic'
-                    defaultValue={'Alcoholic'}
+                    value={values.strAlcoholic}
                     onChange={handleChange('strAlcoholic')}
                     row={true}
                 >
