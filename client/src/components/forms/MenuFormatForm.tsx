@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Grid, List, ListItem, ListItemAvatar, ListItemText, Tooltip } from '@mui/material';
+import { Button, FormControl, FormControlLabel, FormLabel, Grid, List, ListItem, ListItemAvatar, ListItemText, Radio, RadioGroup, Tooltip } from '@mui/material';
 import MenuPrettyDetails from '../MenuPrettyDetails';
 import { CustomRecipe } from '../../models';
 import { get } from '../../axios.service';
@@ -63,9 +63,14 @@ const DrinkList = styled.div`
 `;
 
 function MenuFormatForm() {
+    const location = useLocation();
+    let id = location.state.id;
+
     const [menuPrettyModel, setMenuPrettyModel] = useState<MenuPrettyModel>({
-        title: "My menu", backgroundColor: "white", textColor: "black", textFont: "Calibri", drinks: [], alcoholicLabel: true, alcoholicTextColor: ""
+        title: "My menu", backgroundColor: "#c4c0c0ff", textColor: "#000000ff", textFont: "Calibri", drinks: [], alcoholicLabel: true, alcoholicTextColor: "#000000ff"
     });
+
+    const [alcoholicColorWheel, setAlcoholicColorWheel] = useState<Boolean>(false);
 
     const previousMenu = usePreviousMenuPrettyModel(menuPrettyModel); // allows us to track what actually changed in the object
     const [enabled] = useStrictDroppable(false);
@@ -86,7 +91,13 @@ function MenuFormatForm() {
     ];
 
     const handleReset = () => {
-        setMenuPrettyModel({ title: "My menu", backgroundColor: "white", textColor: "black", textFont: "Calibri", drinks: [], alcoholicLabel: true, alcoholicTextColor: "" });
+        setMenuPrettyModel(
+            (prev: any) => {
+                let obj = { ...prev };
+                obj.drinks = [];
+                return obj;
+            }
+        );
     };
 
     const handleUndo = () => {
@@ -97,9 +108,10 @@ function MenuFormatForm() {
         // create the qr code stuff 
     }
 
-    if (menuPrettyModel.drinks.length === 0) { // populate the pretty drinks
-        const location = useLocation();
-        let id = location.state.id;
+    React.useEffect(() => {
+        if (menuPrettyModel.drinks.length > 0) return;
+        // else populate
+
         get(
             "/cocktail_api/full_menu", {
             menuId: id
@@ -110,6 +122,7 @@ function MenuFormatForm() {
                         (prev: MenuPrettyModel) => {
                             let obj = { ...prev };
 
+                            obj.title = res.data.title;
                             let items = obj.drinks;
 
                             if (items.length >= res.data.menu_items.length) return obj;
@@ -127,7 +140,9 @@ function MenuFormatForm() {
                 });
             }
         )
-    }
+
+    }, [menuPrettyModel])
+
 
     const setBackgroundColor = (e: any) => {
         setMenuPrettyModel(
@@ -142,8 +157,14 @@ function MenuFormatForm() {
     const setTextColor = (e: any) => {
         setMenuPrettyModel(
             (prev: MenuPrettyModel) => {
+                console.log(prev);
                 let obj = { ...prev };
                 obj.textColor = e.hex;
+
+                if (obj.alcoholicLabel) {
+                    obj.alcoholicTextColor = e.hex;
+                }
+
                 return obj;
             }
         );
@@ -181,6 +202,38 @@ function MenuFormatForm() {
         )
     };
 
+    const setAlcoholicLabel = (e: any) => {
+        setMenuPrettyModel(
+            (prev: MenuPrettyModel) => {
+                let obj = { ...prev };
+
+                switch (e.target.value) {
+                    case "false":
+                        obj.alcoholicLabel = false;
+                        setAlcoholicColorWheel(true);
+                        break;
+                    case "true":
+                        obj.alcoholicLabel = true;
+                        break
+                }
+
+                return obj;
+            }
+        );
+    }
+
+    const setAlcoholicTextColor = (e: any) => {
+        setMenuPrettyModel(
+            (prev: MenuPrettyModel) => {
+                let obj = { ...prev };
+                obj.alcoholicTextColor = e.hex;
+
+                console.log(obj);
+                return obj;
+            }
+        );
+    }
+
     return (
         <div>
             <Grid
@@ -200,7 +253,8 @@ function MenuFormatForm() {
                                         <div className="form-group">
                                             <label>Background Color: </label>
                                             <InputColor
-                                                initialValue="#c4c0c0ff"
+                                                key={"background"}
+                                                initialValue={menuPrettyModel.backgroundColor}
                                                 onChange={setBackgroundColor}
                                                 placement="right"
                                             />
@@ -211,7 +265,8 @@ function MenuFormatForm() {
                                         <div className="form-group">
                                             <label>Text Color: </label>
                                             <InputColor
-                                                initialValue="#000000ff"
+                                                key={"text"}
+                                                initialValue={menuPrettyModel.textColor}
                                                 onChange={setTextColor}
                                                 placement="right"
                                             />
@@ -262,6 +317,41 @@ function MenuFormatForm() {
                                             </DragDropContext>
                                         </div>
                                     </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <FormControl>
+                                                <FormLabel id="demo-controlled-radio-buttons-group">
+                                                    I want to know the drinks contain alcohol by:
+                                                </FormLabel>
+                                                <RadioGroup
+                                                    aria-labelledby="demo-controlled-radio-buttons-group"
+                                                    name="controlled-radio-buttons-group"
+                                                    value={menuPrettyModel.alcoholicLabel}
+                                                    onChange={setAlcoholicLabel}
+                                                >
+                                                    <FormControlLabel value="true" control={<Radio />} label="Label them please!" />
+                                                    <FormControlLabel value="false" control={<Radio />} label="Change their color!" />
+                                                </RadioGroup>
+                                            </FormControl>
+                                        </div>
+                                    </div>
+
+                                    {alcoholicColorWheel ?
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Alcoholic Text Color: </label>
+                                                <InputColor
+                                                    key={"alcoholic-text"}
+                                                    initialValue="#FF0000"
+                                                    onChange={setAlcoholicTextColor}
+                                                    placement="right"
+                                                />
+                                            </div>
+                                        </div>
+                                        :
+                                        <></>
+                                    }
 
                                 </form>
                             </div>
