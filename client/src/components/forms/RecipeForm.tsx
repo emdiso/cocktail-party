@@ -9,8 +9,15 @@ import CustomRecipe from './../../models/CustomRecipe';
 import './../styling/RecipeForm.css';
 import { isDOMComponent } from 'react-dom/test-utils';
 import FormData from 'form-data';
+import { useLocation } from 'react-router-dom';
 
 const RecipeForm = () => {
+    const useQuery = () => {
+        const { search } = useLocation();
+        
+        return React.useMemo(() => new URLSearchParams(search), [search]);
+    }
+
     const [values, setValues] = React.useState<CustomRecipe>({
         id: 0,
         image_id: 0,
@@ -51,6 +58,20 @@ const RecipeForm = () => {
         strMeasure15: '',
         dateModified: '',
     });
+
+    useEffect(() => {
+        let query = useQuery();
+
+        const id = query.get('id');
+        const idDrink = query.get('idDrink');
+
+        if (idDrink) {
+            get('/cocktail_api/drink_by_id', {'idDrink': idDrink}, (response) => {setValues(response.data);});
+        }
+        else {
+            get('/recipe/custom_recipe', {'id': id}, (response) => {setValues(response.data);});
+        }
+    }, []);
 
     const [imgUploaded, setImageUploaded] = useState<File | undefined>(undefined);
     const [specifications, setSpecifications] = useState([{ingredient: '', measurement: ''}]);

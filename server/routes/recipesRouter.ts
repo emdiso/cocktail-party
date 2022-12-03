@@ -13,7 +13,7 @@ const recipesRouter = express.Router();
 recipesRouter.use(cors());
 const upload = multer({ storage: multer.memoryStorage() });
 
-recipesRouter.get('/get_custom_recipe', verifyToken, (req: AuthenticatedRequest, res: Response) => {
+recipesRouter.get('/custom_recipe', verifyToken, (req: AuthenticatedRequest, res: Response) => {
     return psqlPool.query("SELECT cr.* FROM custom_recipes cr WHERE cr.id = $1", [req.query.id]).then((result) => {
         if (result.rowCount > 0) {
             const cr: CustomRecipe = result.rows[0];

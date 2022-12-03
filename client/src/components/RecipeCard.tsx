@@ -47,6 +47,17 @@ function RecipeCard(data: any) {
         setExpanded(!expanded);
     };
 
+    const handleModify = () => {
+        if (data.data.idDrink) {
+            window.location.reload();
+            window.location.href = `/recipe?idDrink=${data.data.idDrink}`;
+        }
+        else {
+            window.location.reload();
+            window.location.href = `/recipe?id=${data.data.id}`;
+        }
+    }
+
     let ingredients: string[] = getIngredients(data);
 
     return (
@@ -62,7 +73,7 @@ function RecipeCard(data: any) {
                 Ingredients: {ingredients}
             </CardContent>
             <CardActions disableSpacing>
-                <button>Modify</button>
+                <button onClick={handleModify}>Modify</button>
                 <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}
