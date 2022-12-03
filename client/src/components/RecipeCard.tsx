@@ -15,6 +15,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { styled } from '@mui/material';
 import React from 'react';
 import { getIn } from 'yup/lib/util/reach';
+import { useNavigate } from 'react-router-dom';
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -47,14 +48,14 @@ function RecipeCard(data: any) {
         setExpanded(!expanded);
     };
 
+    const navigate = useNavigate();
+
     const handleModify = () => {
         if (data.data.idDrink) {
-            window.location.reload();
-            window.location.href = `/recipe?idDrink=${data.data.idDrink}`;
+            navigate('/recipe', { state: {id: 0, idDrink: data.data.idDrink}});
         }
         else {
-            window.location.reload();
-            window.location.href = `/recipe?id=${data.data.id}`;
+            navigate('/recipe', { state: {id: data.data.id, idDrink: 0}});
         }
     }
 
