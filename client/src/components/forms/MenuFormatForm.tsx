@@ -1,45 +1,73 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './App.css';
 import { Grid } from '@mui/material';
-// import { Button, Grid, Slider } from '@mui/material';
 import MenuPrettyDetails from '../MenuPrettyDetails';
-import { Drink } from '../Random';
-// import { MenuGenModel } from './MenuForm';
-// import { useLocation } from 'react-router-dom';
+import { Recipe, CustomRecipe } from '../../models';
+import { get } from '../../axios.service';
+import { useLocation } from 'react-router-dom';
+import { bool } from 'yup';
 
 export interface PrettyDrink {
     number: number,
-    drink: Drink,
-    color: string,
+    drink: Recipe | CustomRecipe,
 }
 
 export interface MenuPrettyModel {
     title: string,
     backgroundColor: string,
-    drinks: PrettyDrink[] // string of drink ids
+    textColor: string,
+    textFont: string,
+    drinks: PrettyDrink[], // string of drink ids
+    alcoholicLabel: Boolean,
+    alcoholicTextColor: string
 }
 
 function usePreviousMenuPrettyModel(value: MenuPrettyModel) {
     const ref = useRef<MenuPrettyModel>();
     useEffect(() => {
-        ref.current = value; //assign the value of ref to the argument
-    }, [value]); //this code will run when the value of 'value' changes
-    return ref.current; //in the end, return the current ref value.
+        ref.current = value;
+    }, [value]);
+    return ref.current;
 }
 
-function MenuFormatForm(id: any) {
-
-    const populatePretty = () => {
-        // get menu from database 
-        // create a pretty drink object for each of menu's drinks
-        return [];
-    }
+function MenuFormatForm() {
 
     const [menuPrettyModel, setMenuPrettyModel] = useState<MenuPrettyModel>({
-        title: "My menu", backgroundColor: "white", drinks: populatePretty()
+        title: "My menu", backgroundColor: "white", textColor: "black", textFont: "Calibri", drinks: [], alcoholicLabel: true, alcoholicTextColor: ""
     });
 
     const previousMenu = usePreviousMenuPrettyModel(menuPrettyModel); // allows us to track what actually changed in the object
+
+    if (menuPrettyModel.drinks.length === 0) { // populate the pretty drinks
+        const location = useLocation();
+        let id = location.state.id;
+        get(
+            "/cocktail_api/full_menu", {
+            menuId: id
+        },
+            (res: any) => {
+                res.data.menu_items.map((item:any, index:number) => {
+                    setMenuPrettyModel(
+                        (prev: MenuPrettyModel) => {
+                            let obj = {...prev};
+
+                            let items = obj.drinks;
+
+                            if(items.length >= res.data.menu_items.length) return obj;
+
+                            items.push(
+                                {
+                                    number: index, 
+                                    drink: item.recipe
+                                }
+                            )
+
+                            return obj;
+                        }
+                    )
+                });
+            }
+        )
+    }
 
     return (
         <div>

@@ -10,6 +10,7 @@ import '../axios.service.ts';
 import { getAuthToken, get } from '../axios.service';
 import MenuForm from './forms/MenuForm';
 import { Fab } from '@mui/material';
+import MenuFormatForm from './forms/MenuFormatForm';
 
 export interface UserInfo {
   username: string;
@@ -58,6 +59,7 @@ function App() {
             <Route path='/' element={<Landing />}></Route>
             <Route path='/random' element={<Random />}></Route>
             <Route path='/generate' element={<MenuForm />}></Route>
+            <Route path='/wow' element={<MenuFormatForm />}></Route>
             {isLoggedIn && <Route path='/profile' element={<Profile userInfo={userInfo} />}></Route>}
           </Routes>
         </div>
