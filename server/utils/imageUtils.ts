@@ -2,7 +2,6 @@ import { AuthenticatedRequest } from "./authUtils";
 import { InternalServiceResult } from "./generalUtils";
 import psqlPool from "./psqlConnection";
 
-
 export const insertFile: (req: AuthenticatedRequest) => Promise<InternalServiceResult> = async (req: AuthenticatedRequest) => {
     const file = req.file;
     if (file === undefined) {
@@ -21,6 +20,5 @@ export const insertFile: (req: AuthenticatedRequest) => Promise<InternalServiceR
             console.log(error);
             return { statusCode: 500, message: "Insert Failed" };
         });
-        
     }
 };

@@ -5,6 +5,7 @@ import TablePagination from '@mui/material/TablePagination';
 import { get } from "../axios.service";
 import { stringify } from 'querystring';
 import { AxiosError, AxiosResponse } from 'axios';
+import Recipe from './../models/Recipe';
 import { ContactSupportOutlined } from '@mui/icons-material';
 
 // -TODO- On server side, transform the data before returning it to the client, then adjust this interface to match the transformed data
@@ -22,6 +23,36 @@ export interface Drink {
     strDrinkThumb: string;
     //ingredients: [];
     //measurements: [];
+    strIngredient1: string;
+    strIngredient2: string;
+    strIngredient3: string;
+    strIngredient4: string;
+    strIngredient5: string;
+    strIngredient6: string;
+    strIngredient7: string;
+    strIngredient8: string;
+    strIngredient9: string;
+    strIngredient10: string;
+    strIngredient11: string;
+    strIngredient12: string;
+    strIngredient13: string;
+    strIngredient14: string;
+    strIngredient15: string;
+    strMeasure1: string;
+    strMeasure2: string;
+    strMeasure3: string;
+    strMeasure4: string;
+    strMeasure5: string;
+    strMeasure6: string;
+    strMeasure7: string;
+    strMeasure8: string;
+    strMeasure9: string;
+    strMeasure10: string;
+    strMeasure11: string;
+    strMeasure12: string;
+    strMeasure13: string;
+    strMeasure14: string;
+    strMeasure15: string;
     strImageSource: string;
     strImageAttribution: string;
     strCreativeCommonsConfirmed: string;
@@ -34,7 +65,7 @@ interface random {
 }
 
 const Random = () => {
-    const [randDrink, setRandDrink] = React.useState<Drink | undefined>(undefined);
+    const [randDrink, setRandDrink] = React.useState<Recipe | undefined>(undefined);
     const [ingredients, setIngredients] = React.useState<any[]>([]);
 
     const [drinksByIngredient, setDrinksByIngredient] = React.useState<random[]>([]);
@@ -63,7 +94,6 @@ const Random = () => {
 
     const getRandomDrink = () => {
         get('/cocktail_api/random_drink', {}, (response: AxiosResponse) => {
-            console.log(response.data.drinks);
             setRandDrink(response.data.drinks[0]);
         }, (error: AxiosError) => {
             console.log(error);
