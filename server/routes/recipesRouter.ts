@@ -85,7 +85,7 @@ recipesRouter.post('/insert', verifyToken, upload.single("image"), (req: Authent
 
         const recipePromise = insertCustomRecipe(req.userId, recipe)
         return recipePromise.then((result) => {
-            return res.sendStatus(200).send(result.rows[0].id);
+            return res.status(200).send(result.rows[0].id);
         });
     });
 })
