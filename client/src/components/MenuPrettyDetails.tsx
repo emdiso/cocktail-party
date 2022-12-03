@@ -40,7 +40,8 @@ function MenuPrettyDetails(data: any) {
                                             color={item.drink.strAlcoholic.includes("Alcoholic") ? data.data.alcoholicTextColor : data.data.textColor}
                                         >
                                             {getIngredients(item.drink)}
-                                            {data.data.alcoholicLabel && item.drink.strAlcoholic.includes("Alcoholic") ? <i>contains alcohol</i> : <></>}
+                                            <br></br>
+                                            {data.data.alcoholicLabel && item.drink.strAlcoholic.includes("Alcoholic") ? <i>(contains alcohol)</i> : <></>}
                                         </Typography>
                                     </React.Fragment>} />
                             </ListItem>
@@ -54,7 +55,7 @@ function MenuPrettyDetails(data: any) {
             {!data.data.alcoholicLabel ?
                 <div>
                     <Divider></Divider>
-                    <p style={{ color: data.data.alcoholicTextColor, fontFamily: data.data.textFont }}><i>contains alcohol</i></p>
+                    <p style={{ color: data.data.alcoholicTextColor, fontFamily: data.data.textFont }}><i>(contains alcohol)</i></p>
                 </div>
                 :
                 <></>
