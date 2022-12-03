@@ -1,4 +1,4 @@
-import express, { Request, response, Response } from 'express';
+import express, { Request, Response } from 'express';
 import axios, { AxiosResponse } from 'axios';
 import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
 import dotenv from 'dotenv';
@@ -122,19 +122,7 @@ cocktailApiRouter.get('/list_menus', verifyToken, async (req: AuthenticatedReque
     }).catch(() => {
         res.sendStatus(500);
     });
-});
-
-// cocktailApiRouter.get('/list_custom_recipe_names', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
-//     if (!req.userId) return res.sendStatus(401);
-//     psqlPool.query(
-//         'SELECT cr.id, cr."strDrink" FROM custom_recipes cr WHERE cr.user_id = $1',
-//         [ req.userId ]
-//     ).then((result) => {
-//         res.json({ custom_recipes: result.rows });
-//     }).catch(() => {
-//         res.sendStatus(500);
-//     });
-// });
+})
 
 cocktailApiRouter.get('/list_custom_recipes', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
     if (!req.userId) return res.sendStatus(401);
@@ -149,7 +137,22 @@ cocktailApiRouter.get('/list_custom_recipes', verifyToken, async (req: Authentic
     });
 });
 
-
+cocktailApiRouter.get('/drink_by_id', async (req: Request, res: Response) => {
+    if (!req.query.id) return res.status(400).send("Missing id");
+    return axios.get(`${api_url}lookup.php?i=${req.query.id}`, {
+        headers: {
+            "Authentication": `Bearer ${api_key}`,
+        }
+    }).then((response: AxiosResponse) => {
+        if (response.data.drinks.length === 0) {
+            return res.status(400).send("Drink does not exist");
+        }
+        res.send(response.data.drinks[0]);
+    }).catch((err: any) => {
+        console.log("ERROR " + err);
+        res.status(500).send();
+    });
+});
 
 export default cocktailApiRouter;
 
