@@ -1,15 +1,11 @@
 import { List, ListItem, ListItemAvatar, Avatar, ListItemText, Typography, Divider } from '@mui/material';
-import { color } from '@mui/system';
 import React from 'react';
-import { CustomRecipe, Recipe } from '../models';
-import recipe from '../models/Recipe';
 import { MenuPrettyModel, PrettyDrink } from './forms/MenuFormatForm';
+
 
 function MenuPrettyDetails(data: any) {
     const drinks = data.data.drinks;
-
-    console.log(drinks[0]);
-
+    
     function getIngredients(data: any) {
         let ingredients: string[] = [];
         for (let i = 1; i < 16; i++) {
@@ -21,8 +17,8 @@ function MenuPrettyDetails(data: any) {
     }
 
     return (
-        <div style={{backgroundColor: data.data.backgroundColor}}>
-            <h5 style={{color: data.data.textColor}}>{data.data.title}</h5>
+        <div style={{ backgroundColor: data.data.backgroundColor }}>
+            <h5 style={{ color: data.data.textColor, fontFamily: data.data.textFont }}>{data.data.title}</h5>
 
             <List sx={{ width: '100%', bgcolor: data.data.backgroundColor }}>
                 {drinks.length > 0 ?
@@ -32,14 +28,16 @@ function MenuPrettyDetails(data: any) {
                                 <ListItemAvatar>
                                     <Avatar alt="Drink image not available" src={item.drink.strDrinkThumb} />
                                 </ListItemAvatar>
-                                <ListItemText style={{ color: data.data.textColor, fontFamily: data.data.textFont }}
-                                    primary={item.drink.strDrink}
+                                <ListItemText style={{ color: data.data.textColor }}
+                                    primaryTypographyProps={{ fontFamily: data.data.textFont }}
+                                    primary={item.id}
                                     secondary={<React.Fragment>
                                         <Typography
                                             sx={{ display: 'inline' }}
+                                            fontFamily={data.data.textFont}
                                             component="span"
                                             variant="body2"
-                                            color="text.primary"
+                                            color={data.data.textColor}
                                         >
                                             {getIngredients(item.drink)}
                                         </Typography>
