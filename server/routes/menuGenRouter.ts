@@ -3,7 +3,6 @@ import axios, { AxiosResponse } from 'axios';
 import { verifyToken, AuthenticatedRequest } from '../utils/authUtils';
 import dotenv from 'dotenv';
 import { randomDrinkPromise } from '../utils/cocktailApiUtils';
-import { insertCustomRecipe } from '../utils/recipeUtils';
 import cors from 'cors';
 import psqlPool from '../utils/psqlConnection';
 import { Recipe, CustomRecipe, MenuGenModel } from '../models';
