@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { ReactElement, RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { Button, FormControl, FormControlLabel, FormLabel, Grid, List, ListItem, ListItemAvatar, ListItemText, Radio, RadioGroup, Select, Tooltip } from '@mui/material';
 import MenuPrettyDetails from '../MenuPrettyDetails';
 import { CustomRecipe } from '../../models';
@@ -9,6 +9,10 @@ import recipe from '../../models/Recipe';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import styled from 'styled-components';
 import ReorderIcon from '@mui/icons-material/Reorder';
+import { exportComponentAsPDF } from "react-component-export-image";
+import html2canvas from "html2canvas";
+import ReactDOMServer from 'react-dom/server'
+
 
 export const useStrictDroppable = (loading: boolean) => {
     const [enabled, setEnabled] = useState(false);
@@ -107,11 +111,6 @@ function MenuFormatForm() {
         setMenuPrettyModel(previousMenu!);
     };
 
-    const handleSubmit = () => {
-        // create the qr code stuff 
-
-    }
-
     React.useEffect(() => {
         if (menuPrettyModel.drinks.length > 0) return;
         // else populate
@@ -161,7 +160,6 @@ function MenuFormatForm() {
     const setTextColor = (e: any) => {
         setMenuPrettyModel(
             (prev: MenuPrettyModel) => {
-                console.log(prev);
                 let obj = { ...prev };
                 obj.textColor = e.hex;
 
@@ -364,16 +362,11 @@ function MenuFormatForm() {
                     <Button onClick={handleReset} variant="contained" color="error" sx={{ mt: 1, mr: 1 }}>
                         Reset
                     </Button>
-                    <Tooltip title="Save to my profile">
-                        <Button onClick={handleSubmit} variant="contained" sx={{ mt: 1, mr: 1 }}>Submit</Button>
-                    </Tooltip>
                 </Grid>
 
                 <Grid item xs={5.8}>
                     <h5>Menu Preview</h5>
-                    <div className="card m-3">
-                        <MenuPrettyDetails data={menuPrettyModel} />
-                    </div>
+                    <MenuPrettyDetails data={menuPrettyModel} />
                 </Grid>
             </Grid>
         </div>
@@ -381,3 +374,4 @@ function MenuFormatForm() {
 }
 
 export default MenuFormatForm;
+
