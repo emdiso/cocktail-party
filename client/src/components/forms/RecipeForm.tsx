@@ -14,8 +14,8 @@ import { valueContainerCSS } from 'react-select/dist/declarations/src/components
 import e from 'express';
 
 const defaultValues: CustomRecipe = {
-    id: 0,
-    image_id: 0,
+    id: undefined as unknown as number,
+    image_id: undefined as unknown as number,
     strDrink: '',
     strAlcoholic: '',
     strCategory: '',
@@ -227,16 +227,41 @@ const RecipeForm = () => {
 
         let formData = new FormData();
 
-        if (imgUploaded !== undefined)
+        if (imgUploaded) {
             formData.append('image', imgUploaded);
+        }
+        else {
+            if (typeof existingImg === "string") {
+                axios({
+                    url: existingImg,
+                    method: 'GET',
+                    responseType: 'blob',})
+                .then((res) => {
+                    let data = res.data;
+                    let metadata = {
+                        type: 'image/jpeg'
+                    };
+                    let temp = existingImg.split('/');
+                    let tempSize = temp.length;
 
-        formData.append('id', values.id);
-        formData.append('image_id', values.image_id);
-        formData.append('strDrink', values.strDrink);
-        formData.append('strAlcoholic', values.strAlcoholic);
-        formData.append('strCategory', values.strCategory);
-        formData.append('strGlass', values.strGlass);
-        formData.append('strInstructions', values.strInstructions);
+                    let fileName = temp[tempSize-1];
+                    let file = new File([data], fileName);
+
+                    formData.append('image', file);
+                });
+            }
+            else {
+                formData.append('image', existingImg);
+            }
+        }
+
+        values.id && formData.append('id', values.id);
+        values.image_id && formData.append('image_id', values.image_id);
+        values.strDrink && formData.append('strDrink', values.strDrink);
+        values.strAlcoholic && formData.append('strAlcoholic', values.strAlcoholic);
+        values.strCategory && formData.append('strCategory', values.strCategory);
+        values.strGlass && formData.append('strGlass', values.strGlass);
+        values.strInstructions && formData.append('strInstructions', values.strInstructions);
         formData.append('strIngredient1', values.strIngredient1);
         formData.append('strIngredient2', values.strIngredient2);
         formData.append('strIngredient3', values.strIngredient3);
@@ -267,9 +292,9 @@ const RecipeForm = () => {
         formData.append('strMeasure13', values.strMeasure13);
         formData.append('strMeasure14', values.strMeasure14);
         formData.append('strMeasure15', values.strMeasure15);
-        formData.append('dateModified', values.dateModified);
+        values.dateModified && formData.append('dateModified', values.dateModified);
 
-        post('/recipe/insert', formData, {
+        post('/recipe//upsert_custom_recipe', formData, {
             headers: {
                 'Content-Type': 'Multipart/form-data'
             }
