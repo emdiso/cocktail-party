@@ -59,29 +59,29 @@ const RecipeForm = () => {
 
     const [values, setValues] = React.useState<CustomRecipe>(defaultValues);
     const [imgUploaded, setImageUploaded] = useState<File | undefined>(undefined);
-    const [specifications, setSpecifications] = useState([{ingredient: '', measurement: ''}]);
+    const [specifications, setSpecifications] = useState([{ ingredient: '', measurement: '' }]);
     const [existingImg, setExistingImg] = useState<File | string | undefined>(undefined);
 
     const handleFillRows = (pValues: any) => {
         let ingredientsMeasurements = [
-            {ingredient: pValues.strIngredient1, measurement: pValues.strMeasure1},
-            {ingredient: pValues.strIngredient2, measurement: pValues.strMeasure2},
-            {ingredient: pValues.strIngredient3, measurement: pValues.strMeasure3},
-            {ingredient: pValues.strIngredient4, measurement: pValues.strMeasure4},
-            {ingredient: pValues.strIngredient5, measurement: pValues.strMeasure5},
-            {ingredient: pValues.strIngredient6, measurement: pValues.strMeasure6},
-            {ingredient: pValues.strIngredient7, measurement: pValues.strMeasure7},
-            {ingredient: pValues.strIngredient8, measurement: pValues.strMeasure8},
-            {ingredient: pValues.strIngredient9, measurement: pValues.strMeasure9},
-            {ingredient: pValues.strIngredient10, measurement: pValues.strMeasure10},
-            {ingredient: pValues.strIngredient11, measurement: pValues.strMeasure11},
-            {ingredient: pValues.strIngredient12, measurement: pValues.strMeasure12},
-            {ingredient: pValues.strIngredient13, measurement: pValues.strMeasure13},
-            {ingredient: pValues.strIngredient14, measurement: pValues.strMeasure14},
-            {ingredient: pValues.strIngredient15, measurement: pValues.strMeasure15}
+            { ingredient: pValues.strIngredient1, measurement: pValues.strMeasure1 },
+            { ingredient: pValues.strIngredient2, measurement: pValues.strMeasure2 },
+            { ingredient: pValues.strIngredient3, measurement: pValues.strMeasure3 },
+            { ingredient: pValues.strIngredient4, measurement: pValues.strMeasure4 },
+            { ingredient: pValues.strIngredient5, measurement: pValues.strMeasure5 },
+            { ingredient: pValues.strIngredient6, measurement: pValues.strMeasure6 },
+            { ingredient: pValues.strIngredient7, measurement: pValues.strMeasure7 },
+            { ingredient: pValues.strIngredient8, measurement: pValues.strMeasure8 },
+            { ingredient: pValues.strIngredient9, measurement: pValues.strMeasure9 },
+            { ingredient: pValues.strIngredient10, measurement: pValues.strMeasure10 },
+            { ingredient: pValues.strIngredient11, measurement: pValues.strMeasure11 },
+            { ingredient: pValues.strIngredient12, measurement: pValues.strMeasure12 },
+            { ingredient: pValues.strIngredient13, measurement: pValues.strMeasure13 },
+            { ingredient: pValues.strIngredient14, measurement: pValues.strMeasure14 },
+            { ingredient: pValues.strIngredient15, measurement: pValues.strMeasure15 }
         ];
 
-        let finIM = ingredientsMeasurements.filter((e) => {return e.ingredient !== null});
+        let finIM = ingredientsMeasurements.filter((e) => { return e.ingredient !== null });
         setSpecifications(finIM);
     }
 
@@ -93,20 +93,19 @@ const RecipeForm = () => {
 
             if (idDrink) {
                 get(`/cocktail_api/drink_by_id?id=${idDrink}`, {},
-                (response) =>
-                {
-                    setValues(response.data);
-                    handleFillRows(response.data);
-                    handleExistingImg(response.data.strDrinkThumb);
-                });
+                    (response) => {
+                        setValues(response.data);
+                        handleFillRows(response.data);
+                        handleExistingImg(response.data.strDrinkThumb);
+                    });
             }
             else {
                 get(`/recipe/custom_recipe?id=${id}`, {},
-                (response) => {
-                    setValues(response.data);
-                    handleFillRows(response.data);
-                    handleExistingImg(response.data.strDrinkThumb);
-                });
+                    (response) => {
+                        setValues(response.data);
+                        handleFillRows(response.data);
+                        handleExistingImg(response.data.strDrinkThumb);
+                    });
             }
         }
     }, [values]);
@@ -120,7 +119,7 @@ const RecipeForm = () => {
     };
 
     const handleNewSpec = () => {
-        setSpecifications([...specifications, {ingredient: '', measurement: ''}]);
+        setSpecifications([...specifications, { ingredient: '', measurement: '' }]);
     }
 
     const handleRemoveSpec = (index: number) => {
@@ -132,7 +131,7 @@ const RecipeForm = () => {
     const handleIngredientChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target;
         const value = event.target.value;
-        const list = [... specifications];
+        const list = [...specifications];
         list[index].ingredient = value;
         setSpecifications(list);
     }
@@ -140,7 +139,7 @@ const RecipeForm = () => {
     const handleMeasurementChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target;
         const value = event.target.value;
-        const list = [... specifications];
+        const list = [...specifications];
         list[index].measurement = value;
         setSpecifications(list);
     }
@@ -160,8 +159,8 @@ const RecipeForm = () => {
     const handleSubmit = () => {
         // Ingredients and Measurements Data
         for (let i = 0; i < specifications.length; i++) {
-            let customCocktailIngredient = 'strIngredient' + (i+1);
-            let customCocktailMeasurement = 'strMeasure' + (i+1);
+            let customCocktailIngredient = 'strIngredient' + (i + 1);
+            let customCocktailMeasurement = 'strMeasure' + (i + 1);
 
             if (customCocktailIngredient === 'strIngredient1' && customCocktailMeasurement === 'strMeasure1') {
                 values.strIngredient1 = specifications[0].ingredient;
@@ -235,20 +234,21 @@ const RecipeForm = () => {
                 axios({
                     url: existingImg,
                     method: 'GET',
-                    responseType: 'blob',})
-                .then((res) => {
-                    let data = res.data;
-                    let metadata = {
-                        type: 'image/jpeg'
-                    };
-                    let temp = existingImg.split('/');
-                    let tempSize = temp.length;
+                    responseType: 'blob',
+                })
+                    .then((res) => {
+                        let data = res.data;
+                        let metadata = {
+                            type: 'image/jpeg'
+                        };
+                        let temp = existingImg.split('/');
+                        let tempSize = temp.length;
 
-                    let fileName = temp[tempSize-1];
-                    let file = new File([data], fileName);
+                        let fileName = temp[tempSize - 1];
+                        let file = new File([data], fileName);
 
-                    formData.append('image', file);
-                });
+                        formData.append('image', file);
+                    });
             }
             else {
                 formData.append('image', existingImg);
@@ -320,87 +320,92 @@ const RecipeForm = () => {
 
     return (
         <div>
-            <Grid className='form'>
-                <h1> Recipes </h1>
+            <div className="card m-3">
+                <div className="card-body border-bottom">
+                    <Grid className='form' style={{ paddingLeft: "2vw" }}>
+                        <h1> Recipes </h1>
 
-                <div className='imgContainer'>
-                    {(imgUploaded || existingImg) && <img id='image' src={handleGetImgSrc()} />}
+                        <div className='imgContainer'>
+                            {(imgUploaded || existingImg) && <img id='image' src={handleGetImgSrc()} />}
 
-                    <div>
-                        <Button variant="outlined" component="label">
-                            {(imgUploaded===undefined || existingImg===undefined) ? "Upload Image" : "Change Image"}
-                            <input id='imgInput' hidden accept="image/*" type="file" onChange={handleImageUpload}/>
-                        </Button>
-                        {(imgUploaded!==undefined || existingImg!==undefined) && <Button variant="outlined" component="label" onClick={removeImage}> Remove Image </Button>}
-                    </div>
-                </div>
-
-                <InputLabel htmlFor='cocktail-name'> Cocktail Name: </InputLabel>
-                <TextField
-                    required
-                    id='cocktail-name'
-                    value={values.strDrink}
-                    onChange={handleChange('strDrink')}
-                ></TextField>
-
-                <InputLabel htmlFor='cocktail-alcoholic'> Will this drink contain alcohol? </InputLabel>
-                <RadioGroup
-                    id='cocktail-alcoholic'
-                    value={values.strAlcoholic}
-                    onChange={handleChange('strAlcoholic')}
-                    row={true}
-                >
-                    <FormControlLabel value='Alcoholic' control={<Radio />} label="Yes" />
-                    <FormControlLabel value='Non_Alcoholic' control={<Radio />} label="No" />
-                </RadioGroup>
-
-                <InputLabel htmlFor='cocktail-instructions'> Instructions: </InputLabel>
-                <TextField
-                    required
-                    id='cocktail-instructions'
-                    value={values.strInstructions}
-                    onChange={handleChange('strInstructions')}
-                ></TextField>
-
-                <div className='cocktail-specifications'>
-                    {specifications.map((singleSpec, index) => (
-                        <div key={index} className='row1'>
-                            <div id='ingredients'>
-                                <InputLabel htmlFor='ingredient'> Ingredient </InputLabel>
-                                <TextField 
-                                    required
-                                    name='ingredient'
-                                    id='ingredient'
-                                    value={singleSpec.ingredient}
-                                    onChange={handleIngredientChange(index)}
-                                ></TextField>
+                            <div>
+                                <Button variant="outlined" component="label">
+                                    {(imgUploaded === undefined || existingImg === undefined) ? "Upload Image" : "Change Image"}
+                                    <input id='imgInput' hidden accept="image/*" type="file" onChange={handleImageUpload} />
+                                </Button>
+                                {(imgUploaded !== undefined || existingImg !== undefined) && <Button variant="outlined" component="label" onClick={removeImage}> Remove Image </Button>}
                             </div>
-                            <div id='measurements'>
-                                <InputLabel htmlFor='measurement'> Measurement </InputLabel>
-                                <TextField
-                                    required
-                                    name='measurement'
-                                    id='measurement'
-                                    value={singleSpec.measurement}
-                                    onChange={handleMeasurementChange(index)}
-                                ></TextField>
-                            </div>
-                            {specifications.length >= 2 && <div id='delete'>
-                                <IconButton aria-label="delete" color="primary" onClick={() => handleRemoveSpec(index)}>
-                                    <DeleteIcon />
-                                </IconButton>
+                        </div>
+
+                        <InputLabel htmlFor='cocktail-name'> Cocktail Name: </InputLabel>
+                        <TextField
+                            required
+                            id='cocktail-name'
+                            value={values.strDrink}
+                            onChange={handleChange('strDrink')}
+                        ></TextField>
+
+                        <InputLabel htmlFor='cocktail-alcoholic'> Will this drink contain alcohol? </InputLabel>
+                        <RadioGroup
+                            id='cocktail-alcoholic'
+                            value={values.strAlcoholic}
+                            onChange={handleChange('strAlcoholic')}
+                            row={true}
+                        >
+                            <FormControlLabel value='Alcoholic' control={<Radio />} label="Yes" />
+                            <FormControlLabel value='Non_Alcoholic' control={<Radio />} label="No" />
+                        </RadioGroup>
+
+                        <InputLabel htmlFor='cocktail-instructions'> Instructions: </InputLabel>
+                        <TextField
+                            required
+                            multiline
+                            id='cocktail-instructions'
+                            value={values.strInstructions}
+                            onChange={handleChange('strInstructions')}
+                        ></TextField>
+
+                        <div className='cocktail-specifications'>
+                            {specifications.map((singleSpec, index) => (
+                                <div key={index} className='row1'>
+                                    <div id='ingredients'>
+                                        <InputLabel htmlFor='ingredient'> Ingredient </InputLabel>
+                                        <TextField
+                                            required
+                                            name='ingredient'
+                                            id='ingredient'
+                                            value={singleSpec.ingredient}
+                                            onChange={handleIngredientChange(index)}
+                                        ></TextField>
+                                    </div>
+                                    <div id='measurements'>
+                                        <InputLabel htmlFor='measurement'> Measurement </InputLabel>
+                                        <TextField
+                                            required
+                                            name='measurement'
+                                            id='measurement'
+                                            value={singleSpec.measurement}
+                                            onChange={handleMeasurementChange(index)}
+                                        ></TextField>
+                                    </div>
+                                    {specifications.length >= 2 && <div id='delete'>
+                                        <IconButton aria-label="delete" color="primary" onClick={() => handleRemoveSpec(index)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </div>}
+                                </div>
+                            ))}
+                            {specifications.length <= 15 && <div className='row2'>
+                                <Button onClick={handleNewSpec}> Add Ingredient </Button>
                             </div>}
                         </div>
-                    ))}
-                    {specifications.length <= 15 && <div className='row2'>
-                        <Button onClick={handleNewSpec}> Add Ingredient </Button>
-                    </div>}
-                </div>
 
-                <div className='submit'>
-                    <Button variant='outlined' onClick={handleSubmit}> Create Recipe </Button>
+                        <div className='submit'>
+                            <Button variant='outlined' onClick={handleSubmit}> Create Recipe </Button>
+                        </div>
+                    </Grid>
                 </div>
-            </Grid>
+            </div>
         </div>
     );
 }
