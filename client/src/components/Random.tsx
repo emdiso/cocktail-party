@@ -5,63 +5,12 @@ import TablePagination from '@mui/material/TablePagination';
 import { get } from "../axios.service";
 import { stringify } from 'querystring';
 import { AxiosError, AxiosResponse } from 'axios';
-import Recipe from './../models/Recipe';
 import { ContactSupportOutlined } from '@mui/icons-material';
-
-// -TODO- On server side, transform the data before returning it to the client, then adjust this interface to match the transformed data
-export interface Drink {
-    idDrink: string;
-    strDrink: string;
-    strDrinkAlternate: string;
-    strTags: string;
-    strVideo: string;
-    strCategory: string;
-    strIBA: string;
-    strAlcoholic: string;
-    strGlass: string;
-    strInstructions: string;
-    strDrinkThumb: string;
-    //ingredients: [];
-    //measurements: [];
-    strIngredient1: string;
-    strIngredient2: string;
-    strIngredient3: string;
-    strIngredient4: string;
-    strIngredient5: string;
-    strIngredient6: string;
-    strIngredient7: string;
-    strIngredient8: string;
-    strIngredient9: string;
-    strIngredient10: string;
-    strIngredient11: string;
-    strIngredient12: string;
-    strIngredient13: string;
-    strIngredient14: string;
-    strIngredient15: string;
-    strMeasure1: string;
-    strMeasure2: string;
-    strMeasure3: string;
-    strMeasure4: string;
-    strMeasure5: string;
-    strMeasure6: string;
-    strMeasure7: string;
-    strMeasure8: string;
-    strMeasure9: string;
-    strMeasure10: string;
-    strMeasure11: string;
-    strMeasure12: string;
-    strMeasure13: string;
-    strMeasure14: string;
-    strMeasure15: string;
-    strImageSource: string;
-    strImageAttribution: string;
-    strCreativeCommonsConfirmed: string;
-    dateModified: string;
-}
+import { Recipe } from "../models"
 
 interface random {
     ingredient: string,
-    randDrink: Drink | undefined
+    randDrink: Recipe | undefined
 }
 
 const Random = () => {
@@ -69,6 +18,7 @@ const Random = () => {
     const [ingredients, setIngredients] = React.useState<any[]>([]);
 
     const [drinksByIngredient, setDrinksByIngredient] = React.useState<random[]>([]);
+    const [randomDrinksByIngredient, setRandomDrinksByIngredients] = React.useState<random[]>([]);
 
     get(
         "/cocktail_api/ingredient_options", {},
@@ -87,8 +37,28 @@ const Random = () => {
                         }
                         return obj;
                     }
-                )
-            })
+                );
+            });
+
+            if (drinksByIngredient.length > 0) {
+                setRandomDrinksByIngredients(
+                    (prev: random[]) => {
+                        let obj = [...prev];
+                        if (obj.length < 5) {
+                            let diff = 5 - obj.length;
+                            for (let i = 0; i < diff; i++) {
+                                let randInt = Math.floor(Math.random() * drinksByIngredient.length);
+                                if (obj.includes(drinksByIngredient[randInt])) {
+                                    i--;
+                                } else {
+                                    obj.push(drinksByIngredient[randInt]);
+                                }
+                            }
+                        }
+                        return obj;
+                    }
+                );
+            }
         }
     )
 
@@ -106,7 +76,7 @@ const Random = () => {
         }, (response: AxiosResponse) => {
             const drink = response.data;
             console.log(drink);
-            setDrinksByIngredient(
+            setRandomDrinksByIngredients(
                 (prev: random[]) => {
                     let obj = [...prev];
                     let change: random[] = obj.filter(function (x) {
@@ -127,6 +97,29 @@ const Random = () => {
         return `https://www.thecocktaildb.com/images/ingredients/${i}-Medium.png`;
     }
 
+    const newIngredients = () => {
+        setRandomDrinksByIngredients([]);
+        if (drinksByIngredient.length > 0) {
+            setRandomDrinksByIngredients(
+                (prev: random[]) => {
+                    let obj = [...prev];
+                    if (obj.length < 5) {
+                        let diff = 5 - obj.length;
+                        for (let i = 0; i < diff; i++) {
+                            let randInt = Math.floor(Math.random() * drinksByIngredient.length);
+                            if (obj.includes(drinksByIngredient[randInt])) {
+                                i--;
+                            } else {
+                                obj.push(drinksByIngredient[randInt]);
+                            }
+                        }
+                    }
+                    return obj;
+                }
+            );
+        }
+    }
+
     return (
         <div>
             <Button onClick={getRandomDrink}> Get Random Cocktail </Button>
@@ -142,28 +135,32 @@ const Random = () => {
             )}
 
             <div>
+                <h4>Click for a random drink!</h4>
                 <Grid container spacing={{ xs: 2, md: 5 }} columns={{ xs: 6, sm: 8, md: 12 }} alignItems="center" justifyContent="center">
-                    {drinksByIngredient.map((elem: random, index: number) =>
-                        <Grid item xs={4} sm={4} md={2} key={index}>
-                            {elem.randDrink ?
-                                <RecipeCard data={elem.randDrink} key={index} onClick={() => getRandomDrinkByIngredient(elem.ingredient)} />
-                                :
-                                <Card sx={{ maxWidth: 345 }} key={index} onClick={() => getRandomDrinkByIngredient(elem.ingredient)}>
-                                    <CardHeader title={elem.ingredient} />
-                                    <CardMedia
-                                        component="img"
-                                        height="194"
-                                        image={getIngredientPhoto(elem.ingredient)}
-                                        alt="Recipe img not available"
-                                    />
-                                </Card>
-                            }
-                        </Grid>
-                    )}
+                    {randomDrinksByIngredient ?
+                        randomDrinksByIngredient.map((elem: random, index: number) =>
+                            <Grid item xs={4} sm={4} md={2} key={index}>
+                                {elem.randDrink ?
+                                    <RecipeCard data={elem.randDrink} key={index} onClick={() => getRandomDrinkByIngredient(elem.ingredient)} />
+                                    :
+                                    <Card sx={{ maxWidth: 345 }} key={index} onClick={() => getRandomDrinkByIngredient(elem.ingredient)} style={{ cursor: "pointer" }}>
+                                        <CardHeader title={elem.ingredient} />
+                                        <CardMedia
+                                            component="img"
+                                            height="194"
+                                            image={getIngredientPhoto(elem.ingredient)}
+                                            alt="Recipe img not available"
+                                        />
+                                    </Card>
+                                }
+                            </Grid>
+                        )
+                        : <h4>Hmm.. I can't find any fun ingredients, sorry</h4>
+                    }
                 </Grid>
+                <Button onClick={newIngredients} variant="contained">New Ingredients</Button>
             </div>
-
-        </div>
+        </div >
     )
 }
 

@@ -112,15 +112,17 @@ cocktailApiRouter.get('/category_options', async (req: Request, res: Response) =
     });
 });
 
-cocktailApiRouter.get('/list_menus', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+cocktailApiRouter.get('/my_menus', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
     if (!req.userId) return res.sendStatus(401);
-    psqlPool.query(
-        'SELECT m.id, m.title, m.image_id FROM menus m WHERE m.user_id = $1',
+    return psqlPool.query(
+        `SELECT m.id, m.title, m.image_id, (SELECT count(*) FROM menu_items mi WHERE mi.menu_id = m.id) as item_count
+         FROM menus m
+         WHERE m.user_id = $1`,
         [ req.userId ]
-    ).then((result) => {
-        res.json({ menus: result.rows });
+    ).then(async (result) => {
+        return res.json(result.rows);
     }).catch(() => {
-        res.sendStatus(500);
+        return res.sendStatus(500);
     });
 })
 
@@ -131,7 +133,7 @@ cocktailApiRouter.get('/list_custom_recipes', verifyToken, async (req: Authentic
          FROM custom_recipes cr WHERE cr.user_id = $1`,
         [ req.userId ]
     ).then((result) => {
-        res.json({ custom_recipes: result.rows });
+        res.json(result.rows);
     }).catch(() => {
         res.sendStatus(500);
     });
