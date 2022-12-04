@@ -9,58 +9,117 @@ import CustomRecipe from './../../models/CustomRecipe';
 import './../styling/RecipeForm.css';
 import { isDOMComponent } from 'react-dom/test-utils';
 import FormData from 'form-data';
+import { useLocation } from 'react-router-dom';
+import { valueContainerCSS } from 'react-select/dist/declarations/src/components/containers';
+import e from 'express';
+
+const defaultValues: CustomRecipe = {
+    id: undefined as unknown as number,
+    image_id: undefined as unknown as number,
+    strDrink: '',
+    strAlcoholic: '',
+    strCategory: '',
+    strGlass: '',
+    strInstructions: '',
+    strIngredient1: '',
+    strIngredient2: '',
+    strIngredient3: '',
+    strIngredient4: '',
+    strIngredient5: '',
+    strIngredient6: '',
+    strIngredient7: '',
+    strIngredient8: '',
+    strIngredient9: '',
+    strIngredient10: '',
+    strIngredient11: '',
+    strIngredient12: '',
+    strIngredient13: '',
+    strIngredient14: '',
+    strIngredient15: '',
+    strMeasure1: '',
+    strMeasure2: '',
+    strMeasure3: '',
+    strMeasure4: '',
+    strMeasure5: '',
+    strMeasure6: '',
+    strMeasure7: '',
+    strMeasure8: '',
+    strMeasure9: '',
+    strMeasure10: '',
+    strMeasure11: '',
+    strMeasure12: '',
+    strMeasure13: '',
+    strMeasure14: '',
+    strMeasure15: '',
+    dateModified: '',
+};
 
 const RecipeForm = () => {
-    const [values, setValues] = React.useState<CustomRecipe>({
-        id: 0,
-        image_id: 0,
-        strDrink: '',
-        strAlcoholic: '',
-        strCategory: '',
-        strGlass: '',
-        strInstructions: '',
-        strIngredient1: '',
-        strIngredient2: '',
-        strIngredient3: '',
-        strIngredient4: '',
-        strIngredient5: '',
-        strIngredient6: '',
-        strIngredient7: '',
-        strIngredient8: '',
-        strIngredient9: '',
-        strIngredient10: '',
-        strIngredient11: '',
-        strIngredient12: '',
-        strIngredient13: '',
-        strIngredient14: '',
-        strIngredient15: '',
-        strMeasure1: '',
-        strMeasure2: '',
-        strMeasure3: '',
-        strMeasure4: '',
-        strMeasure5: '',
-        strMeasure6: '',
-        strMeasure7: '',
-        strMeasure8: '',
-        strMeasure9: '',
-        strMeasure10: '',
-        strMeasure11: '',
-        strMeasure12: '',
-        strMeasure13: '',
-        strMeasure14: '',
-        strMeasure15: '',
-        dateModified: '',
-    });
+    const location = useLocation();
 
+    const [values, setValues] = React.useState<CustomRecipe>(defaultValues);
     const [imgUploaded, setImageUploaded] = useState<File | undefined>(undefined);
-    const [specifications, setSpecifications] = useState([{ingredient: '', measurement: ''}]);
+    const [specifications, setSpecifications] = useState([{ ingredient: '', measurement: '' }]);
+    const [existingImg, setExistingImg] = useState<File | string | undefined>(undefined);
+
+    const handleFillRows = (pValues: any) => {
+        let ingredientsMeasurements = [
+            { ingredient: pValues.strIngredient1, measurement: pValues.strMeasure1 },
+            { ingredient: pValues.strIngredient2, measurement: pValues.strMeasure2 },
+            { ingredient: pValues.strIngredient3, measurement: pValues.strMeasure3 },
+            { ingredient: pValues.strIngredient4, measurement: pValues.strMeasure4 },
+            { ingredient: pValues.strIngredient5, measurement: pValues.strMeasure5 },
+            { ingredient: pValues.strIngredient6, measurement: pValues.strMeasure6 },
+            { ingredient: pValues.strIngredient7, measurement: pValues.strMeasure7 },
+            { ingredient: pValues.strIngredient8, measurement: pValues.strMeasure8 },
+            { ingredient: pValues.strIngredient9, measurement: pValues.strMeasure9 },
+            { ingredient: pValues.strIngredient10, measurement: pValues.strMeasure10 },
+            { ingredient: pValues.strIngredient11, measurement: pValues.strMeasure11 },
+            { ingredient: pValues.strIngredient12, measurement: pValues.strMeasure12 },
+            { ingredient: pValues.strIngredient13, measurement: pValues.strMeasure13 },
+            { ingredient: pValues.strIngredient14, measurement: pValues.strMeasure14 },
+            { ingredient: pValues.strIngredient15, measurement: pValues.strMeasure15 }
+        ];
+
+        let finIM = ingredientsMeasurements.filter((e) => { return e.ingredient !== null });
+        setSpecifications(finIM);
+    }
+
+    useEffect(() => {
+        if (location.state) {
+            if (values !== defaultValues) return;
+            const id = location.state.id;
+            const idDrink = location.state.idDrink;
+
+            if (idDrink) {
+                get(`/cocktail_api/drink_by_id?id=${idDrink}`, {},
+                    (response) => {
+                        setValues(response.data);
+                        handleFillRows(response.data);
+                        handleExistingImg(response.data.strDrinkThumb);
+                    });
+            }
+            else {
+                get(`/recipe/custom_recipe?id=${id}`, {},
+                    (response) => {
+                        setValues(response.data);
+                        handleFillRows(response.data);
+                        handleExistingImg(response.data.strDrinkThumb);
+                    });
+            }
+        }
+    }, [values]);
+
+    const handleExistingImg = (imgPath: string) => {
+        setExistingImg(imgPath);
+    }
 
     const handleChange = (prop: keyof CustomRecipe) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [prop]: event.target.value });
     };
 
     const handleNewSpec = () => {
-        setSpecifications([...specifications, {ingredient: '', measurement: ''}]);
+        setSpecifications([...specifications, { ingredient: '', measurement: '' }]);
     }
 
     const handleRemoveSpec = (index: number) => {
@@ -72,7 +131,7 @@ const RecipeForm = () => {
     const handleIngredientChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target;
         const value = event.target.value;
-        const list = [... specifications];
+        const list = [...specifications];
         list[index].ingredient = value;
         setSpecifications(list);
     }
@@ -80,7 +139,7 @@ const RecipeForm = () => {
     const handleMeasurementChange = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const name = event.target;
         const value = event.target.value;
-        const list = [... specifications];
+        const list = [...specifications];
         list[index].measurement = value;
         setSpecifications(list);
     }
@@ -100,8 +159,8 @@ const RecipeForm = () => {
     const handleSubmit = () => {
         // Ingredients and Measurements Data
         for (let i = 0; i < specifications.length; i++) {
-            let customCocktailIngredient = 'strIngredient' + (i+1);
-            let customCocktailMeasurement = 'strMeasure' + (i+1);
+            let customCocktailIngredient = 'strIngredient' + (i + 1);
+            let customCocktailMeasurement = 'strMeasure' + (i + 1);
 
             if (customCocktailIngredient === 'strIngredient1' && customCocktailMeasurement === 'strMeasure1') {
                 values.strIngredient1 = specifications[0].ingredient;
@@ -167,16 +226,42 @@ const RecipeForm = () => {
 
         let formData = new FormData();
 
-        if (imgUploaded !== undefined)
+        if (imgUploaded) {
             formData.append('image', imgUploaded);
+        }
+        else {
+            if (typeof existingImg === "string") {
+                axios({
+                    url: existingImg,
+                    method: 'GET',
+                    responseType: 'blob',
+                })
+                    .then((res) => {
+                        let data = res.data;
+                        let metadata = {
+                            type: 'image/jpeg'
+                        };
+                        let temp = existingImg.split('/');
+                        let tempSize = temp.length;
 
-        formData.append('id', values.id);
-        formData.append('image_id', values.image_id);
-        formData.append('strDrink', values.strDrink);
-        formData.append('strAlcoholic', values.strAlcoholic);
-        formData.append('strCategory', values.strCategory);
-        formData.append('strGlass', values.strGlass);
-        formData.append('strInstructions', values.strInstructions);
+                        let fileName = temp[tempSize - 1];
+                        let file = new File([data], fileName);
+
+                        formData.append('image', file);
+                    });
+            }
+            else {
+                formData.append('image', existingImg);
+            }
+        }
+
+        values.id && formData.append('id', values.id);
+        values.image_id && formData.append('image_id', values.image_id);
+        values.strDrink && formData.append('strDrink', values.strDrink);
+        values.strAlcoholic && formData.append('strAlcoholic', values.strAlcoholic);
+        values.strCategory && formData.append('strCategory', values.strCategory);
+        values.strGlass && formData.append('strGlass', values.strGlass);
+        values.strInstructions && formData.append('strInstructions', values.strInstructions);
         formData.append('strIngredient1', values.strIngredient1);
         formData.append('strIngredient2', values.strIngredient2);
         formData.append('strIngredient3', values.strIngredient3);
@@ -207,10 +292,9 @@ const RecipeForm = () => {
         formData.append('strMeasure13', values.strMeasure13);
         formData.append('strMeasure14', values.strMeasure14);
         formData.append('strMeasure15', values.strMeasure15);
-        formData.append('dateModified', values.dateModified);
+        values.dateModified && formData.append('dateModified', values.dateModified);
 
-        // post('/recipe/insert', {'formData': formData, 'recipe': values});
-        post('/recipe/insert', formData, {
+        post('/recipe//upsert_custom_recipe', formData, {
             headers: {
                 'Content-Type': 'Multipart/form-data'
             }
@@ -222,89 +306,106 @@ const RecipeForm = () => {
         });
     }
 
+    const handleGetImgSrc = () => {
+        if (imgUploaded) {
+            return URL.createObjectURL(imgUploaded);
+        } else {
+            if (typeof existingImg === 'string') {
+                return existingImg;
+            } else {
+                return URL.createObjectURL(existingImg || undefined as unknown as File);
+            }
+        }
+    };
+
     return (
         <div>
-            <Grid className='form'>
-                <h1> Recipes </h1>
+            <div className="card m-3">
+                <div className="card-body border-bottom">
+                    <Grid className='form' style={{ paddingLeft: "2vw" }}>
+                        <h1> Recipes </h1>
 
-                <div className='imgContainer'>
-                    {imgUploaded!=undefined && <img id='image' src={URL.createObjectURL(imgUploaded)}></img>}
+                        <div className='imgContainer'>
+                            {(imgUploaded || existingImg) && <img id='image' src={handleGetImgSrc()} />}
 
-                    <div>
-                        <Button variant="outlined" component="label">
-                            {imgUploaded==undefined ? "Upload Image" : "Change Image"}
-                            <input id='imgInput' hidden accept="image/*" type="file" onChange={handleImageUpload}/>
-                        </Button>
-                        {imgUploaded !== undefined && <Button variant="outlined" component="label" onClick={removeImage}> Remove Image </Button>}
-                    </div>
-                </div>
-
-                <InputLabel htmlFor='cocktail-name'> Cocktail Name: </InputLabel>
-                <TextField
-                    required
-                    id='cocktail-name'
-                    value={values.strDrink}
-                    onChange={handleChange('strDrink')}
-                ></TextField>
-
-                <InputLabel htmlFor='cocktail-alcoholic'> Will this drink contain alcohol? </InputLabel>
-                <RadioGroup
-                    id='cocktail-alcoholic'
-                    value={values.strAlcoholic}
-                    onChange={handleChange('strAlcoholic')}
-                    row={true}
-                >
-                    <FormControlLabel value='Alcoholic' control={<Radio />} label="Yes" />
-                    <FormControlLabel value='Non_Alcoholic' control={<Radio />} label="No" />
-                </RadioGroup>
-
-                <InputLabel htmlFor='cocktail-instructions'> Instructions: </InputLabel>
-                <TextField
-                    required
-                    id='cocktail-instructions'
-                    value={values.strInstructions}
-                    onChange={handleChange('strInstructions')}
-                ></TextField>
-
-                <div className='cocktail-specifications'>
-                    {specifications.map((singleSpec, index) => (
-                        <div key={index} className='row1'>
-                            <div id='ingredients'>
-                                <InputLabel htmlFor='ingredient'> Ingredient </InputLabel>
-                                <TextField 
-                                    required
-                                    name='ingredient'
-                                    id='ingredient'
-                                    value={singleSpec.ingredient}
-                                    onChange={handleIngredientChange(index)}
-                                ></TextField>
+                            <div>
+                                <Button variant="outlined" component="label">
+                                    {(imgUploaded === undefined || existingImg === undefined) ? "Upload Image" : "Change Image"}
+                                    <input id='imgInput' hidden accept="image/*" type="file" onChange={handleImageUpload} />
+                                </Button>
+                                {(imgUploaded !== undefined || existingImg !== undefined) && <Button variant="outlined" component="label" onClick={removeImage}> Remove Image </Button>}
                             </div>
-                            <div id='measurements'>
-                                <InputLabel htmlFor='measurement'> Measurement </InputLabel>
-                                <TextField
-                                    required
-                                    name='measurement'
-                                    id='measurement'
-                                    value={singleSpec.measurement}
-                                    onChange={handleMeasurementChange(index)}
-                                ></TextField>
-                            </div>
-                            {specifications.length >= 2 && <div id='delete'>
-                                <IconButton aria-label="delete" color="primary" onClick={() => handleRemoveSpec(index)}>
-                                    <DeleteIcon />
-                                </IconButton>
+                        </div>
+
+                        <InputLabel htmlFor='cocktail-name'> Cocktail Name: </InputLabel>
+                        <TextField
+                            required
+                            id='cocktail-name'
+                            value={values.strDrink}
+                            onChange={handleChange('strDrink')}
+                        ></TextField>
+
+                        <InputLabel htmlFor='cocktail-alcoholic'> Will this drink contain alcohol? </InputLabel>
+                        <RadioGroup
+                            id='cocktail-alcoholic'
+                            value={values.strAlcoholic}
+                            onChange={handleChange('strAlcoholic')}
+                            row={true}
+                        >
+                            <FormControlLabel value='Alcoholic' control={<Radio />} label="Yes" />
+                            <FormControlLabel value='Non_Alcoholic' control={<Radio />} label="No" />
+                        </RadioGroup>
+
+                        <InputLabel htmlFor='cocktail-instructions'> Instructions: </InputLabel>
+                        <TextField
+                            required
+                            multiline
+                            id='cocktail-instructions'
+                            value={values.strInstructions}
+                            onChange={handleChange('strInstructions')}
+                        ></TextField>
+
+                        <div className='cocktail-specifications'>
+                            {specifications.map((singleSpec, index) => (
+                                <div key={index} className='row1'>
+                                    <div id='ingredients'>
+                                        <InputLabel htmlFor='ingredient'> Ingredient </InputLabel>
+                                        <TextField
+                                            required
+                                            name='ingredient'
+                                            id='ingredient'
+                                            value={singleSpec.ingredient}
+                                            onChange={handleIngredientChange(index)}
+                                        ></TextField>
+                                    </div>
+                                    <div id='measurements'>
+                                        <InputLabel htmlFor='measurement'> Measurement </InputLabel>
+                                        <TextField
+                                            required
+                                            name='measurement'
+                                            id='measurement'
+                                            value={singleSpec.measurement}
+                                            onChange={handleMeasurementChange(index)}
+                                        ></TextField>
+                                    </div>
+                                    {specifications.length >= 2 && <div id='delete'>
+                                        <IconButton aria-label="delete" color="primary" onClick={() => handleRemoveSpec(index)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </div>}
+                                </div>
+                            ))}
+                            {specifications.length <= 15 && <div className='row2'>
+                                <Button onClick={handleNewSpec}> Add Ingredient </Button>
                             </div>}
                         </div>
-                    ))}
-                    {specifications.length <= 15 && <div className='row2'>
-                        <Button onClick={handleNewSpec}> Add Ingredient </Button>
-                    </div>}
-                </div>
 
-                <div className='submit'>
-                    <Button variant='outlined' onClick={handleSubmit}> Create Recipe </Button>
+                        <div className='submit'>
+                            <Button variant='outlined' onClick={handleSubmit}> Create Recipe </Button>
+                        </div>
+                    </Grid>
                 </div>
-            </Grid>
+            </div>
         </div>
     );
 }

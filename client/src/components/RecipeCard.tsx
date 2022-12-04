@@ -9,6 +9,8 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material';
 import React from 'react';
+import { getIn } from 'yup/lib/util/reach';
+import { useNavigate } from 'react-router-dom';
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -41,6 +43,17 @@ function RecipeCard(data: any) {
         setExpanded(!expanded);
     };
 
+    const navigate = useNavigate();
+
+    const handleModify = () => {
+        if (data.data.idDrink) {
+            navigate('/recipe', { state: {id: 0, idDrink: data.data.idDrink}});
+        }
+        else {
+            navigate('/recipe', { state: {id: data.data.id, idDrink: 0}});
+        }
+    }
+
     let ingredients: string[] = getIngredients(data);
 
     return (
@@ -56,7 +69,7 @@ function RecipeCard(data: any) {
                 Ingredients: {ingredients}
             </CardContent>
             <CardActions disableSpacing>
-                <button>Modify</button>
+                <button onClick={handleModify}>Modify</button>
                 <ExpandMore
                     expand={expanded}
                     onClick={handleExpandClick}

@@ -3,7 +3,7 @@ import psqlPool from '../utils/psqlConnection';
 import dotenv from 'dotenv';
 import multer from 'multer';
 import { AuthenticatedRequest, verifyToken } from '../utils/authUtils';
-import { insertCustomRecipe } from '../utils/recipeUtils';
+import { insertCustomRecipe, updateCustomRecipe } from '../utils/recipeUtils';
 import { insertFile } from '../utils/imageUtils';
 import CustomRecipe from '../models/CustomRecipe';
 
@@ -13,7 +13,7 @@ const recipesRouter = express.Router();
 recipesRouter.use(cors());
 const upload = multer({ storage: multer.memoryStorage() });
 
-recipesRouter.get('/get_custom_recipe', verifyToken, (req: AuthenticatedRequest, res: Response) => {
+recipesRouter.get('/custom_recipe', verifyToken, (req: AuthenticatedRequest, res: Response) => {
     return psqlPool.query("SELECT cr.* FROM custom_recipes cr WHERE cr.id = $1", [req.query.id]).then((result) => {
         if (result.rowCount > 0) {
             const cr: CustomRecipe = result.rows[0];
@@ -29,65 +29,43 @@ recipesRouter.get('/get_custom_recipe', verifyToken, (req: AuthenticatedRequest,
     });
 });
 
-recipesRouter.post('/insert', verifyToken, upload.single("image"), (req: AuthenticatedRequest, res: Response) => {
-    let recipe = {} as CustomRecipe;
+recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"), async (req: AuthenticatedRequest, res: Response) => {
+    let custom_recipe: CustomRecipe = req.body;
 
-    recipe = {
-        id: req.body.id,
-        image_id: req.body.image_id,
-        strDrink: req.body.strDrink,
-        strAlcoholic: req.body.strAlcoholic,
-        strCategory: req.body.strCategory,
-        strGlass: req.body.strGlass,
-        strInstructions: req.body.strInstructions,
-        strIngredient1: req.body.strIngredient1,
-        strIngredient2: req.body.strIngredient2,
-        strIngredient3: req.body.strIngredient3,
-        strIngredient4: req.body.strIngredient4,
-        strIngredient5: req.body.strIngredient5,
-        strIngredient6: req.body.strIngredient6,
-        strIngredient7: req.body.strIngredient7,
-        strIngredient8: req.body.strIngredient8,
-        strIngredient9: req.body.strIngredient9,
-        strIngredient10: req.body.strIngredient10,
-        strIngredient11: req.body.strIngredient11,
-        strIngredient12: req.body.strIngredient12,
-        strIngredient13: req.body.strIngredient13,
-        strIngredient14: req.body.strIngredient14,
-        strIngredient15: req.body.strIngredient15,
-        strMeasure1: req.body.strMeasure1,
-        strMeasure2: req.body.strMeasure2,
-        strMeasure3: req.body.strMeasure3,
-        strMeasure4: req.body.strMeasure4,
-        strMeasure5: req.body.strMeasure5,
-        strMeasure6: req.body.strMeasure6,
-        strMeasure7: req.body.strMeasure7,
-        strMeasure8: req.body.strMeasure8,
-        strMeasure9: req.body.strMeasure9,
-        strMeasure10: req.body.strMeasure10,
-        strMeasure11: req.body.strMeasure11,
-        strMeasure12: req.body.strMeasure12,
-        strMeasure13: req.body.strMeasure13,
-        strMeasure14: req.body.strMeasure14,
-        strMeasure15: req.body.strMeasure15,
-        dateModified:  req.body.dateModified
-    };
+    if (!req.userId) return res.status(401).send();
 
-    const promise = insertFile(req);
-    return promise.then((result) => {
-        if (result.statusCode !== 200) {
-            return res.status(result.statusCode).send(result.message);
+    if (req.file) {
+        const imgInsertResult = await insertFile(req);
+        
+        if (imgInsertResult.statusCode !== 200) {
+            return res.status(imgInsertResult.statusCode).send(imgInsertResult.message);
         }
 
-        recipe.image_id = result.data.toString();
+        custom_recipe.image_id = imgInsertResult.data.toString();
+    } else {
+        if (custom_recipe.image_id) {
+            const trueImgId = await psqlPool.query(`SELECT id FROM images WHERE user_id=${req.userId} AND id=${custom_recipe.image_id}`);
+            if (trueImgId.rowCount === 0) {
+                custom_recipe.image_id = undefined;
+            }
+        }
+    }
 
-        if (req.userId === undefined) return res.status(401).send();
-
-        const recipePromise = insertCustomRecipe(req.userId, recipe)
+    if (custom_recipe.id) {
+        const recipePromise = updateCustomRecipe(req.userId, custom_recipe);
         return recipePromise.then((result) => {
-            return res.status(200).send(result.rows[0].id);
+            return res.send(result.rows[0].id.toString());
+        }).catch(() => {
+            return res.status(500).send();
         });
-    });
+    } else {
+        const recipePromise = insertCustomRecipe(req.userId, custom_recipe);
+        return recipePromise.then((result) => {
+            return res.send(result.rows[0].id.toString());
+        }).catch(() => {
+            return res.status(500).send();
+        });
+    }
 })
 
 export default recipesRouter;
