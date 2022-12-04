@@ -35,7 +35,6 @@ recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"),
     if (!req.userId) return res.status(401).send();
 
     if (req.file) {
-        console.log("attempt to insert file");
         const imgInsertResult = await insertFile(req);
         
         if (imgInsertResult.statusCode !== 200) {
@@ -53,7 +52,6 @@ recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"),
     }
 
     if (custom_recipe.id) {
-        console.log("attempt to modify cr");
         const recipePromise = updateCustomRecipe(req.userId, custom_recipe);
         return recipePromise.then((result) => {
             return res.send(result.rows[0].id.toString());
@@ -61,7 +59,6 @@ recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"),
             return res.status(500).send();
         });
     } else {
-        console.log("attempt to insert cr");
         const recipePromise = insertCustomRecipe(req.userId, custom_recipe);
         return recipePromise.then((result) => {
             return res.send(result.rows[0].id.toString());
