@@ -2,6 +2,7 @@ import { List, ListItem, ListItemAvatar, Avatar, ListItemText, Typography, Divid
 import React from 'react';
 import { PrettyDrink } from './forms/MenuFormatForm';
 import html2canvas from 'html2canvas';
+import { Recipe } from '../models';
 
 function MenuPrettyDetails(data: any) {
     const printRef = React.useRef(null);
@@ -50,7 +51,7 @@ function MenuPrettyDetails(data: any) {
                         drinks.map((item: PrettyDrink, index: number) =>
                             <div key={index} style={{ display: "block", marginLeft: "auto", marginRight: "auto" }}>
                                 <ListItem>
-                                    <img style={{ width: "10%", borderRadius: "5px", marginLeft: "2vw" }} alt="" src={item.drink.strDrinkThumb} />
+                                    <img style={{ width: "10%", borderRadius: "5px", marginLeft: "2vw" }} alt="" src={(item.drink as Recipe).strDrinkThumb} />
                                     <ListItemText
                                         style={item.drink.strAlcoholic.includes("Alcoholic") ? { color: data.data.alcoholicTextColor, textAlign: "left", marginLeft: "1vw", marginRight: "2vw" } : { color: data.data.textColor, textAlign: "left", marginLeft: "1vw", marginRight: "2vw" }}
                                         primaryTypographyProps={{ fontFamily: data.data.textFont }}

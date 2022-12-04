@@ -5,9 +5,8 @@ import TablePagination from '@mui/material/TablePagination';
 import { get } from "../axios.service";
 import { stringify } from 'querystring';
 import { AxiosError, AxiosResponse } from 'axios';
-import Recipe from './../models/Recipe';
 import { ContactSupportOutlined } from '@mui/icons-material';
-import { Recipe } from '../models';
+import { Recipe } from "../models"
 
 interface random {
     ingredient: string,
