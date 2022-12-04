@@ -6,6 +6,7 @@ import { get, post } from '../../axios.service';
 import { AxiosResponse } from 'axios';
 import Select from '@mui/material/Select';
 import { CustomRecipe, Recipe } from '../../models';
+import { useNavigate } from "react-router-dom";
 
 export interface MenuGenModel {
   title: string;
@@ -79,16 +80,28 @@ function MenuForm() {
     setMenuGenModel(previousMenu!);
   };
 
-  const handleSubmit = () => {
+  function saveMenu(callback: (id: number) => void): string | void {
     post("/menu_gen/insert_full_menu", {
       title: menuGenModel.title,
       recipes: (menuGenModel.menuRecipes as (Recipe | CustomRecipe)[]).concat(menuGenModel.menuCustomRecipes)
     }, {}, (response: AxiosResponse) => {
-      // TODO: Do something with returned menu id (for example link them to the menu page after we build it)
-      // console.log("Menu id: "+response.data.menu_id.toString());
+      console.log(response);
       handleReset();
+      callback(response.data.menu_id);
     }, () => {
       // TODO: Announce that they need to be logged in to submit/save the menu
+    });
+  }
+
+  let navigate = useNavigate();
+
+  const handleSubmit = async () => {
+    saveMenu(() => navigate("/profile"));
+  }
+
+  const handleDesign = async () => {
+    saveMenu((id) => {
+      navigate("/wow", { state: { id: id } });
     });
   }
 
@@ -430,7 +443,7 @@ function MenuForm() {
               Reset
             </Button>
             <Tooltip title="Design my menu">
-              <Button variant="contained" sx={{ mt: 1, mr: 1 }}>Design</Button>
+              <Button onClick={handleDesign} variant="contained" sx={{ mt: 1, mr: 1 }}>Design</Button>
             </Tooltip>
             <Tooltip title="Save to my profile">
               <Button onClick={handleSubmit} variant="contained" sx={{ mt: 1, mr: 1 }}>Submit</Button>

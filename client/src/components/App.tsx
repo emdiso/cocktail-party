@@ -11,6 +11,7 @@ import { getAuthToken, get } from '../axios.service';
 import MenuForm from './forms/MenuForm';
 import RecipeForm from './forms/RecipeForm';
 import { Fab } from '@mui/material';
+import MenuFormatForm from './forms/MenuFormatForm';
 
 export interface UserInfo {
   username: string;
@@ -58,7 +59,8 @@ function App() {
           <Routes>
             <Route path='/' element={<Landing />}></Route>
             <Route path='/random' element={<Random />}></Route>
-            <Route path='generate' element={<MenuForm />}></Route>
+            <Route path='/generate' element={<MenuForm />}></Route>
+            <Route path='/wow' element={<MenuFormatForm />}></Route>
             {isLoggedIn && <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>}
             {isLoggedIn &&<Route path='/recipe' element={<RecipeForm />}></Route>}
           </Routes>
