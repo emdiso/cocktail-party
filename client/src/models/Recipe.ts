@@ -40,4 +40,5 @@ export default interface recipe {
     strMeasure14: string;
     strMeasure15: string;
     dateModified: string;
+    strDrinkThumb: string;
 }
