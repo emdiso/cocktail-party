@@ -3,6 +3,8 @@ import React from 'react';
 import { PrettyDrink } from './forms/MenuFormatForm';
 import html2canvas from 'html2canvas';
 import { Recipe } from '../models';
+import FormData from 'form-data';
+import { post } from '../axios.service';
 
 function MenuPrettyDetails(data: any) {
     const printRef = React.useRef(null);
@@ -12,18 +14,26 @@ function MenuPrettyDetails(data: any) {
         const canvas = await html2canvas(element!, { useCORS: true });
 
         const url = canvas.toDataURL('image/jpg');
-        const link = document.createElement('a');
+        canvas.toBlob((blob) => {
+            const formData = new FormData();
+            formData.append('image', blob);
+            formData.append('menu_id', data.data.menuId)
+            post('/menu_gen/insert_menu_image', formData, {}, () => {
+                
+            });
+        });
+        // const link = document.createElement('a');
 
-        if (typeof link.download === 'string') {
-            link.href = url;
-            link.download = `${data.data.title}.jpg`;
+        // if (typeof link.download === 'string') {
+        //     link.href = url;
+        //     link.download = `${data.data.title}.jpg`;
 
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } else {
-            window.open(url);
-        }
+        //     document.body.appendChild(link);
+        //     link.click();
+        //     document.body.removeChild(link);
+        // } else {
+        //     window.open(url);
+        // }
     };
 
     const drinks = data.data.drinks;
@@ -89,7 +99,7 @@ function MenuPrettyDetails(data: any) {
 
             </div>
             <div>
-                <Button onClick={handleSubmit} variant="contained" sx={{ mt: 1, mr: 1 }}>Generate QR Code</Button>
+                <Button onClick={handleSubmit} variant="contained" sx={{ mt: 1, mr: 1 }}>Finalize Menu Design</Button>
             </div>
         </div>
     )

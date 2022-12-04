@@ -85,7 +85,6 @@ function MenuForm() {
       title: menuGenModel.title,
       recipes: (menuGenModel.menuRecipes as (Recipe | CustomRecipe)[]).concat(menuGenModel.menuCustomRecipes)
     }, {}, (response: AxiosResponse) => {
-      console.log(response);
       handleReset();
       callback(response.data.menu_id);
     }, () => {

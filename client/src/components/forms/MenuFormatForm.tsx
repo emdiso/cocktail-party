@@ -39,6 +39,7 @@ export interface PrettyDrink {
 }
 
 export interface MenuPrettyModel {
+    menuId: number,
     title: string,
     backgroundColor: string,
     textColor: string,
@@ -76,7 +77,7 @@ function MenuFormatForm() {
     let id = location.state.id;
 
     const [menuPrettyModel, setMenuPrettyModel] = useState<MenuPrettyModel>({
-        title: "My menu", backgroundColor: "#c4c0c0ff", textColor: "#000000ff", textFont: "Calibri", drinks: [], alcoholicLabel: true, alcoholicTextColor: "#000000ff"
+        menuId: id, title: "My menu", backgroundColor: "#c4c0c0ff", textColor: "#000000ff", textFont: "Calibri", drinks: [], alcoholicLabel: true, alcoholicTextColor: "#000000ff"
     });
 
     const previousMenu = usePreviousMenuPrettyModel(menuPrettyModel); // allows us to track what actually changed in the object
