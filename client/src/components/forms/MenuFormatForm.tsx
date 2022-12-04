@@ -109,6 +109,7 @@ function MenuFormatForm() {
 
     const handleSubmit = () => {
         // create the qr code stuff 
+
     }
 
     React.useEffect(() => {
@@ -246,7 +247,7 @@ function MenuFormatForm() {
                 alignItems="stretch">
                 <Grid item xs={5.8} >
                     <div>
-                        <h5>Menu Format Form</h5>
+                        <h5>Menu Design Form</h5>
                         <div className="card m-3">
                             <div className="card-body border-bottom">
 
@@ -368,8 +369,11 @@ function MenuFormatForm() {
                     </Tooltip>
                 </Grid>
 
-                <Grid className="split-screen" item xs={5.8}>
-                    <MenuPrettyDetails data={menuPrettyModel} />
+                <Grid item xs={5.8}>
+                    <h5>Menu Preview</h5>
+                    <div className="card m-3">
+                        <MenuPrettyDetails data={menuPrettyModel} />
+                    </div>
                 </Grid>
             </Grid>
         </div>

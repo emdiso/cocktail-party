@@ -12,14 +12,16 @@ function getIngredients(data: any) {
   let ingredients: string[] = [];
   for (let i = 1; i < 16; i++) {
     if (data[`strIngredient${i}`]) {
-      ingredients.push(data[`strIngredient${i}`])
+      let ingredient = data[`strIngredient${i}`];
+      ingredients.push(`${ingredient}, `)
     }
   }
+  // lol this line gets rid of the comma at the end
+  ingredients[ingredients.length - 1] = ingredients[ingredients.length - 1].substring(0, ingredients[ingredients.length - 1].length - 2);
   return ingredients;
 }
 
 function MenuRawDetails(data: any) {
-  console.log(data);
   let recipes = data.data.menuRecipes;
   let title = data.data.title;
 
@@ -35,7 +37,7 @@ function MenuRawDetails(data: any) {
                 <div key={index}>
                   <ListItem alignItems="flex-start">
                     <ListItemAvatar>
-                      <Avatar alt="Drink image not available" src={item.strDrinkThumb} />
+                      <Avatar alt="" src={item.strDrinkThumb} />
                     </ListItemAvatar>
                     <ListItemText className={item.strAlcoholic}
                       primary={item.strDrink}
