@@ -4,13 +4,13 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import App, {UserInfo} from './App';
+import { UserInfo } from './App';
 import './styling/Profile.css';
-import RecipeForm from './forms/RecipeForm';
 import { get } from '../axios.service';
 import { Link } from 'react-router-dom';
 import { AxiosResponse } from 'axios';
 import { Menu } from '../models';
+import MenuWidget from './MenuWidget';
 
 interface profileProps {
     userInfo: UserInfo;
@@ -32,9 +32,10 @@ const Profile = (props: profileProps) => {
     const [ menuList, setMenuList ] = useState<Menu[]>([]);
 
     useEffect(() => {
+        console.log(menuList);
         if (menuList.length > 0) return;
-        get('/cocktail_api/list_menus', {}, (response: AxiosResponse) => {
-            setMenuList(response.data.menus);
+        get('/cocktail_api/my_menus', {}, (response: AxiosResponse) => {
+            setMenuList(response.data);
         });
     }, [menuList])
 
@@ -54,13 +55,13 @@ const Profile = (props: profileProps) => {
                 <Row> Recipes will be loaded here </Row>
             </Container>
 
-            <Container className='menus'>
+            <Container className='menus' >
                 <Row>
                     <Col sm={2}> My Menus </Col> <Col> <Button> + </Button> </Col>
                 </Row>
                 <Row>
-                    {menuList.length > 0 && menuList.map((value) => {
-                        return <Col sm={2}>{value.title}</Col>
+                    {menuList && menuList.length > 0 && menuList.map((menu) => {
+                        return <Col className='menusCol' sm={3} ><MenuWidget menu={menu} /></Col>
                     })}
                 </Row>
             </Container>
