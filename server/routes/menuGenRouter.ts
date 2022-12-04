@@ -6,10 +6,13 @@ import { randomDrinkPromise } from '../utils/cocktailApiUtils';
 import cors from 'cors';
 import psqlPool from '../utils/psqlConnection';
 import { Recipe, CustomRecipe, MenuGenModel } from '../models';
+import multer from 'multer';
+import { insertFile } from '../utils/imageUtils';
 require('dotenv').config();
 
 
 dotenv.config();
+const upload = multer({ storage: multer.memoryStorage() });
 const menuGenRouter = express.Router();
 menuGenRouter.use(cors());
 menuGenRouter.use(express.json());
@@ -304,6 +307,27 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
     }).catch((error) => {
         return res.status(500).send(error);
     });
+});
+
+menuGenRouter.post('/insert_menu_image', verifyToken, upload.single("image"), async (req: AuthenticatedRequest, res: Response) => {
+    // body = { menu_id }
+    return insertFile(req).then((result) => {
+        if (result.statusCode !== 200) {
+            return res.status(result.statusCode).send(result.message);
+        }
+        const image_id = result.data;
+
+        return psqlPool.query(
+            'UPDATE menus SET image_id = $1 WHERE id = $2 AND user_id = $3',
+            [image_id, req.body.menu_id, req.userId]
+        ).then(() => {
+            console.log(image_id); // TODO: remove this
+            return res.send();
+        }).catch(() => {
+            return res.status(500).send();
+        });
+    });
+
 });
 
 

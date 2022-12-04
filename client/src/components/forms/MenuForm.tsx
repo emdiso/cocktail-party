@@ -85,7 +85,6 @@ function MenuForm() {
       title: menuGenModel.title,
       recipes: (menuGenModel.menuRecipes as (Recipe | CustomRecipe)[]).concat(menuGenModel.menuCustomRecipes)
     }, {}, (response: AxiosResponse) => {
-      console.log(response);
       handleReset();
       callback(response.data.menu_id);
     }, () => {
@@ -96,7 +95,7 @@ function MenuForm() {
   let navigate = useNavigate();
 
   const handleSubmit = async () => {
-    saveMenu(() => navigate("/profile"));
+    saveMenu((id) => navigate("/menu", { state: { id: id }}));
   }
 
   const handleDesign = async () => {

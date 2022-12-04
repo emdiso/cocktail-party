@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { UserInfo } from './App';
 import './styling/Profile.css';
 import { get } from '../axios.service';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AxiosResponse } from 'axios';
 import { CustomRecipe, Menu } from '../models';
 import MenuWidget from './MenuWidget';
@@ -24,6 +24,7 @@ const logOut = () => {
 }
 
 const Profile = (props: profileProps) => {
+    const navigate = useNavigate();
     const [ crList, setCrList ] = useState<CustomRecipe[]>([]);
     const [ menuList, setMenuList ] = useState<Menu[]>([]);
 
@@ -40,6 +41,10 @@ const Profile = (props: profileProps) => {
             setMenuList(response.data);
         });
     }, [menuList]);
+
+    const handleViewMenuClick = (menuId: number) => {
+        navigate("/menu", { state: { id: menuId }});
+    }
 
     return (
         <Container className='profile'>
@@ -67,7 +72,7 @@ const Profile = (props: profileProps) => {
                 </Row>
                 <Row>
                     {menuList && menuList.length > 0 && menuList.map((menu, index) => {
-                        return <Col className='menusCol' sm={3} ><MenuWidget menu={menu} key={index} /></Col>;
+                        return <Col className='menusCol' sm={3} ><MenuWidget menu={menu} handleViewMenuClick={() => handleViewMenuClick(menu.id)} key={index} /></Col>;
                     })}
                 </Row>
             </Container>

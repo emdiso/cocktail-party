@@ -16,8 +16,10 @@ function getIngredients(data: any) {
       ingredients.push(`${ingredient}, `)
     }
   }
+  const ingredientsLength = ingredients.length;
   // lol this line gets rid of the comma at the end
-  ingredients[ingredients.length - 1] = ingredients[ingredients.length - 1].substring(0, ingredients[ingredients.length - 1].length - 2);
+  if (ingredientsLength > 0)
+    ingredients[ingredientsLength - 1] = ingredients[ingredientsLength - 1].substring(0, ingredients[ingredientsLength - 1].length - 2);
   return ingredients;
 }
 

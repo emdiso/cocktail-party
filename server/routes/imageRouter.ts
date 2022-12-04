@@ -30,7 +30,7 @@ imageRouter.get("/display", async (req: Request, res: Response) => {
     });
 });
 
-imageRouter.post("/store", verifyToken, upload.single("image"), (req: AuthenticatedRequest, res: Response) => {
+imageRouter.post("/store", verifyToken, upload.single("image"), async (req: AuthenticatedRequest, res: Response) => {
 
     const promise = insertFile(req);
     return promise.then((result) => {
@@ -39,25 +39,6 @@ imageRouter.post("/store", verifyToken, upload.single("image"), (req: Authentica
         }
         return res.send(result.data.toString());
     })
-    // const file = req.file;
-    // if (file === undefined) {
-    //     return res.status(400).send("no image found");
-    // } else {
-    //     const { originalname, mimetype, size, buffer } = file;
-    //     console.log(size);
-    //     if (size > 2000000) { // Current File size limit is about 2 mb
-    //         return res.status(400).send("File is too large");
-    //     }
-        
-    //     psqlPool.query('INSERT INTO images (user_id, file_name, mime_type, img) VALUES ($1, $2, $3, $4, $5)',
-    //         [req.userId, originalname, mimetype,  buffer]
-    //     ).then(() => {
-    //         return res.send();
-    //     }).catch((error) => {
-    //         console.log(error)
-    //         return res.sendStatus(500);
-    //     });
-    // }
 });
 
 export default imageRouter;
