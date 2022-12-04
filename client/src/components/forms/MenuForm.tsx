@@ -56,7 +56,7 @@ function MenuForm() {
   useEffect(() => {
     if (myCustomRecipes !== undefined) return;
     get("/cocktail_api/list_custom_recipes", {}, (response) => {
-      setMyCustomRecipes(response.data.custom_recipes);
+      setMyCustomRecipes(response.data);
     });
   }, [myCustomRecipes]);
 

@@ -133,7 +133,7 @@ cocktailApiRouter.get('/list_custom_recipes', verifyToken, async (req: Authentic
          FROM custom_recipes cr WHERE cr.user_id = $1`,
         [ req.userId ]
     ).then((result) => {
-        res.json({ custom_recipes: result.rows });
+        res.json(result.rows);
     }).catch(() => {
         res.sendStatus(500);
     });

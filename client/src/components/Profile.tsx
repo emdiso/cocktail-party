@@ -9,8 +9,9 @@ import './styling/Profile.css';
 import { get } from '../axios.service';
 import { Link } from 'react-router-dom';
 import { AxiosResponse } from 'axios';
-import { Menu } from '../models';
+import { CustomRecipe, Menu } from '../models';
 import MenuWidget from './MenuWidget';
+import RecipeCard from './RecipeCard';
 
 interface profileProps {
     userInfo: UserInfo;
@@ -23,21 +24,22 @@ const logOut = () => {
 }
 
 const Profile = (props: profileProps) => {
-    // <link
-    //     rel="stylesheet"
-    //     href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
-    //     integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
-    // />
-
+    const [ crList, setCrList ] = useState<CustomRecipe[]>([]);
     const [ menuList, setMenuList ] = useState<Menu[]>([]);
 
     useEffect(() => {
-        console.log(menuList);
+        if (crList.length > 0) return;
+        get('/cocktail_api/list_custom_recipes', {}, (response: AxiosResponse) => {
+            setCrList(response.data);
+        });
+    }, [crList]);
+
+    useEffect(() => {
         if (menuList.length > 0) return;
         get('/cocktail_api/my_menus', {}, (response: AxiosResponse) => {
             setMenuList(response.data);
         });
-    }, [menuList])
+    }, [menuList]);
 
     return (
         <Container className='profile'>
@@ -52,7 +54,11 @@ const Profile = (props: profileProps) => {
                 <Row>
                     <Col sm={2}> My Recipes </Col> <Col> <Link to='/recipe'> <Button> + </Button> </Link> </Col>
                 </Row>
-                <Row> Recipes will be loaded here </Row>
+                <Row>
+                    {crList && crList.length > 0 && crList.map((cr, index) => {
+                        return <Col className='menusCol' sm={3} ><RecipeCard data={cr} key={index} /></Col>;
+                    })}
+                </Row>
             </Container>
 
             <Container className='menus' >
@@ -60,8 +66,8 @@ const Profile = (props: profileProps) => {
                     <Col sm={2}> My Menus </Col> <Col> <Button> + </Button> </Col>
                 </Row>
                 <Row>
-                    {menuList && menuList.length > 0 && menuList.map((menu) => {
-                        return <Col className='menusCol' sm={3} ><MenuWidget menu={menu} /></Col>
+                    {menuList && menuList.length > 0 && menuList.map((menu, index) => {
+                        return <Col className='menusCol' sm={3} ><MenuWidget menu={menu} key={index} /></Col>;
                     })}
                 </Row>
             </Container>
