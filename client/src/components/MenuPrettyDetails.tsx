@@ -5,9 +5,11 @@ import html2canvas from 'html2canvas';
 import { Recipe } from '../models';
 import FormData from 'form-data';
 import { post } from '../axios.service';
+import { useNavigate } from 'react-router-dom';
 
 function MenuPrettyDetails(data: any) {
     const printRef = React.useRef(null);
+    const navigate = useNavigate();
 
     const handleSubmit = async () => {
         const element = printRef.current;
@@ -19,7 +21,7 @@ function MenuPrettyDetails(data: any) {
             formData.append('image', blob);
             formData.append('menu_id', data.data.menuId)
             post('/menu_gen/insert_menu_image', formData, {}, () => {
-                
+                navigate('/menu', { state: {id: data.data.menuId}});
             });
         });
         // const link = document.createElement('a');

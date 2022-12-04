@@ -12,6 +12,7 @@ import MenuForm from './forms/MenuForm';
 import RecipeForm from './forms/RecipeForm';
 import { Fab } from '@mui/material';
 import MenuFormatForm from './forms/MenuFormatForm';
+import MenuPage from './MenuPage';
 
 export interface UserInfo {
   username: string;
@@ -63,6 +64,7 @@ function App() {
             <Route path='/wow' element={<MenuFormatForm />}></Route>
             {isLoggedIn && <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>}
             {isLoggedIn &&<Route path='/recipe' element={<RecipeForm />}></Route>}
+            {isLoggedIn &&<Route path='/menu' element={<MenuPage />}></Route>}
           </Routes>
         </div>
       </Router>

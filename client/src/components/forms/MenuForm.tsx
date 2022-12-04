@@ -95,7 +95,7 @@ function MenuForm() {
   let navigate = useNavigate();
 
   const handleSubmit = async () => {
-    saveMenu(() => navigate("/profile"));
+    saveMenu((id) => navigate("/menu", { state: { id: id }}));
   }
 
   const handleDesign = async () => {

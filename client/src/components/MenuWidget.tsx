@@ -6,6 +6,7 @@ import './styling/App.css';
 
 interface MenuWidgetProps {
     menu: Menu;
+    handleViewMenuClick: () => void;
 }
 
 export default (props: MenuWidgetProps) => {
@@ -24,7 +25,7 @@ export default (props: MenuWidgetProps) => {
             </CardContent>
             <Divider style={{borderColor: "rgba(0, 0, 0, 0.3)"}} />
             <CardActions style={{marginTop: "auto"}}>
-                <Button size="small">View Menu</Button>
+                <Button size="small" onClick={props.handleViewMenuClick} >View Menu</Button>
             </CardActions>
         </Card>
     );
