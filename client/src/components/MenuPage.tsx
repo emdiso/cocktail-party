@@ -21,7 +21,6 @@ export default () => {
     }, [menuInfo]);
 
     const handleViewDesignedMenu = () => {
-        // TODO: send user to server url of route "/image/display?imageId=menuInfo.image_id"
         window.open(`http://localhost:3001/image/display?imageId=${menuInfo ? menuInfo.image_id || "" : ""}`, "_blank");
     }
 
