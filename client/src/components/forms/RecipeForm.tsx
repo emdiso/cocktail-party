@@ -81,7 +81,7 @@ const RecipeForm = () => {
             { ingredient: pValues.strIngredient15, measurement: pValues.strMeasure15 }
         ];
 
-        let finIM = ingredientsMeasurements.filter((e) => { return e.ingredient !== null });
+        let finIM = ingredientsMeasurements.filter((e) => { return e.ingredient !== null || '' || undefined });
         setSpecifications(finIM);
     }
 
@@ -236,19 +236,19 @@ const RecipeForm = () => {
                     method: 'GET',
                     responseType: 'blob',
                 })
-                    .then((res) => {
-                        let data = res.data;
-                        let metadata = {
-                            type: 'image/jpeg'
-                        };
-                        let temp = existingImg.split('/');
-                        let tempSize = temp.length;
+                .then((res) => {
+                    let data = res.data;
+                    let metadata = {
+                        type: 'image/*'
+                    };
+                    let temp = existingImg.split('/');
+                    let tempSize = temp.length;
 
-                        let fileName = temp[tempSize - 1];
-                        let file = new File([data], fileName);
+                    let fileName = temp[tempSize - 1];
+                    const file = new File([data], fileName, metadata);
 
-                        formData.append('image', file);
-                    });
+                    formData.append('image', file);
+                });
             }
             else {
                 formData.append('image', existingImg);
