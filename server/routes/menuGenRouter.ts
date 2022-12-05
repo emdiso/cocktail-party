@@ -290,7 +290,7 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
     
     // TODO: Add error handling
     psqlPool.query(`INSERT INTO menus (user_id, title) VALUES ($1, $2) RETURNING id`, [req.userId, body.title]).then(async (result) => {
-        if (body.recipes === undefined) {
+        if (body.recipes === undefined || body.recipes === null || body.recipes.length === 0) {
             return res.status(400).send("Missing Menu Items");
         }
         // TODO: change to gather all the promises and await the for loop.
@@ -311,6 +311,10 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
 
 menuGenRouter.post('/insert_menu_image', verifyToken, upload.single("image"), async (req: AuthenticatedRequest, res: Response) => {
     // body = { menu_id }
+    if ((await psqlPool.query('SELECT id FROM menus WHERE id = $1 AND user_id = $2', [req.body.menu_id, req.userId])).rowCount == 0) {
+        return res.status(403).send("Access Forbidden");
+    }
+
     return insertFile(req).then((result) => {
         if (result.statusCode !== 200) {
             return res.status(result.statusCode).send(result.message);
