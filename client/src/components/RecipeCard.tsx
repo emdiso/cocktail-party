@@ -67,7 +67,7 @@ function RecipeCard(data: any) {
                 alt=""
             />}
             <CardContent>
-                Ingredients: {ingredients}
+                Ingredients: {ingredients.join(", ")}
             </CardContent>
             <CardActions disableSpacing>
                 <button onClick={handleModify}>Modify</button>
