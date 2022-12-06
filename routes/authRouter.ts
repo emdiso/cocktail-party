@@ -74,7 +74,7 @@ authRouter.post("/signup", (req: Request, res: Response) => {
               "INSERT INTO users (username, hashed_password, email) VALUES ($1, $2, $3) RETURNING id",
               [username, hashedPassword, email]
             )
-              .then((result) => {
+              .then((result: { rows: { id: number; }[]; }) => {
                 // account created
                 console.log(username, "account created");
                 return res.json({ accessToken: generateAccessToken(result.rows[0].id)});
@@ -131,11 +131,11 @@ authRouter.get("/userInfo", verifyToken, (req: AuthenticatedRequest, res: Respon
   let userId = req.userId;
 
   psqlPool.query("SELECT username, email FROM users WHERE id=$1", [userId])
-  .then((response) => {
+  .then((response: { rows: any[]; }) => {
       let userInfo = response.rows[0];
       res.json({ "username":userInfo.username, "email":userInfo.email });
   })
-  .catch((error) => {
+  .catch((error: any) => {
       console.log(error);
       res.status(500).send();
   });

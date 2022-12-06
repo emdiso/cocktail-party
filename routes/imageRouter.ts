@@ -24,7 +24,7 @@ imageRouter.get("/display", async (req: Request, res: Response) => {
             res.contentType(data.mime_type);
             return res.send(Buffer.from(data.img, 'binary'));
         }
-    }).catch((error) => {
+    }).catch((error: any) => {
         console.log(error);
         res.sendStatus(500);
     });

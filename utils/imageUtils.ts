@@ -14,9 +14,9 @@ export const insertFile: (req: AuthenticatedRequest) => Promise<InternalServiceR
         
         return await psqlPool.query('INSERT INTO images (user_id, file_name, mime_type, img) VALUES ($1, $2, $3, $4) RETURNING id',
             [req.userId, originalname, mimetype, buffer]
-        ).then((result) => {
+        ).then((result: { rows: { id: any; }[]; }) => {
             return { statusCode: 200, message: "OK", data: result.rows[0].id };
-        }).catch((error) => {
+        }).catch((error: any) => {
             console.log(error);
             return { statusCode: 500, message: "Insert Failed" };
         });

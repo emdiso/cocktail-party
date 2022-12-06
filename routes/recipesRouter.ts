@@ -14,7 +14,7 @@ recipesRouter.use(cors());
 const upload = multer({ storage: multer.memoryStorage() });
 
 recipesRouter.get('/custom_recipe', verifyToken, (req: AuthenticatedRequest, res: Response) => {
-    return psqlPool.query("SELECT cr.* FROM custom_recipes cr WHERE cr.id = $1", [req.query.id]).then((result) => {
+    return psqlPool.query("SELECT cr.* FROM custom_recipes cr WHERE cr.id = $1", [req.query.id]).then((result: { rowCount: number; rows: CustomRecipe[]; }) => {
         if (result.rowCount > 0) {
             const cr: CustomRecipe = result.rows[0];
             if (cr.user_id == req.userId) {
@@ -61,14 +61,14 @@ recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"),
 
     if (custom_recipe.id) {
         const recipePromise = updateCustomRecipe(req.userId, custom_recipe);
-        return recipePromise.then((result) => {
+        return recipePromise.then((result: { rows: { id: { toString: () => any; }; }[]; }) => {
             return res.send(result.rows[0].id.toString());
         }).catch(() => {
             return res.status(500).send();
         });
     } else {
         const recipePromise = insertCustomRecipe(req.userId, custom_recipe);
-        return recipePromise.then((result) => {
+        return recipePromise.then((result: { rows: { id: { toString: () => any; }; }[]; }) => {
             return res.send(result.rows[0].id.toString());
         }).catch(() => {
             return res.status(500).send();

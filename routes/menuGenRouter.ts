@@ -289,7 +289,7 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
     }
     
     // TODO: Add error handling
-    psqlPool.query(`INSERT INTO menus (user_id, title) VALUES ($1, $2) RETURNING id`, [req.userId, body.title]).then(async (result) => {
+    psqlPool.query(`INSERT INTO menus (user_id, title) VALUES ($1, $2) RETURNING id`, [req.userId, body.title]).then(async (result: { rows: { id: any; }[]; }) => {
         if (body.recipes === undefined || body.recipes === null || body.recipes.length === 0) {
             return res.status(400).send("Missing Menu Items");
         }
@@ -304,7 +304,7 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
                 );
         }
         return res.json({ menu_id: result.rows[0].id });
-    }).catch((error) => {
+    }).catch((error: any) => {
         return res.status(500).send(error);
     });
 });
