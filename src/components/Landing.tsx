@@ -21,7 +21,7 @@ function Landing() {
     // TODO: handle for when the request doesn't work
     get(
       "/cocktail_api/drinks_by_letter",
-      { "letter": letter },
+      { "letter": `'${letter}'` },
       (res: AxiosResponse) => {
         setDrinks(res.data.drinks);
         setLoading(false);

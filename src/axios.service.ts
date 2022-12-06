@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 
-const baseUrl = "http://localhost:3001";
+const baseUrl = "https://cocktail-party-server.herokuapp.com";
 let authToken = "";
 
 export function setAuthToken(token: string) {
