@@ -14,40 +14,40 @@ const defaultValues: CustomRecipe = {
     image_id: undefined as unknown as number,
     strDrink: '',
     strAlcoholic: '',
-    strCategory: '',
-    strGlass: '',
-    strInstructions: '',
-    strIngredient1: '',
-    strIngredient2: '',
-    strIngredient3: '',
-    strIngredient4: '',
-    strIngredient5: '',
-    strIngredient6: '',
-    strIngredient7: '',
-    strIngredient8: '',
-    strIngredient9: '',
-    strIngredient10: '',
-    strIngredient11: '',
-    strIngredient12: '',
-    strIngredient13: '',
-    strIngredient14: '',
-    strIngredient15: '',
-    strMeasure1: '',
-    strMeasure2: '',
-    strMeasure3: '',
-    strMeasure4: '',
-    strMeasure5: '',
-    strMeasure6: '',
-    strMeasure7: '',
-    strMeasure8: '',
-    strMeasure9: '',
-    strMeasure10: '',
-    strMeasure11: '',
-    strMeasure12: '',
-    strMeasure13: '',
-    strMeasure14: '',
-    strMeasure15: '',
-    dateModified: '',
+    strCategory: null,
+    strGlass: null,
+    strInstructions: null,
+    strIngredient1: null,
+    strIngredient2: null,
+    strIngredient3: null,
+    strIngredient4: null,
+    strIngredient5: null,
+    strIngredient6: null,
+    strIngredient7: null,
+    strIngredient8: null,
+    strIngredient9: null,
+    strIngredient10: null,
+    strIngredient11: null,
+    strIngredient12: null,
+    strIngredient13: null,
+    strIngredient14: null,
+    strIngredient15: null,
+    strMeasure1: null,
+    strMeasure2: null,
+    strMeasure3: null,
+    strMeasure4: null,
+    strMeasure5: null,
+    strMeasure6: null,
+    strMeasure7: null,
+    strMeasure8: null,
+    strMeasure9: null,
+    strMeasure10: null,
+    strMeasure11: null,
+    strMeasure12: null,
+    strMeasure13: null,
+    strMeasure14: null,
+    strMeasure15: null,
+    dateModified: null,
 };
 
 const RecipeForm = () => {
@@ -100,7 +100,8 @@ const RecipeForm = () => {
                     (response) => {
                         setValues(response.data);
                         handleFillRows(response.data);
-                        setExistingImg(`${baseServerUrl}/image/display?imageId=${response.data.image_id}`);
+                        if (response.data.image_id)
+                            setExistingImg(`${baseServerUrl}/image/display?imageId=${response.data.image_id}`);
                     });
             }
         }
@@ -116,7 +117,9 @@ const RecipeForm = () => {
 
     const handleRemoveSpec = (index: number) => {
         const list = [...specifications];
+        console.log(list);
         list.splice(index, 1);
+        console.log(list);
         setSpecifications(list);
     }
 
@@ -150,69 +153,14 @@ const RecipeForm = () => {
 
     const handleSubmit = async () => {
         // Ingredients and Measurements Data
-        for (let i = 0; i < specifications.length; i++) {
-            let customCocktailIngredient = 'strIngredient' + (i + 1);
-            let customCocktailMeasurement = 'strMeasure' + (i + 1);
-
-            if (customCocktailIngredient === 'strIngredient1' && customCocktailMeasurement === 'strMeasure1') {
-                values.strIngredient1 = specifications[0].ingredient;
-                values.strMeasure1 = specifications[0].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient2' && customCocktailMeasurement === 'strMeasure2') {
-                values.strIngredient2 = specifications[1].ingredient;
-                values.strMeasure2 = specifications[1].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient3' && customCocktailMeasurement === 'strMeasure3') {
-                values.strIngredient3 = specifications[2].ingredient;
-                values.strMeasure3 = specifications[2].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient4' && customCocktailMeasurement === 'strMeasure4') {
-                values.strIngredient4 = specifications[3].ingredient;
-                values.strMeasure4 = specifications[3].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient5' && customCocktailMeasurement === 'strMeasure5') {
-                values.strIngredient5 = specifications[4].ingredient;
-                values.strMeasure5 = specifications[4].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient6' && customCocktailMeasurement === 'strMeasure6') {
-                values.strIngredient6 = specifications[5].ingredient;
-                values.strMeasure6 = specifications[5].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient7' && customCocktailMeasurement === 'strMeasure7') {
-                values.strIngredient7 = specifications[6].ingredient;
-                values.strMeasure7 = specifications[6].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient8' && customCocktailMeasurement === 'strMeasure8') {
-                values.strIngredient8 = specifications[7].ingredient;
-                values.strMeasure8 = specifications[7].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient9' && customCocktailMeasurement === 'strMeasure9') {
-                values.strIngredient9 = specifications[8].ingredient;
-                values.strMeasure9 = specifications[8].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient10' && customCocktailMeasurement === 'strMeasure10') {
-                values.strIngredient10 = specifications[9].ingredient;
-                values.strMeasure10 = specifications[9].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient11' && customCocktailMeasurement === 'strMeasure11') {
-                values.strIngredient11 = specifications[10].ingredient;
-                values.strMeasure11 = specifications[10].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient12' && customCocktailMeasurement === 'strMeasure12') {
-                values.strIngredient12 = specifications[11].ingredient;
-                values.strMeasure12 = specifications[11].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient13' && customCocktailMeasurement === 'strMeasure13') {
-                values.strIngredient13 = specifications[12].ingredient;
-                values.strMeasure13 = specifications[12].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient14' && customCocktailMeasurement === 'strMeasure14') {
-                values.strIngredient14 = specifications[13].ingredient;
-                values.strMeasure14 = specifications[13].measurement;
-            }
-            else if (customCocktailIngredient === 'strIngredient15' && customCocktailMeasurement === 'strMeasure15') {
-                values.strIngredient15 = specifications[14].ingredient;
-                values.strMeasure15 = specifications[14].measurement;
+        for (let i = 0; i < 15; i++) {
+            const specificationsLength = specifications.length;
+            if (specificationsLength > i) {
+                (values as any)[`strIngredient${i+1}`] = specifications[i].ingredient;
+                (values as any)[`strMeasure${i+1}`] = specifications[i].measurement;
+            } else {
+                (values as any)[`strIngredient${i+1}`] = null;
+                (values as any)[`strMeasure${i+1}`] = null;
             }
         }
 
@@ -254,36 +202,12 @@ const RecipeForm = () => {
         values.strCategory && formData.append('strCategory', values.strCategory);
         values.strGlass && formData.append('strGlass', values.strGlass);
         values.strInstructions && formData.append('strInstructions', values.strInstructions);
-        values.strIngredient1 && formData.append('strIngredient1', values.strIngredient1);
-        values.strIngredient2 && formData.append('strIngredient2', values.strIngredient2);
-        values.strIngredient3 && formData.append('strIngredient3', values.strIngredient3);
-        values.strIngredient4 && formData.append('strIngredient4', values.strIngredient4);
-        values.strIngredient5 && formData.append('strIngredient5', values.strIngredient5);
-        values.strIngredient6 && formData.append('strIngredient6', values.strIngredient6);
-        values.strIngredient7 && formData.append('strIngredient7', values.strIngredient7);
-        values.strIngredient8 && formData.append('strIngredient8', values.strIngredient8);
-        values.strIngredient9 && formData.append('strIngredient9', values.strIngredient9);
-        values.strIngredient10 && formData.append('strIngredient10', values.strIngredient10);
-        values.strIngredient11 && formData.append('strIngredient11', values.strIngredient11);
-        values.strIngredient12 && formData.append('strIngredient12', values.strIngredient12);
-        values.strIngredient13 && formData.append('strIngredient13', values.strIngredient13);
-        values.strIngredient14 && formData.append('strIngredient14', values.strIngredient14);
-        values.strIngredient15 && formData.append('strIngredient15', values.strIngredient15);
-        values.strMeasure1 && formData.append('strMeasure1', values.strMeasure1);
-        values.strMeasure2 && formData.append('strMeasure2', values.strMeasure2);
-        values.strMeasure3 && formData.append('strMeasure3', values.strMeasure3);
-        values.strMeasure4 && formData.append('strMeasure4', values.strMeasure4);
-        values.strMeasure5 && formData.append('strMeasure5', values.strMeasure5);
-        values.strMeasure6 && formData.append('strMeasure6', values.strMeasure6);
-        values.strMeasure7 && formData.append('strMeasure7', values.strMeasure7);
-        values.strMeasure8 && formData.append('strMeasure8', values.strMeasure8);
-        values.strMeasure9 && formData.append('strMeasure9', values.strMeasure9);
-        values.strMeasure10 && formData.append('strMeasure10', values.strMeasure10);
-        values.strMeasure11 && formData.append('strMeasure11', values.strMeasure11);
-        values.strMeasure12 && formData.append('strMeasure12', values.strMeasure12);
-        values.strMeasure13 && formData.append('strMeasure13', values.strMeasure13);
-        values.strMeasure14 && formData.append('strMeasure14', values.strMeasure14);
-        values.strMeasure15 && formData.append('strMeasure15', values.strMeasure15);
+        for (let i = 1; i < 16; i++) {
+            const ingredientName = `strIngredient${i}`;
+            (values as any)[ingredientName] && formData.append(ingredientName, (values as any)[ingredientName]);
+            const measureName = `strMeasure${i}`;
+            (values as any)[measureName] && formData.append(measureName, (values as any)[measureName]);
+        }
         values.dateModified && formData.append('dateModified', values.dateModified);
 
         post('/recipe//upsert_custom_recipe', formData, {
