@@ -54,6 +54,8 @@ cocktailApiRouter.get('/list_ingredients', authUtils_1.verifyToken, (req, res) =
     });
 }));
 cocktailApiRouter.get('/drinks_by_letter', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let letter = req.query.letter;
+    letter = letter.substring(1, 1);
     axios_1.default.get(`${api_url}search.php?f=${req.query.letter}`, {
         headers: {
             "Authentication": `Bearer ${api_key}`,

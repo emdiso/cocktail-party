@@ -46,6 +46,8 @@ cocktailApiRouter.get('/list_ingredients', verifyToken, async (req: Authenticate
 });
 
 cocktailApiRouter.get('/drinks_by_letter', async (req: Request, res: Response) => {
+    let letter = req.query.letter as string;
+    letter = letter.substring(1,1);
     axios.get(`${api_url}search.php?f=${req.query.letter}`, {
         headers: {
             "Authentication": `Bearer ${api_key}`,
