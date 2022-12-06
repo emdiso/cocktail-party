@@ -1,17 +1,13 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { Button, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Radio, RadioGroup, Select, SelectChangeEvent, Slider, TextField } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Button, FormControlLabel, Grid, IconButton, InputLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { get, post } from '../../axios.service';
-import axios, { Axios, AxiosResponse } from 'axios';
+import axios from 'axios';
 import './../styling/App.css';
-import { Label } from '@mui/icons-material';
 import CustomRecipe from './../../models/CustomRecipe';
 import './../styling/RecipeForm.css';
-import { isDOMComponent } from 'react-dom/test-utils';
 import FormData from 'form-data';
 import { useLocation } from 'react-router-dom';
-import { valueContainerCSS } from 'react-select/dist/declarations/src/components/containers';
-import e from 'express';
 
 const defaultValues: CustomRecipe = {
     id: undefined as unknown as number,
@@ -156,7 +152,7 @@ const RecipeForm = () => {
         setImageUploaded(undefined);
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // Ingredients and Measurements Data
         for (let i = 0; i < specifications.length; i++) {
             let customCocktailIngredient = 'strIngredient' + (i + 1);
@@ -231,24 +227,22 @@ const RecipeForm = () => {
         }
         else {
             if (typeof existingImg === "string") {
-                axios({
+                const imageResponse = await axios({
                     url: existingImg,
                     method: 'GET',
                     responseType: 'blob',
-                })
-                .then((res) => {
-                    let data = res.data;
-                    let metadata = {
-                        type: 'image/*'
-                    };
-                    let temp = existingImg.split('/');
-                    let tempSize = temp.length;
-
-                    let fileName = temp[tempSize - 1];
-                    const file = new File([data], fileName, metadata);
-
-                    formData.append('image', file);
                 });
+                let data = imageResponse.data;
+                let metadata = {
+                    type: 'image/*'
+                };
+                let temp = existingImg.split('/');
+                let tempSize = temp.length;
+
+                let fileName = temp[tempSize - 1];
+                const file = new File([data], fileName, metadata);
+
+                formData.append('image', file);
             }
             else {
                 formData.append('image', existingImg);
