@@ -40,7 +40,6 @@ recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"),
         if (imgInsertResult.statusCode !== 200) {
             return res.status(imgInsertResult.statusCode).send(imgInsertResult.message);
         }
-        // TODO: Confirm this works correctly
         if (custom_recipe.image_id) {
             try {
                 psqlPool.query("UPDATE images SET date_deleted = NOW() WHERE id = $1", [custom_recipe.image_id]);
@@ -62,8 +61,9 @@ recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"),
     if (custom_recipe.id) {
         const recipePromise = updateCustomRecipe(req.userId, custom_recipe);
         return recipePromise.then((result) => {
-            return res.send(result.rows[0].id.toString());
-        }).catch(() => {
+            return res.send(custom_recipe.id);
+        }).catch((error) => {
+            console.log(error);
             return res.status(500).send();
         });
     } else {

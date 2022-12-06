@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, FormControlLabel, Grid, IconButton, InputLabel, Radio, RadioGroup, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { get, post } from '../../axios.service';
+import { baseServerUrl, get, post } from '../../axios.service';
 import axios from 'axios';
 import './../styling/App.css';
 import CustomRecipe from './../../models/CustomRecipe';
@@ -92,7 +92,7 @@ const RecipeForm = () => {
                     (response) => {
                         setValues(response.data);
                         handleFillRows(response.data);
-                        handleExistingImg(response.data.strDrinkThumb);
+                        setExistingImg(response.data.strDrinkThumb);
                     });
             }
             else {
@@ -100,15 +100,11 @@ const RecipeForm = () => {
                     (response) => {
                         setValues(response.data);
                         handleFillRows(response.data);
-                        handleExistingImg(response.data.strDrinkThumb);
+                        setExistingImg(`${baseServerUrl}/image/display?imageId=${response.data.image_id}`);
                     });
             }
         }
     }, [values]);
-
-    const handleExistingImg = (imgPath: string) => {
-        setExistingImg(imgPath);
-    }
 
     const handleChange = (prop: keyof CustomRecipe) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [prop]: event.target.value });
@@ -227,22 +223,24 @@ const RecipeForm = () => {
         }
         else {
             if (typeof existingImg === "string") {
-                const imageResponse = await axios({
-                    url: existingImg,
-                    method: 'GET',
-                    responseType: 'blob',
-                });
-                let data = imageResponse.data;
-                let metadata = {
-                    type: 'image/*'
-                };
-                let temp = existingImg.split('/');
-                let tempSize = temp.length;
-
-                let fileName = temp[tempSize - 1];
-                const file = new File([data], fileName, metadata);
-
-                formData.append('image', file);
+                if (!values.id) {
+                    const imageResponse = await axios({
+                        url: existingImg,
+                        method: 'GET',
+                        responseType: 'blob',
+                    });
+                    let data = imageResponse.data;
+                    let metadata = {
+                        type: 'image/*'
+                    };
+                    let temp = existingImg.split('/');
+                    let tempSize = temp.length;
+    
+                    let fileName = temp[tempSize - 1];
+                    const file = new File([data], fileName, metadata);
+    
+                    formData.append('image', file);
+                }
             }
             else {
                 formData.append('image', existingImg);
@@ -395,7 +393,7 @@ const RecipeForm = () => {
                         </div>
 
                         <div className='submit'>
-                            <Button variant='outlined' onClick={handleSubmit}> Create Recipe </Button>
+                            <Button variant='outlined' onClick={handleSubmit}>{values.id ? "Modify Custom Recipe" : "Create Custom Recipe"}</Button>
                         </div>
                     </Grid>
                 </div>

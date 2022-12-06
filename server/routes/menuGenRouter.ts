@@ -322,7 +322,6 @@ menuGenRouter.post('/insert_menu_image', verifyToken, upload.single("image"), as
             return res.status(result.statusCode).send(result.message);
         }
 
-        // Delete Old image, TODO: Confirm this works correctly
         if (old_image_id) {
             try {
                 psqlPool.query("UPDATE images SET date_deleted = NOW() WHERE id = $1", [old_image_id]);
