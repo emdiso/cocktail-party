@@ -16,7 +16,7 @@ imageRouter.get("/display", async (req: Request, res: Response) => {
     if (imageId === null || imageId === undefined || imageId === "") {
         return res.status(400).send("imageId parameter is required");
     }
-    psqlPool.query(`SELECT i.id, i.mime_type, i.img FROM images i WHERE i.id = ${imageId} AND i.date_deleted IS NOT NULL`).then((result: any) => {
+    psqlPool.query(`SELECT i.id, i.mime_type, i.img FROM images i WHERE i.id = ${imageId} AND i.date_deleted IS NULL`).then((result: any) => {
         if (result.rows.length === 0) {
             return res.status(400).send("Image Not Found");
         } else {
