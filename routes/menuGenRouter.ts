@@ -322,7 +322,6 @@ menuGenRouter.post('/insert_menu_image', verifyToken, upload.single("image"), as
             return res.status(result.statusCode).send(result.message);
         }
 
-        // Delete Old image, TODO: Confirm this works correctly
         if (old_image_id) {
             try {
                 psqlPool.query("UPDATE images SET date_deleted = NOW() WHERE id = $1", [old_image_id]);
@@ -343,6 +342,16 @@ menuGenRouter.post('/insert_menu_image', verifyToken, upload.single("image"), as
         });
     });
 
+});
+
+menuGenRouter.delete("/delete_menu", verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+    const menu_id = req.query.menuId;
+    //TODO: Delete all connected information as well (menu image, menu items, custom recipes, custom recipe images)
+    return psqlPool.query(`DELETE FROM menus m WHERE m.id = ${menu_id} AND m.user_id = ${req.userId}`).then((result) => {
+        return res.send("OK");
+    }).catch(() => {
+        return res.status(400).send();
+    });
 });
 
 

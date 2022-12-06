@@ -1,6 +1,5 @@
 export default interface CustomRecipe {
     id: number;
-    user_id?: number;
     image_id?: number;
     strDrink: string;
     strAlcoholic: string;
