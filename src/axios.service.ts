@@ -1,6 +1,5 @@
 import axios, { AxiosResponse } from "axios";
 
-
 // We need to abstract this and the baseUrl of server in "axios.service.ts" to an env file
 export const baseServerUrl = "http://localhost:3001";
 
@@ -26,7 +25,7 @@ export function get(endpoint: string, params: any, resHandler?: (res: AxiosRespo
                 "authorization": "Bearer " + authToken
             }
         }
-    ).then(resHandler).catch((error) => {
+    ).then(resHandler).catch((error: { status: number; }) => {
         if (error.status === 401) {
             localStorage.clear();
         }
@@ -47,7 +46,7 @@ export function post(endpoint: string, data: any, params?: any, resHandler?: (re
                 "authorization": "Bearer " + authToken
             }
         }
-    ).then(resHandler).catch((error) => {
+    ).then(resHandler).catch((error: { status: number; }) => {
         if (error.status === 401) {
             localStorage.clear();
         }
@@ -67,7 +66,7 @@ export function del(endpoint: string, params?: any, resHandler?: (res: AxiosResp
                 "authorization": "Bearer " + authToken
             }
         }
-    ).then(resHandler).catch((error) => {
+    ).then(resHandler).catch((error: { status: number; }) => {
         if (error.status === 401) {
             localStorage.clear();
         }
