@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import QRCode from 'qrcode';
 import { baseServerUrl } from '../axios.service';
 
@@ -9,10 +9,12 @@ interface ImageQRCodeProps {
 
 const ImageQRCode = (props: ImageQRCodeProps) => {
   const [qrUrl, setQRUrl] = React.useState("");
-  QRCode.toDataURL(`${baseServerUrl}/image/display?imageId=${props.imageId}`).then((value) => {
-    console.log(value);
-    setQRUrl(value);
-  });
+  useEffect(()=> {
+    if (qrUrl !== "") return;
+    QRCode.toDataURL(`${baseServerUrl}/image/display?imageId=${props.imageId}`).then((value) => {
+        setQRUrl(value);
+      });
+  }, [qrUrl]);
 
   return qrUrl ? (<img src={qrUrl} />) : (<div></div>);
 };

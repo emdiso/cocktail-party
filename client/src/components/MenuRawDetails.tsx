@@ -6,6 +6,7 @@ import './styling/App.css';
 export interface MenuRawDetailsModel {
   title: string;
   menuRecipes: Recipe[] | CustomRecipe[];
+  disableComponentNameDisplay?: boolean;
 }
 
 function getIngredients(data: any) {
@@ -29,7 +30,7 @@ function MenuRawDetails(data: any) {
 
   return (
     <div>
-      <h5>Menu Details</h5>
+      {data.disableComponentNameDisplay !== true && <h5>Menu Details</h5>}
       <div className="card m-3">
         <div className="card-body border-bottom">
           <h5>{title}</h5>
