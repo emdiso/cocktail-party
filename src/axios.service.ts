@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 
 // We need to abstract this and the baseUrl of server in "axios.service.ts" to an env file
-export const baseServerUrl = "http://localhost:3001";
+export const baseServerUrl = "http://cocktail-party-server.herokuapp.com";
 
 let authToken = "";
 
