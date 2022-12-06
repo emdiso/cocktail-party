@@ -256,36 +256,36 @@ const RecipeForm = () => {
         values.strCategory && formData.append('strCategory', values.strCategory);
         values.strGlass && formData.append('strGlass', values.strGlass);
         values.strInstructions && formData.append('strInstructions', values.strInstructions);
-        formData.append('strIngredient1', values.strIngredient1);
-        formData.append('strIngredient2', values.strIngredient2);
-        formData.append('strIngredient3', values.strIngredient3);
-        formData.append('strIngredient4', values.strIngredient4);
-        formData.append('strIngredient5', values.strIngredient5);
-        formData.append('strIngredient6', values.strIngredient6);
-        formData.append('strIngredient7', values.strIngredient7);
-        formData.append('strIngredient8', values.strIngredient8);
-        formData.append('strIngredient9', values.strIngredient9);
-        formData.append('strIngredient10', values.strIngredient10);
-        formData.append('strIngredient11', values.strIngredient11);
-        formData.append('strIngredient12', values.strIngredient12);
-        formData.append('strIngredient13', values.strIngredient13);
-        formData.append('strIngredient14', values.strIngredient14);
-        formData.append('strIngredient15', values.strIngredient15);
-        formData.append('strMeasure1', values.strMeasure1);
-        formData.append('strMeasure2', values.strMeasure2);
-        formData.append('strMeasure3', values.strMeasure3);
-        formData.append('strMeasure4', values.strMeasure4);
-        formData.append('strMeasure5', values.strMeasure5);
-        formData.append('strMeasure6', values.strMeasure6);
-        formData.append('strMeasure7', values.strMeasure7);
-        formData.append('strMeasure8', values.strMeasure8);
-        formData.append('strMeasure9', values.strMeasure9);
-        formData.append('strMeasure10', values.strMeasure10);
-        formData.append('strMeasure11', values.strMeasure11);
-        formData.append('strMeasure12', values.strMeasure12);
-        formData.append('strMeasure13', values.strMeasure13);
-        formData.append('strMeasure14', values.strMeasure14);
-        formData.append('strMeasure15', values.strMeasure15);
+        values.strIngredient1 && formData.append('strIngredient1', values.strIngredient1);
+        values.strIngredient2 && formData.append('strIngredient2', values.strIngredient2);
+        values.strIngredient3 && formData.append('strIngredient3', values.strIngredient3);
+        values.strIngredient4 && formData.append('strIngredient4', values.strIngredient4);
+        values.strIngredient5 && formData.append('strIngredient5', values.strIngredient5);
+        values.strIngredient6 && formData.append('strIngredient6', values.strIngredient6);
+        values.strIngredient7 && formData.append('strIngredient7', values.strIngredient7);
+        values.strIngredient8 && formData.append('strIngredient8', values.strIngredient8);
+        values.strIngredient9 && formData.append('strIngredient9', values.strIngredient9);
+        values.strIngredient10 && formData.append('strIngredient10', values.strIngredient10);
+        values.strIngredient11 && formData.append('strIngredient11', values.strIngredient11);
+        values.strIngredient12 && formData.append('strIngredient12', values.strIngredient12);
+        values.strIngredient13 && formData.append('strIngredient13', values.strIngredient13);
+        values.strIngredient14 && formData.append('strIngredient14', values.strIngredient14);
+        values.strIngredient15 && formData.append('strIngredient15', values.strIngredient15);
+        values.strMeasure1 && formData.append('strMeasure1', values.strMeasure1);
+        values.strMeasure2 && formData.append('strMeasure2', values.strMeasure2);
+        values.strMeasure3 && formData.append('strMeasure3', values.strMeasure3);
+        values.strMeasure4 && formData.append('strMeasure4', values.strMeasure4);
+        values.strMeasure5 && formData.append('strMeasure5', values.strMeasure5);
+        values.strMeasure6 && formData.append('strMeasure6', values.strMeasure6);
+        values.strMeasure7 && formData.append('strMeasure7', values.strMeasure7);
+        values.strMeasure8 && formData.append('strMeasure8', values.strMeasure8);
+        values.strMeasure9 && formData.append('strMeasure9', values.strMeasure9);
+        values.strMeasure10 && formData.append('strMeasure10', values.strMeasure10);
+        values.strMeasure11 && formData.append('strMeasure11', values.strMeasure11);
+        values.strMeasure12 && formData.append('strMeasure12', values.strMeasure12);
+        values.strMeasure13 && formData.append('strMeasure13', values.strMeasure13);
+        values.strMeasure14 && formData.append('strMeasure14', values.strMeasure14);
+        values.strMeasure15 && formData.append('strMeasure15', values.strMeasure15);
         values.dateModified && formData.append('dateModified', values.dateModified);
 
         post('/recipe//upsert_custom_recipe', formData, {
@@ -293,7 +293,7 @@ const RecipeForm = () => {
                 'Content-Type': 'Multipart/form-data'
             }
         }, (result) => {
-            window.location.reload();
+            window.location.reload(); // TODO: shouldn't this be deleted?
             window.location.href = '/profile';
         }, (error) => {
             console.log(error);
