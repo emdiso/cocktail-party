@@ -1,6 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 
-const baseUrl = "http://localhost:3001";
+
+// We need to abstract this and the baseUrl of server in "axios.service.ts" to an env file
+export const baseServerUrl = "http://localhost:3001";
+
 let authToken = "";
 
 export function setAuthToken(token: string) {
@@ -16,7 +19,7 @@ authToken = localStorage.getItem('cocktailPartyAccessToken') || "";
 
 export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
     axios.get(
-        `${baseUrl}${endpoint}`,
+        `${baseServerUrl}${endpoint}`,
         {
             params: params,
             headers: {
@@ -36,7 +39,7 @@ export function get(endpoint: string, params: any, resHandler?: (res: AxiosRespo
 
 export function post(endpoint: string, data: any, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
     axios.post(
-        `${baseUrl}${endpoint}`,
+        `${baseServerUrl}${endpoint}`,
         data,
         {
             params: params, 
