@@ -76,4 +76,15 @@ recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"),
     }
 })
 
+recipesRouter.delete("/delete_custom_recipe", verifyToken, async (req: AuthenticatedRequest, res: Response) => {
+    const cr_id = req.query.crId;
+
+    //TODO: Delete all connected information as well (image)
+    return psqlPool.query(`DELETE FROM custom_recipes cr WHERE cr.id = ${cr_id} AND cr.user_id = ${req.userId}`).then((result) => {
+        return res.send("OK");
+    }).catch(() => {
+        return res.status(400).send();
+    });
+})
+
 export default recipesRouter;

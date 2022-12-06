@@ -57,3 +57,23 @@ export function post(endpoint: string, data: any, params?: any, resHandler?: (re
         console.log(err);
     })});
 }
+
+export function del(endpoint: string, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
+    axios.delete(
+        `${baseServerUrl}${endpoint}`,
+        {
+            params: params || {},
+            headers: {
+                "authorization": "Bearer " + authToken
+            }
+        }
+    ).then(resHandler).catch((error) => {
+        if (error.status === 401) {
+            localStorage.clear();
+        }
+
+        errHandler || ((err: any) => {
+        // TO DO - write some error dialog / snackbar to display this information
+        console.log(err);
+    })});
+}
