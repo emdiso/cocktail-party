@@ -40,6 +40,14 @@ recipesRouter.post('/upsert_custom_recipe', verifyToken, upload.single("image"),
         if (imgInsertResult.statusCode !== 200) {
             return res.status(imgInsertResult.statusCode).send(imgInsertResult.message);
         }
+        // TODO: Confirm this works correctly
+        if (custom_recipe.image_id) {
+            try {
+                psqlPool.query("UPDATE images SET date_deleted = NOW() WHERE id = $1", [custom_recipe.image_id]);
+            } catch (error) {
+                console.log(error);
+            }
+        }
 
         custom_recipe.image_id = imgInsertResult.data.toString();
     } else {

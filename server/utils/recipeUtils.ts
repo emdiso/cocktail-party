@@ -1,15 +1,9 @@
-import { QueryResult } from "pg";
 import dotenv from 'dotenv';
 import psqlPool from "./psqlConnection";
-import Menu from "../models/Menu";
-import MenuItem from "../models/MenuItem";
-import axios from "axios";
 import { CustomRecipe } from "../models";
 
 
 dotenv.config();
-const api_key = process.env.PUBLIC_DEV_COCKTAIL_API_KEY;
-const api_url = process.env.COCKTAIL_API_MAIN_URL;
 
 export const insertCustomRecipe = (user_id: string, recipe: CustomRecipe) => {
     return psqlPool.query(

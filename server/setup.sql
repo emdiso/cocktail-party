@@ -12,6 +12,7 @@ CREATE TABLE images (
 	file_name VARCHAR(200),
 	mime_type VARCHAR(50),
 	img BYTEA,
+	date_deleted TIMESTAMP,
 
 	CONSTRAINT FK_Image_User FOREIGN KEY(user_id)
         REFERENCES users(id)
@@ -22,6 +23,7 @@ CREATE TABLE menus (
 	user_id INT,
 	image_id INT,
 	title VARCHAR(100),
+	data_created TIMESTAMP DEFAULT NOW(),
 
 	CONSTRAINT FK_Menu_User FOREIGN KEY(user_id)
         REFERENCES users(id)

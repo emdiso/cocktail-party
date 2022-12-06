@@ -4,7 +4,6 @@ import psqlPool from "./psqlConnection";
 import Menu from "../models/Menu";
 import MenuItem from "../models/MenuItem";
 import axios from "axios";
-import { CustomRecipe } from "../models";
 
 
 dotenv.config();
@@ -21,7 +20,7 @@ export const randomDrinkPromise = () => {
 
 export const retreiveAllMenuInfo = async (menuId: string, userId: string) => {
     const menuResult: QueryResult = await psqlPool.query(
-        `SELECT m.id, m.image_id, m.title, (SELECT count(*) FROM menu_items mi WHERE mi.menu_id = m.id) as item_count
+        `SELECT m.id, m.image_id, m.title, m.date_created, (SELECT count(*) FROM menu_items mi WHERE mi.menu_id = m.id) as item_count
          FROM menus m
          WHERE m.id = $1 AND m.user_id = $2`,
         [ menuId, userId ]);

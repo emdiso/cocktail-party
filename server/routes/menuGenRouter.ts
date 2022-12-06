@@ -290,7 +290,7 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
     
     // TODO: Add error handling
     psqlPool.query(`INSERT INTO menus (user_id, title) VALUES ($1, $2) RETURNING id`, [req.userId, body.title]).then(async (result) => {
-        if (body.recipes === undefined) {
+        if (body.recipes === undefined || body.recipes === null || body.recipes.length === 0) {
             return res.status(400).send("Missing Menu Items");
         }
         // TODO: change to gather all the promises and await the for loop.
@@ -311,17 +311,32 @@ menuGenRouter.post('/insert_full_menu', verifyToken, async (req: AuthenticatedRe
 
 menuGenRouter.post('/insert_menu_image', verifyToken, upload.single("image"), async (req: AuthenticatedRequest, res: Response) => {
     // body = { menu_id }
+    const authQueryResult = await psqlPool.query('SELECT image_id FROM menus WHERE id = $1 AND user_id = $2', [req.body.menu_id, req.userId]);
+    if (authQueryResult.rowCount === 0) {
+        return res.status(403).send("Access Forbidden");
+    }
+    const old_image_id = authQueryResult.rows[0].image_id;
+
     return insertFile(req).then((result) => {
         if (result.statusCode !== 200) {
             return res.status(result.statusCode).send(result.message);
         }
+
+        // Delete Old image, TODO: Confirm this works correctly
+        if (old_image_id) {
+            try {
+                psqlPool.query("UPDATE images SET date_deleted = NOW() WHERE id = $1", [old_image_id]);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
         const image_id = result.data;
 
         return psqlPool.query(
             'UPDATE menus SET image_id = $1 WHERE id = $2 AND user_id = $3',
             [image_id, req.body.menu_id, req.userId]
         ).then(() => {
-            console.log(image_id); // TODO: remove this
             return res.send();
         }).catch(() => {
             return res.status(500).send();

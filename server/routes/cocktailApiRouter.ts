@@ -115,9 +115,10 @@ cocktailApiRouter.get('/category_options', async (req: Request, res: Response) =
 cocktailApiRouter.get('/my_menus', verifyToken, async (req: AuthenticatedRequest, res: Response) => {
     if (!req.userId) return res.sendStatus(401);
     return psqlPool.query(
-        `SELECT m.id, m.title, m.image_id, (SELECT count(*) FROM menu_items mi WHERE mi.menu_id = m.id) as item_count
+        `SELECT m.id, m.title, m.image_id, m.date_created, (SELECT count(*) FROM menu_items mi WHERE mi.menu_id = m.id) as item_count
          FROM menus m
-         WHERE m.user_id = $1`,
+         WHERE m.user_id = $1
+         ORDER BY m.date_created DESC`,
         [ req.userId ]
     ).then(async (result) => {
         return res.json(result.rows);
