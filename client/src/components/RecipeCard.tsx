@@ -9,8 +9,9 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material';
 import React from 'react';
-import { getIn } from 'yup/lib/util/reach';
 import { useNavigate } from 'react-router-dom';
+import { baseServerUrl } from '../axios.service';
+
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -62,7 +63,7 @@ function RecipeCard(data: any) {
             {(data.data.strDrinkThumb || data.data.image_id) && <CardMedia
                 component="img"
                 height="194"
-                image={data.data.strDrinkThumb || `http://localhost:3001/image/display?imageId=${data.data.image_id}`}
+                image={data.data.strDrinkThumb || `${baseServerUrl}/image/display?imageId=${data.data.image_id}`}
                 alt=""
             />}
             <CardContent>

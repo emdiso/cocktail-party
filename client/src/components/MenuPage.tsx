@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { get } from "../axios.service";
 import { Menu } from "../models";
 import MenuRawDetails from "./MenuRawDetails";
+import { baseServerUrl } from '../axios.service';
 
 
 export default () => {
@@ -21,7 +22,7 @@ export default () => {
     }, [menuInfo]);
 
     const handleViewDesignedMenu = () => {
-        window.open(`http://localhost:3001/image/display?imageId=${menuInfo ? menuInfo.image_id || "" : ""}`, "_blank");
+        window.open(`${baseServerUrl}/image/display?imageId=${menuInfo ? menuInfo.image_id || "" : ""}`, "_blank");
     }
 
     const handleCreateNewDesignedMenu = () => {
