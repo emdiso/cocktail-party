@@ -352,7 +352,7 @@ menuGenRouter.delete("/delete_menu", verifyToken, async (req: AuthenticatedReque
     }).catch(() => {
         return res.status(400).send();
     })
-})
+});
 
 
 export default menuGenRouter;
