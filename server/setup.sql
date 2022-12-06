@@ -12,6 +12,7 @@ CREATE TABLE images (
 	file_name VARCHAR(200),
 	mime_type VARCHAR(50),
 	img BYTEA,
+	date_deleted TIMESTAMP,
 
 	CONSTRAINT FK_Image_User FOREIGN KEY(user_id)
         REFERENCES users(id)
