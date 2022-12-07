@@ -1,6 +1,6 @@
 import React from 'react';
 import RecipeCard from './RecipeCard';
-import { alpha, Breadcrumbs, Button, ButtonGroup, Chip, Grid, Link, Pagination, Stack, Typography } from '@mui/material';
+import { alpha, Breadcrumbs, Button, ButtonGroup, Chip, Grid, IconButton, ImageList, ImageListItem, ImageListItemBar, Link, ListSubheader, Pagination, Stack, Typography } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
 import { get } from "../axios.service";
 import { stringify } from 'querystring';
@@ -43,20 +43,14 @@ function Landing() {
         })}
       </ButtonGroup>
       <div style={{ marginTop: "2vw" }}>
-        <h4>Recipes that start with: {letter.toUpperCase()}</h4>
-      </div>
-      <div style={{ marginTop: "2vw" }}>
-        <Grid container spacing={{ xs: 2, md: 5 }} columns={{ xs: 6, sm: 8, md: 12 }}>
-          {drinks ?
-            drinks.map((item, index) => (
-              <Grid item xs={4} sm={4} md={2} key={index}>
-                <RecipeCard data={item} key={index} />
-              </Grid>
-            ))
-            :
-            <h4>There are no recipes that start with: {letter.toUpperCase()}</h4>
-          }
-        </Grid>
+        <ImageListItem key="Subheader" >
+          <ListSubheader component="div">Recipes that start with: {letter.toUpperCase()}</ListSubheader>
+        </ImageListItem>
+        <ImageList sx={{ width: "100%", height: "auto" }} cols={5}>
+          {drinks.map((item, index) => (
+            <RecipeCard data={item} key={index} />
+          ))}
+        </ImageList>
       </div>
     </div>
   );
