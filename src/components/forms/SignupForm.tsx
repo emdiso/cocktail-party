@@ -2,7 +2,7 @@ import * as React from 'react';
 import Button, { FilledInput, IconButton, InputAdornment, InputLabel } from '@mui/material';
 import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
-import {post, setAuthToken} from '../../axios.service';
+import { post, setAuthToken } from '../../axios.service';
 import { AxiosError, AxiosResponse } from 'axios';
 
 export interface SignupInfo {
@@ -30,13 +30,13 @@ const SignupForm = (props: SignupFormProps) => {
 
     const handleChange =
         (prop: keyof SignupInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
-        setValues({ ...values, [prop]: event.target.value });
+            setValues({ ...values, [prop]: event.target.value });
         };
-    
+
     const handleClickShowPassword = () => {
         setValues({
-        ...values,
-        showPassword: !values.showPassword,
+            ...values,
+            showPassword: !values.showPassword,
         });
     };
 
@@ -45,12 +45,12 @@ const SignupForm = (props: SignupFormProps) => {
     };
 
     const handleSubmit = () => {
-        const response = post('/auth/signup', 
+        const response = post('/auth/signup',
             {
-			    username : values.username,
-                email : values.email,
-                password : values.password,
-		    }, {}, (response: AxiosResponse) => {
+                username: values.username,
+                email: values.email,
+                password: values.password,
+            }, {}, (response: AxiosResponse) => {
                 setAuthToken(response.data.accessToken);
                 setDisplayUNError(false);
                 setDisplayEMLError(false);
@@ -59,19 +59,19 @@ const SignupForm = (props: SignupFormProps) => {
                 window.location.reload();
             }, (error: AxiosError) => {
                 console.log(error);
-                if (error.response?.data === 'Invalid username') {
+                if (error.response && error.response.data === 'Invalid username') {
                     console.log("hit UN");
                     setDisplayUNError(true);
                     setDisplayEMLError(false);
                     setDisplayPWError(false);
                 }
-                if (error.response?.data === 'Invalid email') {
+                if (error.response && error.response.data === 'Invalid email') {
                     console.log("hit EML");
                     setDisplayUNError(false);
                     setDisplayEMLError(true);
                     setDisplayPWError(false);
                 }
-                if (error.response?.data === 'Invalid password') {
+                if (error.response && error.response.data === 'Invalid password') {
                     console.log("hit PW");
                     setDisplayUNError(false);
                     setDisplayEMLError(false);
@@ -88,7 +88,7 @@ const SignupForm = (props: SignupFormProps) => {
                 required
                 id='username-input'
                 variant='filled'
-                value={values.username} 
+                value={values.username}
                 onChange={handleChange('username')}
             />
 
@@ -98,33 +98,33 @@ const SignupForm = (props: SignupFormProps) => {
                 required
                 id='email-input'
                 variant='filled'
-                value={values.email} 
+                value={values.email}
                 onChange={handleChange('email')}
             />
-            
+
             {displayPWError && <p className='error-message'> Invalid password. Passwords must include a special character and be 8-30 characters in length. </p>}
             <InputLabel htmlFor="filled-password"> Password </InputLabel>
             <FilledInput
                 id="filled-password"
                 type={values.showPassword ? 'text' : 'password'}
-                required                
+                required
                 value={values.password}
                 onChange={handleChange('password')}
                 endAdornment={
                     <InputAdornment position="end">
                         <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end"
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
                         >
-                        {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                            {values.showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                     </InputAdornment>
                 }
             />
 
-            <button onClick={handleSubmit}> Sign Up </button> 
+            <button onClick={handleSubmit}> Sign Up </button>
         </div>
     )
 }

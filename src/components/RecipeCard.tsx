@@ -135,10 +135,16 @@ function RecipeCard(data: any) {
     return (
         <div>
             <ImageListItem key={data.data.strDrink}>
-                {(data.data.strDrinkThumb || data.data.image_id) && <img
-                    src={data.data.strDrinkThumb || `${baseServerUrl}/image/display?imageId=${data.data.image_id}`}
-                    loading="lazy"
-                />}
+                {(data.data.strDrinkThumb || data.data.image_id) ?
+                    <img
+                        src={data.data.strDrinkThumb || `${baseServerUrl}/image/display?imageId=${data.data.image_id}`}
+                        loading="lazy"
+                    /> :
+                    <img
+                        src="img/default.jpeg"
+                        loading="lazy"
+                    />
+                }
                 <ImageListItemBar
                     title={data.data.strDrink}
                     subtitle={getIngredients(data.data)}
