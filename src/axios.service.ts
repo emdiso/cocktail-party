@@ -17,6 +17,11 @@ export function getAuthToken() {
     return authToken;
 }
 
+export function makeLoggedInTrue() {
+    const setMethodLoggedIn = getGlobalSetStateMethod("setLoggedIn");
+    setMethodLoggedIn !== undefined && setMethodLoggedIn(true);
+}
+
 const globalSetStateMethods = new MethodStore();
 
 export function setGlobalSetStateMethod(name: string, method: Dispatch<React.SetStateAction<any>>) {

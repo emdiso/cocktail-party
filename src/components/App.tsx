@@ -55,7 +55,7 @@ function App() {
             <Route path='/generate' element={<MenuForm />}></Route>
             <Route path='/wow' element={<MenuFormatForm />}></Route>
             {isLoggedIn && <Route path='/profile' element={<Profile userInfo={userInfo} />}></Route>}
-            {isLoggedIn && <Route path='/recipe' element={<RecipeForm />}></Route>}
+            <Route path='/recipe' element={<RecipeForm />}></Route>
             {isLoggedIn && <Route path='/menu' element={<MenuPage />}></Route>}
             <Route path='*' element={<Navigate to="/" />}></Route>
           </Routes>

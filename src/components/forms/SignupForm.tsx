@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, FilledInput, IconButton, InputAdornment, InputLabel } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
-import { post, setAuthToken } from '../../axios.service';
+import { makeLoggedInTrue, post, setAuthToken } from '../../axios.service';
 import { AxiosError, AxiosResponse } from 'axios';
 
 export interface SignupInfo {
@@ -56,23 +56,19 @@ const SignupForm = (props: SignupFormProps) => {
                 setDisplayEMLError(false);
                 setDisplayPWError(false);
                 props.handleClose();
-                window.location.reload();
+                makeLoggedInTrue();
             }, (error: AxiosError) => {
-                console.log(error);
                 if (error.response && error.response.data === 'Invalid username') {
-                    console.log("hit UN");
                     setDisplayUNError(true);
                     setDisplayEMLError(false);
                     setDisplayPWError(false);
                 }
                 if (error.response && error.response.data === 'Invalid email') {
-                    console.log("hit EML");
                     setDisplayUNError(false);
                     setDisplayEMLError(true);
                     setDisplayPWError(false);
                 }
                 if (error.response && error.response.data === 'Invalid password') {
-                    console.log("hit PW");
                     setDisplayUNError(false);
                     setDisplayEMLError(false);
                     setDisplayPWError(true);
