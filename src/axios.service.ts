@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 // We need to abstract this and the baseUrl of server in "axios.service.ts" to an env file
 // export const baseServerUrl = "https://cocktail-party-server.herokuapp.com";
@@ -17,7 +17,6 @@ export function getAuthToken() {
 
 authToken = localStorage.getItem('cocktailPartyAccessToken') || "";
 
-export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void) {
 export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void) {
     axios.get(
         `${baseServerUrl}${endpoint}`,
