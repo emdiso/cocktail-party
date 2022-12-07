@@ -92,7 +92,7 @@ const handlePromise = (promise: Promise<AxiosResponse<any, any>>, resHandler?: (
             const setMethodErrorAlert = getGlobalSetStateMethod("setErrorAlert");
             setMethodErrorAlert !== undefined && setMethodErrorAlert(errMessage);
         }
-        if (error.response && error.response.status === 401) {
+        if (error.response && (error.response.status === 401 || error.response.status === 403 )) {
             localStorage.clear();
             const setMethodLoggedIn = getGlobalSetStateMethod("setLoggedIn");
             setMethodLoggedIn !== undefined && setMethodLoggedIn(false);
