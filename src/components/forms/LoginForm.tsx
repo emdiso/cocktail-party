@@ -48,8 +48,13 @@ const LoginForm = (props: LoginFormProps) => {
                 password : values.password
 		    }, {}, (response: AxiosResponse) => {
                 setAuthToken(response.data.accessToken);
+                setDisplayError(false);
                 props.handleClose();
                 window.location.reload();
+            }, (error: AxiosError) => {
+                if (error.response?.status === 401) {
+                    setDisplayError(true);
+                }
             });
     }
 
