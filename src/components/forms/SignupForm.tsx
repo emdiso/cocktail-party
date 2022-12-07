@@ -3,6 +3,7 @@ import Button, { FilledInput, IconButton, InputAdornment, InputLabel } from '@mu
 import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import {post, setAuthToken} from '../../axios.service';
+import { AxiosError, AxiosResponse } from 'axios';
 
 export interface SignupInfo {
     username: string;
@@ -22,6 +23,10 @@ const SignupForm = (props: SignupFormProps) => {
         password: '',
         showPassword: false,
     });
+
+    const [displayUNError, setDisplayUNError] = React.useState<boolean>(false);
+    const [displayEMLError, setDisplayEMLError] = React.useState<boolean>(false);
+    const [displayPWError, setDisplayPWError] = React.useState<boolean>(false);
 
     const handleChange =
         (prop: keyof SignupInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,15 +50,39 @@ const SignupForm = (props: SignupFormProps) => {
 			    username : values.username,
                 email : values.email,
                 password : values.password,
-		    }, {}, (response) => {
+		    }, {}, (response: AxiosResponse) => {
                 setAuthToken(response.data.accessToken);
+                setDisplayUNError(false);
+                setDisplayEMLError(false);
+                setDisplayPWError(false);
                 props.handleClose();
                 window.location.reload();
+            }, (error: AxiosError) => {
+                console.log(error);
+                if (error.response?.data === 'Invalid username') {
+                    console.log("hit UN");
+                    setDisplayUNError(true);
+                    setDisplayEMLError(false);
+                    setDisplayPWError(false);
+                }
+                if (error.response?.data === 'Invalid email') {
+                    console.log("hit EML");
+                    setDisplayUNError(false);
+                    setDisplayEMLError(true);
+                    setDisplayPWError(false);
+                }
+                if (error.response?.data === 'Invalid password') {
+                    console.log("hit PW");
+                    setDisplayUNError(false);
+                    setDisplayEMLError(false);
+                    setDisplayPWError(true);
+                }
             });
     }
 
     return (
         <div>
+            {displayUNError && <p className='error-message'> Invalid username. Please make sure your username is 5-30 characters in length. </p>}
             <InputLabel htmlFor='username-input'> Username </InputLabel>
             <TextField
                 required
@@ -63,6 +92,7 @@ const SignupForm = (props: SignupFormProps) => {
                 onChange={handleChange('username')}
             />
 
+            {displayEMLError && <p className='error-message'> Invalid email. </p>}
             <InputLabel htmlFor='email-input'> Email </InputLabel>
             <TextField
                 required
@@ -72,6 +102,7 @@ const SignupForm = (props: SignupFormProps) => {
                 onChange={handleChange('email')}
             />
             
+            {displayPWError && <p className='error-message'> Invalid password. Passwords must include a special character and be 8-30 characters in length. </p>}
             <InputLabel htmlFor="filled-password"> Password </InputLabel>
             <FilledInput
                 id="filled-password"
