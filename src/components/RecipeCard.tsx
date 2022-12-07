@@ -1,32 +1,16 @@
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
-import Collapse from '@mui/material/Collapse';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { ImageListItem, ImageListItemBar, styled } from '@mui/material';
-import React from 'react';
+import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, ImageListItem, ImageListItemBar, List, ListItem, ListItemAvatar, ListItemText, Menu, MenuItem, styled } from '@mui/material';
+import React, { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { baseServerUrl } from '../axios.service';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { blue } from '@mui/material/colors';
 
-
-interface ExpandMoreProps extends IconButtonProps {
-    expand: boolean;
+export interface InstructionObject {
+    strIngredient: string,
+    strMeasurement: string
 }
-
-const ExpandMore = styled((props: ExpandMoreProps) => {
-    const { expand, ...other } = props;
-    return <IconButton {...other} />;
-})(({ theme, expand }) => ({
-    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-    }),
-}));
 
 function getIngredients(data: any) {
     let ingredients: string[] = [];
@@ -43,11 +27,98 @@ function getIngredients(data: any) {
     return ingredients;
 }
 
-function RecipeCard(data: any) {
-    const [expanded, setExpanded] = React.useState(false);
+function getInstructionObjects(data: any): InstructionObject[] {
+    let obj: InstructionObject[] = [];
 
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
+    for (let i = 1; i < 16; i++) {
+        if (data[`strIngredient${i}`]) {
+            let ingredient = data[`strIngredient${i}`];
+            let measurement = data[`strMeasure${i}`];
+            obj.push({
+                strIngredient: ingredient,
+                strMeasurement: measurement
+            });
+        }
+    }
+
+    return obj;
+}
+
+export interface SimpleDialogProps {
+    open: boolean;
+    data: any,
+    onClose: () => void;
+}
+
+function SimpleDialog(props: SimpleDialogProps) {
+    const { onClose, data, open } = props;
+
+    const handleClose = () => {
+        onClose();
+    };
+
+    const objects = getInstructionObjects(data);
+
+    return (
+        <Dialog onClose={handleClose} open={open} disableAutoFocus={false}>
+            <DialogTitle>Recipe for {data.strDrink}</DialogTitle>
+            <DialogContent title="Ingredients">
+                <h6>Ingredients</h6>
+                <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }} >
+                    {objects.map((obj: InstructionObject, index: number) => (
+                        <div>
+                            <ListItem alignItems="center">
+                                <ListItemText
+                                    primary={`${index + 1}. ${obj.strIngredient}`}
+                                    secondary={
+                                        <React.Fragment>
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                {obj.strMeasurement}
+                                            </Typography>
+                                        </React.Fragment>
+                                    }
+                                />
+                            </ListItem>
+                            <Divider />
+                        </div>
+                    ))}
+                </List>
+            </DialogContent>
+            <DialogContent title='Instructions'>
+                <h6>Instructions</h6>
+                {data.strInstructions}
+            </DialogContent>
+            <DialogActions>
+                <Button variant="contained" onClick={handleClose}>Close</Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
+function RecipeCard(data: any) {
+    const [openDialog, setOpenDialog] = React.useState(false);
+
+    const handleClickOpen = () => {
+        setOpenDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+    };
+
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const openMenu = Boolean(anchorEl);
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
     };
 
     const navigate = useNavigate();
@@ -74,43 +145,34 @@ function RecipeCard(data: any) {
                     actionIcon={
                         <IconButton
                             sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                            aria-label={`info about ${data.data.strDrink}`}
+                            aria-controls={openMenu ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={openMenu ? 'true' : undefined}
+                            onClick={handleClick}
                         >
+                            <MoreVertIcon />
                         </IconButton>
                     }
                 />
+                <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={openMenu}
+                    onClose={handleClose}
+                    MenuListProps={{
+                        'aria-labelledby': 'basic-button',
+                    }}
+                >
+                    <MenuItem onClick={handleModify}>Modify</MenuItem>
+                    <MenuItem onClick={handleClickOpen}>See Recipe</MenuItem>
+                    {data.data.id && <MenuItem>Delete</MenuItem>}
+                </Menu>
+                <SimpleDialog
+                    open={openDialog}
+                    data={data.data}
+                    onClose={handleCloseDialog}
+                />
             </ImageListItem>
-            {/* <Card sx={{ maxWidth: 345 }}>
-                <CardHeader title={data.data.strDrink} />
-                {(data.data.strDrinkThumb || data.data.image_id) && <CardMedia
-                    component="img"
-                    height="194"
-                    image={data.data.strDrinkThumb || `${baseServerUrl}/image/display?imageId=${data.data.image_id}`}
-                    alt=""
-                />}
-                <CardContent>
-                    Ingredients: {ingredients.join(", ")}
-                </CardContent>
-                <CardActions disableSpacing>
-                    <button onClick={handleModify}>Modify</button>
-                    <ExpandMore
-                        expand={expanded}
-                        onClick={handleExpandClick}
-                        aria-expanded={expanded}
-                        aria-label="show more"
-                    >
-                        <ExpandMoreIcon />
-                    </ExpandMore>
-                </CardActions>
-                <Collapse in={expanded} timeout="auto" unmountOnExit>
-                    <CardContent>
-                        <Typography paragraph>Recipe:</Typography>
-                        <Typography paragraph>
-                            {data.data.strInstructions}
-                        </Typography>
-                    </CardContent>
-                </Collapse>
-            </Card> */}
         </div>
     );
 }
