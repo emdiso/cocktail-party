@@ -4,7 +4,7 @@ import { PrettyDrink } from './forms/MenuFormatForm';
 import html2canvas from 'html2canvas';
 import { Recipe } from '../models';
 import FormData from 'form-data';
-import { post } from '../axios.service';
+import { baseServerUrl, post } from '../axios.service';
 import { useNavigate } from 'react-router-dom';
 
 function MenuPrettyDetails(data: any) {
@@ -21,7 +21,7 @@ function MenuPrettyDetails(data: any) {
             formData.append('image', blob);
             formData.append('menu_id', data.data.menuId)
             post('/menu_gen/insert_menu_image', formData, {}, () => {
-                navigate('/menu', { state: {id: data.data.menuId}});
+                navigate('/menu', { state: { id: data.data.menuId } });
             });
         });
         // const link = document.createElement('a');
@@ -65,7 +65,10 @@ function MenuPrettyDetails(data: any) {
                         drinks.map((item: PrettyDrink, index: number) =>
                             <div key={index} style={{ display: "block", marginLeft: "auto", marginRight: "auto" }}>
                                 <ListItem>
-                                    <img style={{ width: "10%", borderRadius: "5px", marginLeft: "2vw" }} alt="" src={(item.drink as Recipe).strDrinkThumb} />
+                                    {/* <ListItemAvatar>
+                                        <Avatar alt="" src={(item.drink as Recipe).strDrinkThumb || `${baseServerUrl}/image/display?imageId=${data.data.image_id}`} />
+                                    </ListItemAvatar> */}
+                                    <img style={{ width: "15%", borderRadius: "5px", marginLeft: "2vw" }} alt="" src={(item.drink as Recipe).strDrinkThumb} />
                                     <ListItemText
                                         style={item.drink.strAlcoholic.includes("Alcoholic") ? { color: data.data.alcoholicTextColor, textAlign: "left", marginLeft: "1vw", marginRight: "2vw" } : { color: data.data.textColor, textAlign: "left", marginLeft: "1vw", marginRight: "2vw" }}
                                         primaryTypographyProps={{ fontFamily: data.data.textFont }}

@@ -1,8 +1,8 @@
 import React from 'react';
 import RecipeCard from './RecipeCard';
-import { alpha, Breadcrumbs, Button, ButtonGroup, Card, CardContent, CardHeader, CardMedia, Chip, Grid, Link, Pagination, Stack, Typography } from '@mui/material';
+import { alpha, Breadcrumbs, Button, ButtonGroup, Card, CardContent, CardHeader, CardMedia, Chip, Grid, IconButton, ImageList, ImageListItem, ImageListItemBar, Link, ListSubheader, Menu, MenuItem, Pagination, Stack, Typography } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
-import { get } from "../axios.service";
+import { baseServerUrl, get } from "../axios.service";
 import { stringify } from 'querystring';
 import { AxiosError, AxiosResponse } from 'axios';
 import { ContactSupportOutlined } from '@mui/icons-material';
@@ -10,11 +10,13 @@ import { Recipe } from "../models"
 
 interface random {
     ingredient: string,
-    randDrink: Recipe | undefined
+    randDrink: Recipe | undefined,
+    randDrinkSet: boolean
 }
 
 const Random = () => {
     const [randDrink, setRandDrink] = React.useState<Recipe | undefined>(undefined);
+    const [once, setOnce] = React.useState<boolean>(false);
     const [ingredients, setIngredients] = React.useState<any[]>([]);
 
     const [drinksByIngredient, setDrinksByIngredient] = React.useState<random[]>([]);
@@ -32,7 +34,8 @@ const Random = () => {
                         if (obj.length < ingredients.length) {
                             obj.push({
                                 "ingredient": ingredient.strIngredient1,
-                                "randDrink": undefined
+                                "randDrink": undefined,
+                                randDrinkSet: false
                             })
                         }
                         return obj;
@@ -65,6 +68,7 @@ const Random = () => {
     const getRandomDrink = () => {
         get('/cocktail_api/random_drink', {}, (response: AxiosResponse) => {
             setRandDrink(response.data.drinks[0]);
+            setOnce(true);
         }, (error: AxiosError) => {
             console.log(error);
         });
@@ -87,7 +91,6 @@ const Random = () => {
                     return obj;
                 }
             );
-            setRandDrink(response.data.drinks[0]);
         }, (error: AxiosError) => {
             console.log(error);
         });
@@ -122,42 +125,64 @@ const Random = () => {
 
     return (
         <div>
-            <Button onClick={getRandomDrink}> Get Random Cocktail </Button>
-            {randDrink !== undefined && (
-                <div>
-                    <h4>Here's your random cocktail: {randDrink.strDrink}</h4>
-                    <Grid container spacing={{ xs: 2, md: 5 }} columns={{ xs: 6, sm: 8, md: 12 }} alignItems="center" justifyContent="center">
-                        <Grid item xs={4} sm={4} md={2}>
+            <ImageListItem key="Subheader">
+                <ListSubheader component="div">Any random cocktail</ListSubheader>
+            </ImageListItem>
+            <ImageList sx={{ width: "100%", height: "auto" }} cols={5}>
+                {
+                    randDrink ?
+                        <div style={{ cursor: "pointer" }} onClick={getRandomDrink}>
                             <RecipeCard data={randDrink} />
-                        </Grid>
-                    </Grid>
-                </div>
-            )}
+                        </div>
+                        :
+                        <div style={{ cursor: "pointer" }} onClick={getRandomDrink}>
+                            <ImageListItem onClick={getRandomDrink} style={{ cursor: "pointer" }}>
+                                <img
+                                    src="img/default.jpeg"
+                                    loading="lazy"
+                                />
+                                <ImageListItemBar
+                                    title="*"
+                                />
+                            </ImageListItem>
+                        </div>
+                }
+            </ImageList>
 
             <div>
-                <h4>Click for a random drink!</h4>
-                <Grid container spacing={{ xs: 2, md: 5 }} columns={{ xs: 6, sm: 8, md: 12 }} alignItems="center" justifyContent="center">
+                <ImageListItem key="Subheader">
+                    <ListSubheader component="div">Random cocktail by an ingredient</ListSubheader>
+                </ImageListItem>
+                <ImageList sx={{ width: "100%", height: "auto" }} cols={5}>
                     {randomDrinksByIngredient ?
                         randomDrinksByIngredient.map((elem: random, index: number) =>
-                            <Grid item xs={4} sm={4} md={2} key={index}>
+                            <div>
                                 {elem.randDrink ?
-                                    <RecipeCard data={elem.randDrink} key={index} onClick={() => getRandomDrinkByIngredient(elem.ingredient)} />
-                                    :
-                                    <Card sx={{ maxWidth: 345 }} key={index} onClick={() => getRandomDrinkByIngredient(elem.ingredient)} style={{ cursor: "pointer" }}>
-                                        <CardHeader title={elem.ingredient} />
-                                        <CardMedia
-                                            component="img"
-                                            height="194"
-                                            image={getIngredientPhoto(elem.ingredient)}
-                                            alt="Recipe img not available"
+                                    <div onClick={() => getRandomDrinkByIngredient(elem.ingredient)} style={{ cursor: "pointer" }} >
+                                        <RecipeCard data={elem.randDrink} key={index} />
+                                        <ImageListItemBar
+                                            title={elem.ingredient}
+                                            position="below"
                                         />
-                                    </Card>
+                                    </div>
+                                    :
+                                    <div onClick={() => getRandomDrinkByIngredient(elem.ingredient)} style={{ cursor: "pointer" }}>
+                                        <ImageListItem key={index + 1} >
+                                            <img
+                                                src={getIngredientPhoto(elem.ingredient)}
+                                                loading="lazy"
+                                            />
+                                            <ImageListItemBar
+                                                title={elem.ingredient}
+                                            />
+                                        </ImageListItem>
+                                    </div>
                                 }
-                            </Grid>
+                            </div>
                         )
                         : <h4>Hmm.. I can't find any fun ingredients, sorry</h4>
                     }
-                </Grid>
+                </ImageList>
                 <Button onClick={newIngredients} variant="contained">New Ingredients</Button>
             </div>
         </div >

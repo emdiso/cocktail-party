@@ -134,8 +134,8 @@ function RecipeCard(data: any) {
 
     return (
         <div>
-            <ImageListItem key={data.data.strDrink}>
-                {(data.data.strDrinkThumb || data.data.image_id) ?
+            <ImageListItem>
+                {data.data && (data.data.strDrinkThumb || data.data.image_id) ?
                     <img
                         src={data.data.strDrinkThumb || `${baseServerUrl}/image/display?imageId=${data.data.image_id}`}
                         loading="lazy"
@@ -146,9 +146,9 @@ function RecipeCard(data: any) {
                     />
                 }
                 <ImageListItemBar
-                    title={data.data.strDrink}
-                    subtitle={getIngredients(data.data)}
-                    actionIcon={
+                    title={data.data ? data.data.strDrink : "*"}
+                    subtitle={data.data && getIngredients(data.data)}
+                    actionIcon={data.data &&
                         <IconButton
                             sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
                             aria-controls={openMenu ? 'basic-menu' : undefined}
@@ -160,24 +160,29 @@ function RecipeCard(data: any) {
                         </IconButton>
                     }
                 />
-                <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={openMenu}
-                    onClose={handleClose}
-                    MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                    }}
-                >
-                    <MenuItem onClick={handleModify}>Modify</MenuItem>
-                    <MenuItem onClick={handleClickOpen}>See Recipe</MenuItem>
-                    {data.data.id && <MenuItem>Delete</MenuItem>}
-                </Menu>
-                <SimpleDialog
-                    open={openDialog}
-                    data={data.data}
-                    onClose={handleCloseDialog}
-                />
+                {data.data &&
+                    (
+                        <div>
+                            <Menu
+                                id="basic-menu"
+                                anchorEl={anchorEl}
+                                open={openMenu}
+                                onClose={handleClose}
+                                MenuListProps={{
+                                    'aria-labelledby': 'basic-button',
+                                }}
+                            >
+                                <MenuItem onClick={handleModify}>Modify</MenuItem>
+                                <MenuItem onClick={handleClickOpen}>See Recipe</MenuItem>
+                                {data.data.id && <MenuItem>Delete</MenuItem>}
+                            </Menu>
+                            <SimpleDialog
+                                open={openDialog}
+                                data={data.data}
+                                onClose={handleCloseDialog}
+                            />
+                        </div>
+                    )}
             </ImageListItem>
         </div>
     );

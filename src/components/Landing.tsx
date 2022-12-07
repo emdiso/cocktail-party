@@ -43,10 +43,10 @@ function Landing() {
         })}
       </ButtonGroup>
       <div style={{ marginTop: "2vw" }}>
-        <ImageList sx={{ width: "100%", height: "auto" }}>
-          <ImageListItem key="Subheader" cols={7}>
-            <ListSubheader component="div">Recipes that start with: {letter.toUpperCase()}</ListSubheader>
-          </ImageListItem>
+        <ImageListItem key="Subheader" >
+          <ListSubheader component="div">Recipes that start with: {letter.toUpperCase()}</ListSubheader>
+        </ImageListItem>
+        <ImageList sx={{ width: "100%", height: "auto" }} cols={5}>
           {drinks.map((item, index) => (
             <RecipeCard data={item} key={index} />
           ))}
