@@ -317,7 +317,7 @@ const RecipeForm = () => {
                         </div>
 
                         <div className='submit'>
-                            <Button variant='outlined' onClick={handleSubmit}>{values.id ? "Modify Custom Recipe" : "Create Custom Recipe"}</Button>
+                            <Button variant='outlined' onClick={handleSubmit}>Save Recipe</Button>
                         </div>
                     </Grid>
                 </div>

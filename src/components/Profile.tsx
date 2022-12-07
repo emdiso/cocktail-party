@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import { Button, Divider } from "@mui/material";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styling/Profile.css';
 import { get } from '../axios.service';
@@ -11,6 +11,7 @@ import { AxiosResponse } from 'axios';
 import { CustomRecipe, Menu, UserInfo } from '../models';
 import MenuWidget from './MenuWidget';
 import RecipeCard from './RecipeCard';
+import AddIcon from '@mui/icons-material/Add';
 
 interface profileProps {
     userInfo: UserInfo;
@@ -47,16 +48,18 @@ const Profile = (props: profileProps) => {
 
     return (
         <Container className='profile'>
-            <Row className='logoutBtn'> <Button onClick={logOut}> Log Out </Button> </Row>
+            <Row className='logoutBtn'> <Button onClick={logOut} color="secondary" variant="contained"> Log Out </Button> </Row>
 
             <Container className='userInfo'>
                 <Row className='username'> {props.userInfo.username} </Row>
                 <Row className='email'> {props.userInfo.email} </Row>
             </Container>
 
+            <Divider style={{marginBottom:"2vw"}} />
+
             <Container className='recipes'>
                 <Row>
-                    <Col sm={2}> My Recipes </Col> <Col> <Link to='/recipe'> <Button> + </Button> </Link> </Col>
+                    <Col sm={2}> My Recipes </Col> <Col> <Link to='/recipe'> <Button variant="contained" color="secondary"><AddIcon/></Button> </Link> </Col>
                 </Row>
                 <Row>
                     {crList && crList.length > 0 && crList.map((cr, index) => {
@@ -65,9 +68,11 @@ const Profile = (props: profileProps) => {
                 </Row>
             </Container>
 
+            <Divider style={{marginBottom:"2vw"}} />
+
             <Container className='menus' >
                 <Row>
-                    <Col sm={2}> My Menus </Col> <Col> <Button> + </Button> </Col>
+                    <Col sm={2}> My Menus </Col> <Col> <Button variant="contained" color="secondary"><AddIcon/></Button> </Col>
                 </Row>
                 <Row>
                     {menuList && menuList.length > 0 && menuList.map((menu, index) => {
