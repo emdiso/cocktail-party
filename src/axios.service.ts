@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosError, AxiosResponse } from "axios";
 
 // We need to abstract this and the baseUrl of server in "axios.service.ts" to an env file
 // export const baseServerUrl = "https://cocktail-party-server.herokuapp.com";
@@ -18,6 +18,7 @@ export function getAuthToken() {
 authToken = localStorage.getItem('cocktailPartyAccessToken') || "";
 
 export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void) {
+export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void) {
     axios.get(
         `${baseServerUrl}${endpoint}`,
         {
@@ -27,7 +28,7 @@ export function get(endpoint: string, params: any, resHandler?: (res: AxiosRespo
             }
         }
     ).then(resHandler).catch((error: AxiosError) => {
-        if (error.status === 401) {
+        if (error.response && error.response.status === 401) {
             localStorage.clear();
         }
         
@@ -49,7 +50,7 @@ export function post(endpoint: string, data: any, params?: any, resHandler?: (re
             }
         }
     ).then(resHandler).catch((error: AxiosError) => {
-        if (error.status === 401) {
+        if (error.response && error.response.status === 401) {
             localStorage.clear();
         }
         
@@ -70,7 +71,7 @@ export function del(endpoint: string, params?: any, resHandler?: (res: AxiosResp
             }
         }
     ).then(resHandler).catch((error: AxiosError) => {
-        if (error.status === 401) {
+        if (error.response && error.response.status === 401) {
             localStorage.clear();
         }
 
