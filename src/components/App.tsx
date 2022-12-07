@@ -46,9 +46,9 @@ function App() {
             <Route path='/random' element={<Random />}></Route>
             <Route path='/generate' element={<MenuForm />}></Route>
             <Route path='/wow' element={<MenuFormatForm />}></Route>
-            {isLoggedIn && <Route path='/profile' element={<Profile userInfo={userInfo}/>}></Route>}
-            {isLoggedIn &&<Route path='/recipe' element={<RecipeForm />}></Route>}
-            {isLoggedIn &&<Route path='/menu' element={<MenuPage />}></Route>}
+            {isLoggedIn && <Route path='/profile' element={<Profile userInfo={userInfo} />}></Route>}
+            {isLoggedIn && <Route path='/recipe' element={<RecipeForm />}></Route>}
+            {isLoggedIn && <Route path='/menu' element={<MenuPage />}></Route>}
           </Routes>
         </div>
         <LSPopUp open={openLogin} handleClose={handleClose} />

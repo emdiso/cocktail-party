@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Button, { FilledInput, IconButton, InputAdornment, InputLabel } from '@mui/material';
+import { Button, FilledInput, IconButton, InputAdornment, InputLabel } from '@mui/material';
 import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { post, setAuthToken } from '../../axios.service';
@@ -82,49 +82,55 @@ const SignupForm = (props: SignupFormProps) => {
 
     return (
         <div>
-            {displayUNError && <p className='error-message'> Invalid username. Please make sure your username is 5-30 characters in length. </p>}
-            <InputLabel htmlFor='username-input'> Username </InputLabel>
-            <TextField
-                required
-                id='username-input'
-                variant='filled'
-                value={values.username}
-                onChange={handleChange('username')}
-            />
+            <div className="card m-3">
+                <div className="card-body border-bottom">
+                    <InputLabel htmlFor='username-input'> Username </InputLabel>
+                    <TextField
+                        required
+                        id='username-input'
+                        variant='filled'
+                        value={values.username}
+                        onChange={handleChange('username')}
+                    />
+                    {displayUNError && <p className='error-message' style={{ color: "red" }}> Invalid username. <br></br>Please make sure your username is 5-30 characters in length. </p>}
 
-            {displayEMLError && <p className='error-message'> Invalid email. </p>}
-            <InputLabel htmlFor='email-input'> Email </InputLabel>
-            <TextField
-                required
-                id='email-input'
-                variant='filled'
-                value={values.email}
-                onChange={handleChange('email')}
-            />
+                    <InputLabel htmlFor='email-input'> Email </InputLabel>
+                    <TextField
+                        required
+                        id='email-input'
+                        variant='filled'
+                        value={values.email}
+                        onChange={handleChange('email')}
+                    />
+                    {displayEMLError && <p className='error-message' style={{ color: "red" }}> Invalid email. </p>}
 
-            {displayPWError && <p className='error-message'> Invalid password. Passwords must include a special character and be 8-30 characters in length. </p>}
-            <InputLabel htmlFor="filled-password"> Password </InputLabel>
-            <FilledInput
-                id="filled-password"
-                type={values.showPassword ? 'text' : 'password'}
-                required
-                value={values.password}
-                onChange={handleChange('password')}
-                endAdornment={
-                    <InputAdornment position="end">
-                        <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
-                            edge="end"
-                        >
-                            {values.showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                    </InputAdornment>
-                }
-            />
+                    <InputLabel htmlFor="filled-password"> Password </InputLabel>
+                    <FilledInput
+                        id="filled-password"
+                        type={values.showPassword ? 'text' : 'password'}
+                        required
+                        value={values.password}
+                        onChange={handleChange('password')}
+                        endAdornment={
+                            <InputAdornment position="end">
+                                <IconButton
+                                    aria-label="toggle password visibility"
+                                    onClick={handleClickShowPassword}
+                                    onMouseDown={handleMouseDownPassword}
+                                    edge="end"
+                                >
+                                    {values.showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                        }
+                    />
+                    {displayPWError && <p className='error-message' style={{ color: "red" }}> Invalid password. <br></br>Passwords must include a special character and be 8-30 characters in length. </p>}
 
-            <button onClick={handleSubmit}> Sign Up </button>
+                    <div style={{ paddingTop: "2vw" }}>
+                        <Button onClick={handleSubmit} variant="contained" color="secondary"> Sign Up </Button>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
