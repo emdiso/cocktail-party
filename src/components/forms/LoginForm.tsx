@@ -52,7 +52,7 @@ const LoginForm = (props: LoginFormProps) => {
                 props.handleClose();
                 window.location.reload();
             }, (error: AxiosError) => {
-                if (error.response?.status === 401) {
+                if (error.response && error.response.status === 401) {
                     setDisplayError(true);
                 }
             });

@@ -45,7 +45,7 @@ const SignupForm = (props: SignupFormProps) => {
     };
 
     const handleSubmit = () => {
-        const response = post('/auth/signup', 
+        post('/auth/signup', 
             {
 			    username : values.username,
                 email : values.email,
@@ -59,19 +59,19 @@ const SignupForm = (props: SignupFormProps) => {
                 window.location.reload();
             }, (error: AxiosError) => {
                 console.log(error);
-                if (error.response?.data === 'Invalid username') {
+                if (error.response && error.response.data === 'Invalid username') {
                     console.log("hit UN");
                     setDisplayUNError(true);
                     setDisplayEMLError(false);
                     setDisplayPWError(false);
                 }
-                if (error.response?.data === 'Invalid email') {
+                if (error.response && error.response.data === 'Invalid email') {
                     console.log("hit EML");
                     setDisplayUNError(false);
                     setDisplayEMLError(true);
                     setDisplayPWError(false);
                 }
-                if (error.response?.data === 'Invalid password') {
+                if (error.response && error.response.data === 'Invalid password') {
                     console.log("hit PW");
                     setDisplayUNError(false);
                     setDisplayEMLError(false);
