@@ -30,11 +30,12 @@ export function get(endpoint: string, params: any, resHandler?: (res: AxiosRespo
         if (error.status === 401) {
             localStorage.clear();
         }
-
-        errHandler || ((err: any) => {
-        // TO DO - write some error dialog / snackbar to display this information
-        console.log(err);
-    })});
+        
+        (errHandler || ((err: any) => {
+            // TO DO - write some error dialog / snackbar to display this information
+            console.log(err);
+        }))(error);
+    });
 }
 
 export function post(endpoint: string, data: any, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
@@ -52,10 +53,11 @@ export function post(endpoint: string, data: any, params?: any, resHandler?: (re
             localStorage.clear();
         }
         
-        errHandler || ((err: any) => {
-        // TO DO - write some error dialog / snackbar to display this information
-        console.log(err);
-    })});
+        (errHandler || ((err: any) => {
+            // TO DO - write some error dialog / snackbar to display this information
+            console.log(err);
+        }))(error);
+    });
 }
 
 export function del(endpoint: string, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: any) => void) {
@@ -72,8 +74,11 @@ export function del(endpoint: string, params?: any, resHandler?: (res: AxiosResp
             localStorage.clear();
         }
 
-        errHandler || ((err: any) => {
-        // TO DO - write some error dialog / snackbar to display this information
-        console.log(err);
-    })});
+        
+        
+        (errHandler || ((err: any) => {
+            // TO DO - write some error dialog / snackbar to display this information
+            console.log(err);
+        }))(error);
+    });
 }
