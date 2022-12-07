@@ -13,27 +13,34 @@ import MenuFormatForm from './forms/MenuFormatForm';
 import MenuPage from './MenuPage';
 import { UserInfo } from '../models';
 import LSPopUp from './LSPopUp';
+import { Alert, Snackbar } from '@mui/material';
 
 
 function App() {
   const [isLoggedIn, setLoggedIn] = React.useState(getAuthToken() !== "");
-  const [openLogin, setOpenLogin] = React.useState(false);
+  const [openLSPopUp, setOpenLSPopUp] = React.useState(false);
+  const [errorAlert, setErrorAlert] = React.useState<string | undefined>(undefined);
   const [userInfo, setUserInfo] = React.useState<UserInfo>({ username: "", email: "" });
   setGlobalSetStateMethod("setLoggedIn", setLoggedIn);
   setGlobalSetStateMethod("setUserInfo", setUserInfo);
+  setGlobalSetStateMethod("setErrorAlert", setErrorAlert);
 
   useEffect(() => {
     if (!isLoggedIn) return;
     get('/auth/userInfo', {}, (res) => { setUserInfo({ username: res.data.username, email: res.data.email }) });
   }, [isLoggedIn]);
 
-  const handleClose = () => {
-    setOpenLogin(false);
-  }
+  const handleLSPopUpClose = () => {
+    setOpenLSPopUp(false);
+  };
 
   const handleOpen = () => {
-    setOpenLogin(true);
-  }
+    setOpenLSPopUp(true);
+  };
+
+  const handleErrorAlertClose = () => {
+    setErrorAlert(undefined);
+  };
 
   return (
     <div className="App">
@@ -53,7 +60,12 @@ function App() {
             <Route path='*' element={<Navigate to="/" />}></Route>
           </Routes>
         </div>
-        <LSPopUp open={openLogin} handleClose={handleClose} />
+        <LSPopUp open={openLSPopUp} handleClose={handleLSPopUpClose} />
+        <Snackbar open={errorAlert !== undefined} autoHideDuration={6000} onClose={handleErrorAlertClose}>
+          <Alert onClose={handleErrorAlertClose} severity="error" sx={{ width: '100%' }}>
+            {errorAlert}
+          </Alert>
+        </Snackbar>
       </Router>
     </div>
   );
