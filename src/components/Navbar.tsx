@@ -1,19 +1,26 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
+import { Fab } from '@mui/material';
+import { UserInfo } from '../models';
+
 
 export interface link {
   link: string,
   text: string
 }
 
-const Navbar = () => {
+interface NavbarProps {
+  isLoggedIn: boolean;
+  handleOpen: ()=>void;
+  userInfo: UserInfo;
+}
+
+const Navbar = (props: NavbarProps) => {
 
   const pages: link[] = [
     { link: "/", text: "Home" }, { link: "/random", text: "Random drink" }, { link: "/generate", text: "Make me a menu" }
@@ -23,13 +30,13 @@ const Navbar = () => {
     <div>
       <Box sx={{ flexGrow: 1 }}>
         <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Toolbar style={{display: "flex", justifyContent: "space-between"}}>
+            <Typography variant="h6">
               Cocktail Party
             </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            <Box sx={{display: "flex"}}>
               {pages.map((link: link, index: number) => (
-                <Link to={link.link}>
+                <Link to={link.link} key={index+20} >
                   <Button
                     key={index}
                     sx={{ my: 2, color: 'white', display: 'block' }}
@@ -39,6 +46,17 @@ const Navbar = () => {
                 </Link>
               ))}
             </Box>
+            {props.isLoggedIn ?
+                <Link to="/profile">
+                  <Fab variant="extended" size="small">
+                    {props.userInfo.username}
+                  </Fab>
+                </Link>
+              :
+                <Fab variant="extended" onClick={props.handleOpen} size="small">
+                  Log In
+                </Fab>
+            }
           </Toolbar>
         </AppBar>
       </Box>

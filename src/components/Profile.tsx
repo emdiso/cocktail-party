@@ -4,12 +4,11 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { UserInfo } from './App';
 import './styling/Profile.css';
 import { get } from '../axios.service';
 import { Link, useNavigate } from 'react-router-dom';
 import { AxiosResponse } from 'axios';
-import { CustomRecipe, Menu } from '../models';
+import { CustomRecipe, Menu, UserInfo } from '../models';
 import MenuWidget from './MenuWidget';
 import RecipeCard from './RecipeCard';
 
