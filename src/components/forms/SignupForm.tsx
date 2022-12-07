@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, FilledInput, IconButton, InputAdornment, InputLabel } from '@mui/material';
-import { Label, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import TextField from '@mui/material/TextField';
 import { post, setAuthToken } from '../../axios.service';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -45,7 +45,7 @@ const SignupForm = (props: SignupFormProps) => {
     };
 
     const handleSubmit = () => {
-        const response = post('/auth/signup',
+        post('/auth/signup', 
             {
                 username: values.username,
                 email: values.email,
