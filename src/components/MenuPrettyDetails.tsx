@@ -106,7 +106,7 @@ function MenuPrettyDetails(data: any) {
 
             </div>
             <div>
-                <Button onClick={handleSubmit} variant="contained" sx={{ mt: 1, mr: 1 }}>Finalize Menu Design</Button>
+                <Button onClick={handleSubmit} variant="contained" color="secondary" sx={{ mt: 1, mr: 1 }}>Save Design</Button>
             </div>
         </div>
     )

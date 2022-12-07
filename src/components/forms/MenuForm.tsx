@@ -395,7 +395,7 @@ function MenuForm() {
           <div>
             <h5>Menu Form</h5>
             <Box className="card m-3">
-              <Stepper activeStep={activeStep} orientation="vertical" style={{ width: "100%" }}>
+              <Stepper activeStep={activeStep} orientation="vertical" style={{ width: "100%" }} >
                 {steps.map((step, index) => (
                   <Step key={step.title}>
                     <StepLabel
@@ -417,6 +417,7 @@ function MenuForm() {
                             sx={{ mt: 1, mr: 1 }}
                             variant="contained"
                             size="small"
+                            color="warning"
                           >
                             Back
                           </Button>
@@ -425,6 +426,7 @@ function MenuForm() {
                             onClick={handleNext}
                             sx={{ mt: 1, mr: 1 }}
                             size="small"
+                            color="secondary"
                           >
                             {index === steps.length - 1 ? 'Finish' : 'Continue'}
                           </Button>
@@ -435,17 +437,17 @@ function MenuForm() {
                 ))}
               </Stepper>
             </Box>
-            <Button onClick={handleUndo} variant="contained" color="error" sx={{ mt: 1, mr: 1 }}>
+            <Button onClick={handleUndo} variant="contained" color="warning" sx={{ mt: 1, mr: 1 }}>
               Undo
             </Button>
             <Button onClick={handleReset} variant="contained" color="error" sx={{ mt: 1, mr: 1 }}>
               Reset
             </Button>
             <Tooltip title="Design my menu">
-              <Button onClick={handleDesign} variant="contained" sx={{ mt: 1, mr: 1 }}>Design</Button>
+              <Button onClick={handleDesign} variant="contained" color="secondary" sx={{ mt: 1, mr: 1 }}>Design</Button>
             </Tooltip>
             <Tooltip title="Save to my profile">
-              <Button onClick={handleSubmit} variant="contained" sx={{ mt: 1, mr: 1 }}>Submit</Button>
+              <Button onClick={handleSubmit} variant="contained" color="secondary" sx={{ mt: 1, mr: 1 }}>Submit</Button>
             </Tooltip>
           </div>
         </Grid>

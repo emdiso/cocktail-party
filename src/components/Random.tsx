@@ -16,7 +16,6 @@ interface random {
 
 const Random = () => {
     const [randDrink, setRandDrink] = React.useState<Recipe | undefined>(undefined);
-    const [once, setOnce] = React.useState<boolean>(false);
     const [ingredients, setIngredients] = React.useState<any[]>([]);
 
     const [drinksByIngredient, setDrinksByIngredient] = React.useState<random[]>([]);
@@ -68,7 +67,6 @@ const Random = () => {
     const getRandomDrink = () => {
         get('/cocktail_api/random_drink', {}, (response: AxiosResponse) => {
             setRandDrink(response.data.drinks[0]);
-            setOnce(true);
         }, (error: AxiosError) => {
             console.log(error);
         });
@@ -128,14 +126,14 @@ const Random = () => {
             <ImageListItem key="Subheader">
                 <ListSubheader component="div">Any random cocktail</ListSubheader>
             </ImageListItem>
-            <ImageList sx={{ width: "100%", height: "auto" }} cols={5}>
+            <ImageList sx={{ width: "20%", height: "auto", margin: "auto" }} cols={1}>
                 {
                     randDrink ?
-                        <div style={{ cursor: "pointer" }} onClick={getRandomDrink}>
+                        <div style={{ cursor: "pointer", margin: "auto" }} onClick={getRandomDrink}>
                             <RecipeCard data={randDrink} />
                         </div>
                         :
-                        <div style={{ cursor: "pointer" }} onClick={getRandomDrink}>
+                        <div style={{ cursor: "pointer", margin: "auto" }} onClick={getRandomDrink}>
                             <ImageListItem onClick={getRandomDrink} style={{ cursor: "pointer" }}>
                                 <img
                                     src="img/default.jpeg"
@@ -149,42 +147,40 @@ const Random = () => {
                 }
             </ImageList>
 
-            <div>
-                <ImageListItem key="Subheader">
-                    <ListSubheader component="div">Random cocktail by an ingredient</ListSubheader>
-                </ImageListItem>
-                <ImageList sx={{ width: "100%", height: "auto" }} cols={5}>
-                    {randomDrinksByIngredient ?
-                        randomDrinksByIngredient.map((elem: random, index: number) =>
-                            <div>
-                                {elem.randDrink ?
-                                    <div onClick={() => getRandomDrinkByIngredient(elem.ingredient)} style={{ cursor: "pointer" }} >
-                                        <RecipeCard data={elem.randDrink} key={index} />
+            <ImageListItem key="Subheader">
+                <ListSubheader component="div">Random cocktail by an ingredient</ListSubheader>
+            </ImageListItem>
+            <ImageList sx={{ width: "100%", height: "auto" }} cols={5}>
+                {randomDrinksByIngredient ?
+                    randomDrinksByIngredient.map((elem: random, index: number) =>
+                        <div>
+                            {elem.randDrink ?
+                                <div onClick={() => getRandomDrinkByIngredient(elem.ingredient)} style={{ cursor: "pointer" }} >
+                                    <RecipeCard data={elem.randDrink} key={index} />
+                                    <ImageListItemBar
+                                        title={elem.ingredient}
+                                        position="below"
+                                    />
+                                </div>
+                                :
+                                <div onClick={() => getRandomDrinkByIngredient(elem.ingredient)} style={{ cursor: "pointer" }}>
+                                    <ImageListItem key={index + 1} >
+                                        <img
+                                            src={getIngredientPhoto(elem.ingredient)}
+                                            loading="lazy"
+                                        />
                                         <ImageListItemBar
                                             title={elem.ingredient}
-                                            position="below"
                                         />
-                                    </div>
-                                    :
-                                    <div onClick={() => getRandomDrinkByIngredient(elem.ingredient)} style={{ cursor: "pointer" }}>
-                                        <ImageListItem key={index + 1} >
-                                            <img
-                                                src={getIngredientPhoto(elem.ingredient)}
-                                                loading="lazy"
-                                            />
-                                            <ImageListItemBar
-                                                title={elem.ingredient}
-                                            />
-                                        </ImageListItem>
-                                    </div>
-                                }
-                            </div>
-                        )
-                        : <h4>Hmm.. I can't find any fun ingredients, sorry</h4>
-                    }
-                </ImageList>
-                <Button onClick={newIngredients} variant="contained">New Ingredients</Button>
-            </div>
+                                    </ImageListItem>
+                                </div>
+                            }
+                        </div>
+                    )
+                    : <h4>Hmm.. I can't find any fun ingredients, sorry</h4>
+                }
+            </ImageList>
+            <Button onClick={newIngredients} variant="contained" color="secondary">New Ingredients</Button>
         </div >
     )
 }
