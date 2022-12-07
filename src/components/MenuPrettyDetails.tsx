@@ -1,10 +1,10 @@
-import { List, ListItem, ListItemAvatar, Avatar, ListItemText, Typography, Divider, Button, Tooltip } from '@mui/material';
+import { List, ListItem, ListItemText, Typography, Divider, Button } from '@mui/material';
 import React from 'react';
 import { PrettyDrink } from './forms/MenuFormatForm';
 import html2canvas from 'html2canvas';
 import { Recipe } from '../models';
 import FormData from 'form-data';
-import { baseServerUrl, post } from '../axios.service';
+import { post } from '../axios.service';
 import { useNavigate } from 'react-router-dom';
 
 function MenuPrettyDetails(data: any) {

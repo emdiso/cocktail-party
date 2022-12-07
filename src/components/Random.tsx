@@ -1,11 +1,8 @@
 import React, { useEffect } from 'react';
 import RecipeCard from './RecipeCard';
-import { alpha, Breadcrumbs, Button, ButtonGroup, Card, CardContent, CardHeader, CardMedia, Chip, Grid, IconButton, ImageList, ImageListItem, ImageListItemBar, Link, ListSubheader, Menu, MenuItem, Pagination, Stack, Typography } from '@mui/material';
-import TablePagination from '@mui/material/TablePagination';
-import { baseServerUrl, get } from "../axios.service";
-import { stringify } from 'querystring';
+import { Button, ImageList, ImageListItem, ImageListItemBar, ListSubheader } from '@mui/material';
+import { get } from "../axios.service";
 import { AxiosError, AxiosResponse } from 'axios';
-import { ContactSupportOutlined } from '@mui/icons-material';
 import { Recipe } from "../models"
 
 interface random {
@@ -132,7 +129,7 @@ const Random = () => {
     return (
         <div>
             <ImageListItem key="Subheader">
-                <ListSubheader component="div">Any random cocktail</ListSubheader>
+                <ListSubheader component="div">Click cocktail for new random cocktail</ListSubheader>
             </ImageListItem>
             <ImageList sx={{ width: "20%", height: "auto", margin: "auto" }} cols={1}>
                 {
@@ -188,7 +185,7 @@ const Random = () => {
                     : <h4>Hmm.. I can't find any fun ingredients, sorry</h4>
                 }
             </ImageList>
-            <Button onClick={newIngredients} variant="contained" color="secondary">New Ingredients</Button>
+            <Button onClick={newIngredients} variant="contained" color="secondary">{randomDrinksByIngredient.length > 0 ? "New Ingredients" : "Random Ingredients"}</Button>
         </div >
     )
 }
