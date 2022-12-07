@@ -1,9 +1,7 @@
 import React from 'react';
 import RecipeCard from './RecipeCard';
-import { alpha, Breadcrumbs, Button, ButtonGroup, Chip, Grid, IconButton, ImageList, ImageListItem, ImageListItemBar, Link, ListSubheader, Pagination, Stack, Typography } from '@mui/material';
-import TablePagination from '@mui/material/TablePagination';
+import { Button, ButtonGroup, ImageList, ImageListItem, ListSubheader } from '@mui/material';
 import { get } from "../axios.service";
-import { stringify } from 'querystring';
 import { AxiosResponse } from 'axios';
 
 

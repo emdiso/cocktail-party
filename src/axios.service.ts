@@ -3,8 +3,8 @@ import { Dispatch } from "react";
 import MethodStore from "./MethodStore";
 
 // We need to abstract this and the baseUrl of server in "axios.service.ts" to an env file
-export const baseServerUrl = "https://cocktail-party-server.herokuapp.com";
-// export const baseServerUrl = "http://localhost:3001";
+// export const baseServerUrl = "https://cocktail-party-server.herokuapp.com";
+export const baseServerUrl = "http://localhost:3001";
 
 let authToken = localStorage.getItem('cocktailPartyAccessToken') || "";
 
@@ -27,7 +27,7 @@ export function getGlobalSetStateMethod(name: string) {
     return globalSetStateMethods.get(name);
 }
 
-export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void) {
+export function get(endpoint: string, params: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void, disableErrorAlert?: boolean) {
     handlePromise(
         axios.get(
             `${baseServerUrl}${endpoint}`,
@@ -39,11 +39,12 @@ export function get(endpoint: string, params: any, resHandler?: (res: AxiosRespo
             }
         ),
         resHandler,
-        errHandler
+        errHandler,
+        disableErrorAlert
     );
 }
 
-export function post(endpoint: string, data: any, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void) {
+export function post(endpoint: string, data: any, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void, disableErrorAlert?: boolean) {
     handlePromise(
         axios.post(
             `${baseServerUrl}${endpoint}`,
@@ -56,11 +57,12 @@ export function post(endpoint: string, data: any, params?: any, resHandler?: (re
             }
         ),
         resHandler,
-        errHandler
+        errHandler,
+        disableErrorAlert
     );
 }
 
-export function del(endpoint: string, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void) {
+export function del(endpoint: string, params?: any, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void, disableErrorAlert?: boolean) {
     handlePromise(
         axios.delete(
             `${baseServerUrl}${endpoint}`,
@@ -72,16 +74,19 @@ export function del(endpoint: string, params?: any, resHandler?: (res: AxiosResp
             }
         ),
         resHandler,
-        errHandler
+        errHandler,
+        disableErrorAlert
     );
 }
 
-const handlePromise = (promise: Promise<AxiosResponse<any, any>>, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void) => {
+const handlePromise = (promise: Promise<AxiosResponse<any, any>>, resHandler?: (res: AxiosResponse) => void, errHandler?: (err: AxiosError) => void, disableErrorAlert?: boolean) => {
     promise.then(resHandler).catch((error: AxiosError) => {
-        let errMessage = "Error!";
-        if (error.response && error.response.data && typeof error.response.data === "string" && error.response.data !== "") errMessage = error.response.data;
-        const setMethodErrorAlert = getGlobalSetStateMethod("setErrorAlert");
-        setMethodErrorAlert !== undefined && setMethodErrorAlert(errMessage);
+        if (!disableErrorAlert) {
+            let errMessage = "Error!";
+            if (error.response && error.response.data && typeof error.response.data === "string" && error.response.data !== "") errMessage = error.response.data;
+            const setMethodErrorAlert = getGlobalSetStateMethod("setErrorAlert");
+            setMethodErrorAlert !== undefined && setMethodErrorAlert(errMessage);
+        }
         if (error.response && error.response.status === 401) {
             localStorage.clear();
             const setMethodLoggedIn = getGlobalSetStateMethod("setLoggedIn");

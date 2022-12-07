@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import RecipeCard from './RecipeCard';
 import { alpha, Breadcrumbs, Button, ButtonGroup, Card, CardContent, CardHeader, CardMedia, Chip, Grid, IconButton, ImageList, ImageListItem, ImageListItemBar, Link, ListSubheader, Menu, MenuItem, Pagination, Stack, Typography } from '@mui/material';
 import TablePagination from '@mui/material/TablePagination';
@@ -21,48 +21,56 @@ const Random = () => {
     const [drinksByIngredient, setDrinksByIngredient] = React.useState<random[]>([]);
     const [randomDrinksByIngredient, setRandomDrinksByIngredients] = React.useState<random[]>([]);
 
-    get(
-        "/cocktail_api/ingredient_options", {},
-        (res: any) => {
-            setIngredients(res.data.drinks);
+    useEffect(() => {
+        if (ingredients.length > 0) return;
+        get(
+            "/cocktail_api/ingredient_options", {},
+            (res: any) => {
+                setIngredients(res.data.drinks);
+    
+                // The only reason the code below in this useEffect worked is because the get request was being infinitely re-called triggering the below
 
-            ingredients.forEach((ingredient: any) => {
-                setDrinksByIngredient(
-                    (prev: random[]) => {
-                        let obj = [...prev];
-                        if (obj.length < ingredients.length) {
-                            obj.push({
-                                "ingredient": ingredient.strIngredient1,
-                                "randDrink": undefined,
-                                randDrinkSet: false
-                            })
-                        }
-                        return obj;
-                    }
-                );
-            });
-
-            if (drinksByIngredient.length > 0) {
-                setRandomDrinksByIngredients(
-                    (prev: random[]) => {
-                        let obj = [...prev];
-                        if (obj.length < 5) {
-                            let diff = 5 - obj.length;
-                            for (let i = 0; i < diff; i++) {
-                                let randInt = Math.floor(Math.random() * drinksByIngredient.length);
-                                if (obj.includes(drinksByIngredient[randInt])) {
-                                    i--;
-                                } else {
-                                    obj.push(drinksByIngredient[randInt]);
-                                }
+                res.data.drinks.forEach((ingredient: any) => {
+                    setDrinksByIngredient(
+                        (prev: random[]) => {
+                            let obj = [...prev];
+                            if (obj.length < res.data.drinks.length) {
+                                obj.push({
+                                    "ingredient": ingredient.strIngredient1,
+                                    "randDrink": undefined,
+                                    randDrinkSet: false
+                                })
                             }
+                            return obj;
                         }
-                        return obj;
-                    }
-                );
+                    );
+                });
+    
+                // No functionality changed after commenting the below out (this needs to be triggered somehow after drinksByIngredient is definitly set)
+
+                // if (drinksByIngredient.length > 0) {
+                //     setRandomDrinksByIngredients(
+                //         (prev: random[]) => {
+                //             let obj = [...prev];
+                //             if (obj.length < 5) {
+                //                 let diff = 5 - obj.length;
+                //                 for (let i = 0; i < diff; i++) {
+                //                     let randInt = Math.floor(Math.random() * drinksByIngredient.length);
+                //                     if (obj.includes(drinksByIngredient[randInt])) {
+                //                         i--;
+                //                     } else {
+                //                         obj.push(drinksByIngredient[randInt]);
+                //                     }
+                //                 }
+                //             }
+                //             return obj;
+                //         }
+                //     );
+                // }
             }
-        }
-    )
+        );
+    }, [ingredients]);
+    
 
     const getRandomDrink = () => {
         get('/cocktail_api/random_drink', {}, (response: AxiosResponse) => {

@@ -58,7 +58,7 @@ function MenuForm() {
     if (myCustomRecipes !== undefined) return;
     get("/cocktail_api/list_custom_recipes", {}, (response) => {
       setMyCustomRecipes(response.data);
-    });
+    }, undefined, true);
   }, [myCustomRecipes]);
 
   const [activeStep, setActiveStep] = React.useState(0);
@@ -87,8 +87,6 @@ function MenuForm() {
     }, {}, (response: AxiosResponse) => {
       handleReset();
       callback(response.data.menu_id);
-    }, () => {
-      // TODO: Announce that they need to be logged in to submit/save the menu
     });
   }
 

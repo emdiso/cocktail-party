@@ -24,7 +24,7 @@ const LSPopUp = (props: LSPopUpProps) => {
         <div>
             <Dialog open={props.open} onClose={props.handleClose}>
                 <DialogActions>
-                    <ButtonGroup variant="text" aria-label="text button group">
+                    <ButtonGroup variant="text" aria-label="text button group" color="secondary">
                         <Button onClick={()=>displayLogin(true)}> Log-In </Button>
                         <Button onClick={()=>displayLogin(false)}> Sign-Up </Button>
                     </ButtonGroup>
