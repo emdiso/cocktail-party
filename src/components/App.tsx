@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import './styling/App.css';
-import LSPopUp from './LSPopUp';
 import Navbar from './Navbar';
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Landing from './Landing';
 import Random from './Random';
 import Profile from './Profile';
@@ -10,14 +9,11 @@ import '../axios.service.ts';
 import { getAuthToken, get } from '../axios.service';
 import MenuForm from './forms/MenuForm';
 import RecipeForm from './forms/RecipeForm';
-import { Fab } from '@mui/material';
 import MenuFormatForm from './forms/MenuFormatForm';
 import MenuPage from './MenuPage';
+import { UserInfo } from '../models';
+import LSPopUp from './LSPopUp';
 
-export interface UserInfo {
-  username: string;
-  email: string;
-}
 
 function App() {
   let myAuthToken = getAuthToken();
@@ -34,27 +30,15 @@ function App() {
     setOpenLogin(false);
   }
 
+  const handleOpen = () => {
+    setOpenLogin(true);
+  }
+
   return (
     <div className="App">
       <Router>
         <header>
-          <Navbar />
-          {isLoggedIn ?
-            <div style={{position:"absolute", top:"1vw", right:"2vw"}}>
-              <Link to="/profile">
-                <Fab variant="extended" size="small">
-                  {userInfo.username}
-                </Fab>
-              </Link>
-            </div>
-            :
-            <div style={{position:"absolute", top:"1vw", right:"2vw"}}>
-              <Fab variant="extended" onClick={() => { setOpenLogin(true) }} size="small">
-                Log In
-              </Fab>
-              <LSPopUp open={openLogin} handleClose={handleClose} />
-            </div>
-          }
+          <Navbar isLoggedIn={isLoggedIn} handleOpen={handleOpen} userInfo={userInfo} />
         </header>
         <div className="App-body">
           <Routes>
@@ -67,6 +51,7 @@ function App() {
             {isLoggedIn &&<Route path='/menu' element={<MenuPage />}></Route>}
           </Routes>
         </div>
+        <LSPopUp open={openLogin} handleClose={handleClose} />
       </Router>
     </div>
   );
