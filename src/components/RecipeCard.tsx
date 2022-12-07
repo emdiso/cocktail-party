@@ -1,11 +1,11 @@
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, ImageListItem, ImageListItemBar, List, ListItem, ListItemAvatar, ListItemText, Menu, MenuItem, styled } from '@mui/material';
-import React, { ReactNode } from 'react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, ImageListItem, ImageListItemBar, List, ListItem, ListItemText, Menu, MenuItem } from '@mui/material';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { baseServerUrl } from '../axios.service';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { blue } from '@mui/material/colors';
+import { del } from '../axios.service';
 
 export interface InstructionObject {
     strIngredient: string,
@@ -132,6 +132,10 @@ function RecipeCard(data: any) {
         }
     }
 
+    const handleDelete = () => {
+        del(`/recipe/delete_custom_recipe?crId=${data.data.id}`, {}, () => window.location.reload());
+    };
+
     return (
         <div>
             <ImageListItem>
@@ -174,7 +178,7 @@ function RecipeCard(data: any) {
                             >
                                 <MenuItem onClick={handleModify}>Modify</MenuItem>
                                 <MenuItem onClick={handleClickOpen}>See Recipe</MenuItem>
-                                {data.data.id && <MenuItem>Delete</MenuItem>}
+                                {data.data.id && <MenuItem onClick={handleDelete}>Delete</MenuItem>}
                             </Menu>
                             <SimpleDialog
                                 open={openDialog}

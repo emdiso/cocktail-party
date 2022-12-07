@@ -245,11 +245,11 @@ const RecipeForm = () => {
                             {(imgUploaded || existingImg) && <img id='image' src={handleGetImgSrc()} />}
 
                             <div>
-                                <Button variant="outlined" component="label">
+                                <Button variant="outlined" color="secondary" component="label">
                                     {(imgUploaded === undefined || existingImg === undefined) ? "Upload Image" : "Change Image"}
                                     <input id='imgInput' hidden accept="image/*" type="file" onChange={handleImageUpload} />
                                 </Button>
-                                {(imgUploaded !== undefined || existingImg !== undefined) && <Button variant="outlined" component="label" onClick={removeImage}> Remove Image </Button>}
+                                {(imgUploaded !== undefined || existingImg !== undefined) && <Button variant="outlined" color="secondary" component="label" onClick={removeImage}> Remove Image </Button>}
                             </div>
                         </div>
 
@@ -268,8 +268,8 @@ const RecipeForm = () => {
                             onChange={handleChange('strAlcoholic')}
                             row={true}
                         >
-                            <FormControlLabel value='Alcoholic' control={<Radio />} label="Yes" />
-                            <FormControlLabel value='Non_Alcoholic' control={<Radio />} label="No" />
+                            <FormControlLabel value='Alcoholic' control={<Radio color="secondary" />} label="Yes" />
+                            <FormControlLabel value='Non_Alcoholic' control={<Radio color="secondary" />} label="No" />
                         </RadioGroup>
 
                         <InputLabel htmlFor='cocktail-instructions'> Instructions: </InputLabel>
@@ -305,19 +305,19 @@ const RecipeForm = () => {
                                         ></TextField>
                                     </div>
                                     {specifications.length >= 2 && <div id='delete'>
-                                        <IconButton aria-label="delete" color="primary" onClick={() => handleRemoveSpec(index)}>
+                                        <IconButton aria-label="delete" color="error" onClick={() => handleRemoveSpec(index)}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </div>}
                                 </div>
                             ))}
                             {specifications.length <= 15 && <div className='row2'>
-                                <Button onClick={handleNewSpec}> Add Ingredient </Button>
+                                <Button style={{marginTop: "0.5rem" }} variant="outlined" color="secondary" onClick={handleNewSpec}> Add Ingredient </Button>
                             </div>}
                         </div>
 
                         <div className='submit'>
-                            <Button variant='outlined' onClick={handleSubmit}>Save Recipe</Button>
+                            <Button variant="contained" color="secondary" onClick={handleSubmit}>Save Recipe</Button>
                         </div>
                     </Grid>
                 </div>
